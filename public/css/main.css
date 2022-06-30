@@ -1,0 +1,93 @@
+/* 메인 화면 */
+.menuarea {
+  width: 100%;
+  height: 100%;
+}
+
+.selectMenu {
+	position: absolute;
+	width:340px; /* wrap에 속한 div의 넓이+margin값을 더한 넓이와 높이값 */
+	height:340px;
+	top: 40%;
+	left: 50%;
+	transform: translate(-50%, -40%); /* 중앙정렬 */
+}
+.selectMenu > div {
+	width:150px;
+	height:150px;
+	border-radius: 10px;
+	float:left;
+	margin: 10px;
+	box-sizing:border-box; /* border 또한 위치값을 갖기에 div크기가 더 커짐을 방지하기 위한 */
+	transition: .3s;
+}
+.selectMenu > div:hover,
+.selectMenu > div > a:hover {
+	color: #F9FFFF;
+	transform: scale(1.2);
+}
+.selectMenu > div > a {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+	color: black;
+	transition: .3s;
+}
+.selectMenu > div:nth-child(3) {
+	clear: both;
+}
+
+.macstatus {
+	background-color: rgb(234, 237, 176);
+}
+.caution {
+	background-color: rgb(188, 206, 082);
+}
+.wait {
+	background-color: rgb(002, 170, 178);
+}
+.waitcheck {
+	background-color: rgb(180, 239, 236);
+}
+
+@media ( max-width: 300px ) {
+  .selectMenu {
+    position: fixed;
+    width: 108px; /* wrap에 속한 div의 넓이+margin값을 더한 넓이와 높이값 */
+    height: 108px;
+    top: 60%;
+    left: 50%;
+    transform: translate(-50%, -60%); /* 중앙정렬 */
+  }
+  .selectMenu > div {
+    width: 50px;
+    height: 50px;
+    border-radius: 10px;
+    float: left;
+    margin: 2px;
+    box-sizing: border-box; 
+    font-size: 2px;
+  }
+}
+
+@media ( min-width: 992px ) {
+  .selectMenu {
+    position: fixed;
+    width:680px; /* wrap에 속한 div의 넓이+margin값을 더한 넓이와 높이값 */
+    height:680px;
+    top: 60%;
+    left: 50%;
+    transform: translate(-50%, -60%); /* 중앙정렬 */
+  }
+  .selectMenu > div {
+    width:300px;
+    height:300px;
+    border-radius: 10px;
+    float: left;
+    margin: 20px;
+    box-sizing: border-box; 
+    font-size: 24px;
+  }
+}

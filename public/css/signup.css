@@ -1,0 +1,102 @@
+@import url('https://fonts.googleapis.com/css2?family=Nanum+Gothic:wght@400;700&display=swap');
+* {margin: 0; padding: 0; box-sizing: border-box;}
+body {
+  font-family: 'Nanum Gothic', sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+.signup-form {
+  position: relative;
+  width: 100%;
+  padding: 5% 20%;
+}
+.signup-form h2 {
+  font-size: 28px;
+  color: #111;
+  text-align: center;
+  margin-bottom: 30px;
+}
+.int-area {
+  position: relative;
+  width: 100%;
+  margin-top: 25px;
+}
+.int-area:first-child {
+  margin-top: 0;
+}
+.int-area input {
+  width: 100%;
+  padding: 20px 10px 10px;
+  border: none;
+  border-bottom: 1px solid #111;
+  font-size: 16px;
+  color: #111;
+  outline: none;
+}
+.int-area label {
+  position: absolute;
+  top: 15px;
+  left: 18px;
+  font-size: 16px;
+  color: #111;
+  transition: .5s ease;
+}
+.int-area label.warning {
+  color: red !important;
+  animation: warning .3s ease;
+  animation-iteration-count: 3;
+}
+@keyframes warning {
+  0% {transform: translateX(-8px);}
+  25% {transform: translateX(8px);}
+  50% {transform: translateX(-8px);}
+  75% {transform: translateX(8px);}
+}
+.int-area input:focus + label,
+.int-area input:valid + label {
+  top: -2px;
+  font-size: 13px;
+  color: #166cea;
+}
+
+.btn-area {
+  margin-top: 40px;
+}
+.btn-area button {
+  width: 100%;
+  height: 30px;
+  background-color: #166cea;
+  color: #fff;
+  font-size: 18px;
+  border: none;
+  border-radius: 25px;
+}
+.btn-area button:hover {
+  cursor: pointer;
+}
+.btn-area button:active {
+  background-color: #162fea;
+}
+span.pwspan {
+  display: block;
+  font-size: 12px;
+  height: 12px;
+  padding: 5px 0 0 0;
+  color: green;
+}
+span.pwspan.plscheck,
+span.pwspan.cannotid {
+  color: red;
+}
+span.pwcheckspan {
+  display: block;
+  font-size: 12px;
+  height: 12px;
+  padding: 5px 0 0 0;
+  color: green;
+}
+span.pwcheckspan.different {
+  color: red;
+}

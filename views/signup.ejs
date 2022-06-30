@@ -1,0 +1,244 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reset-css@5.0.1/reset.min.css" />
+
+    <link rel="stylesheet" href="../public/css/nav.css">
+    <link rel="stylesheet" href="../public/css/signup.css">
+
+    <link rel="icon" href="/public/favicon.ico" />
+    <title>회원가입</title>
+  </head>
+  <body style="overflow-x: hidden;">
+
+    <section class="signup-form">
+      <h2>회원가입</h2>
+      <form action="/signup" method="post" onsubmit="return formCheck()">
+        <div class="int-area">
+          <input type="text" name="name" id="name" autocomplete="off" required />
+          <label for="name">이름</label>
+        </div>
+        <div class="int-area">
+          <input type="text" name="id" id="id" autocomplete="off" required />
+          <label for="id">아이디</label>
+        </div>
+        <div class="int-area">
+          <input type="password" name="pw" id="pw" autocomplete="off" onkeyup="pwValCheck()" required />
+          <label for="pw">비밀번호</label>
+          <span class="pwspan"></span>
+        </div>
+        <div class="int-area">
+          <input type="password" name="pwcheck" id="pwcheck" autocomplete="off" onkeyup="pwSameCheck()" required />
+          <label for="pwcheck">비밀번호 확인</label>
+          <span class="pwcheckspan"></span>
+        </div>
+        <div class="int-area">
+          <input type="text" name="phone" id="phone" autocomplete="off" maxlength="11" required />
+          <label for="phone">전화번호</label>
+        </div>
+        <div class="btn-area">
+          <button type="submit" onclick="register()">회원가입</button>
+        </div>
+      </form>
+    </section>
+
+    <script>
+      const nameEl = document.querySelector('#name')
+      const idEl = document.querySelector('#id')
+      const pwEl = document.querySelector('#pw')
+      const pwCheckEl = document.querySelector('#pwcheck')
+      const phoneEl = document.querySelector('#phone')
+      const btnEl = document.querySelector('button')
+      const pwSpanEl = document.querySelector('span.pwspan')
+      const pwCheckSpanEl = document.querySelector('span.pwcheckspan')
+      const form = document.querySelector('form')
+
+      function pwValCheck() {
+        let pw_passed = true
+
+        let pattern1 = /[0-9]/;
+        let pattern2 = /[a-zA-Z]/;
+        let pattern3 = /[~!@\#$%<>^&*]/;     // 원하는 특수문자 추가 제거
+        let pw_msg = "";
+
+        if (pwEl.value == "") {
+          pwCheckEl.value = ''
+          pwSpanEl.textContent = ''
+          pwCheckSpanEl.textContent = ''
+          return false
+        }
+        else if (pwEl.value.indexOf(idEl.value) > -1) {
+          pwSpanEl.classList.add('cannotid')
+          pwSpanEl.textContent = '비밀번호는 ID를 포함할 수 없습니다.'
+          return false
+        }
+        else if(!pattern1.test(pwEl.value) || !pattern2.test(pwEl.value) || !pattern3.test(pwEl.value) || pwEl.value.length < 8 || pwEl.value.length > 50) {
+          pwSpanEl.classList.add('plscheck')
+          pwSpanEl.textContent = '영문+숫자+특수기호 8자리 이상으로!'
+          return false
+        }
+        else if (pattern1.test(pwEl.value) && pattern2.test(pwEl.value) && pattern3.test(pwEl.value) && pwEl.value.length >= 8 && pwEl.value.length <= 50) {
+          pwSpanEl.classList.remove('plscheck')
+          pwSpanEl.classList.remove('cannotid')
+          pwSpanEl.textContent = '훌륭한 비밀번호네요!'
+          return true
+        }
+      }
+
+      function pwSameCheck() {
+        if (pwEl.value == "" || pwCheckEl.value == "") {
+          pwCheckSpanEl.textContent = ''
+          return false
+        }
+        else if (pwEl.value != "" && pwCheckEl.value != "") {
+          if (pwEl.value != pwCheckEl.value) {
+            pwCheckSpanEl.classList.add('different')
+            pwCheckSpanEl.textContent = '비밀번호가 일치하지 않습니다.'
+            return false
+          }
+          else if (pwEl.value == pwCheckEl.value) {
+            pwCheckSpanEl.classList.remove('different')
+            pwCheckSpanEl.textContent = '비밀번호가 일치합니다.'
+            return true
+          }
+        }
+        
+      }
+
+      // 한글 입력 방지 -> 한글은 삭제
+      idEl.onkeyup = function() {
+        var v = this.value;
+        this.value = v.replace(/[^a-z0-9]/gi, '');
+      }
+
+      // 숫자만 입력
+      phoneEl.onkeyup = function() {
+        var regexp = /[^0-9]/gi;
+        this.onkeyup = function(e){
+          var v = this.value;
+          this.value = v.replace(regexp,'');
+        }
+      }
+
+      // submit(회원가입 버튼) 시 유효성 체크
+      // 추가적으로 비밀번호의 길이나 특수문자 포함 여부 등의 기능 넣을지 의논
+      function register() {
+        if (nameEl.value == "") {
+          nameEl.nextElementSibling.classList.add('warning')
+          setTimeout(function() {
+            nameEl.nextElementSibling.classList.remove('warning')
+          }, 1500)
+        }
+        else if (idEl.value == "") {
+          idEl.nextElementSibling.classList.add('warning')
+          setTimeout(function() {
+            idEl.nextElementSibling.classList.remove('warning')
+          }, 1500)
+        }
+        else if (pwEl.value == "") {
+          pwEl.nextElementSibling.classList.add('warning')
+          setTimeout(function() {
+            pwEl.nextElementSibling.classList.remove('warning')
+          }, 1500)
+        }
+        else if (pwCheckEl.value == "") {
+          pwCheckEl.nextElementSibling.classList.add('warning')
+          setTimeout(function() {
+            pwCheckEl.nextElementSibling.classList.remove('warning')
+          }, 1500)
+        }
+        else if (phoneEl.value == "") {
+          phoneEl.nextElementSibling.classList.add('warning')
+          setTimeout(function() {
+            phoneEl.nextElementSibling.classList.remove('warning')
+          }, 1500)
+        }
+      }
+      function formCheck() {
+        if (pwValCheck() && pwSameCheck()){
+          form.submit()
+          return true
+        }
+        else {
+          alert('다시 한번 확인해주세요~')
+          return false
+        }
+      }
+      /*
+      // 상황별 입력 제한
+      window.onload = function(){
+        engAndNumberFunc(document.getElementById("id"));
+        onlyNumberFunc(document.getElementById("phone1"));
+        onlyNumberFunc(document.getElementById("phone2"));
+        onlyNumberFunc(document.getElementById("phone3"));
+        onlyKorFunc(document.getElementById("name"));
+        onlyEngFunc(document.getElementById("location"));
+      }
+
+      //영문, 숫자만 입력가능한 keyup 이벤트 함수
+      function engAndNumberFunc(t){
+        var regexp = /[^a-z0-9]/gi;
+        t.onkeyup = function(e){
+          var v = this.value;
+          this.value = v.replace(regexp,'');
+        }
+      }
+
+      //숫자만 입력가능한 keyup 이벤트 함수
+      function onlyNumberFunc(t){
+        var regexp = /[^0-9]/gi;
+        t.onkeyup = function(e){
+          var v = this.value;
+          this.value = v.replace(regexp,'');
+        }
+      }
+
+      //영문만 입력가능한 keyup 이벤트 함수
+      function onlyEngFunc(t){
+        var regexp = /[^a-z]/gi;
+        t.onkeyup = function(e){
+          var v = this.value;
+          this.value = v.replace(regexp,'');
+        }
+      }
+
+      //한글만 입력가능한 keyup 이벤트 함수
+      function onlyKorFunc(t){
+        var regexp = /[a-z0-9]|[ \[\]{}()<>?|`~!@#$%^&*-_+=,.;:\"'\\]/g;
+        t.onkeyup = function(e){
+          var v = this.value;
+          this.value = v.replace(regexp,'');
+        }
+      }
+
+      //한글, 숫자만 입력가능한 keyup 이벤트 함수
+      function korAndNumberFunc(t){
+        var regexp = /[^ㄱ-ㅎ가-힣0-9]/gi;
+        t.onkeyup = function(e){
+          var v = this.value;
+          this.value = v.replace(regexp,'');
+        }
+      }
+      */
+    </script>
+
+    <!-- Optional JavaScript; choose one of the two! -->
+
+    <!-- Option 1: Bootstrap Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+
+    <!-- Option 2: Separate Popper and Bootstrap JS -->
+    <!--
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js" integrity="sha384-7+zCNj/IqJ95wo16oMtfsKbZ9ccEh31eOz1HGyDuCQ6wgnyJNSYdrPa03rtR1zdB" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js" integrity="sha384-QJHtvGhmr9XOIpI6YVutG+2QOK9T+ZnN4kzFN1RtK3zEFEIsxhlmWl5/YESvpZ13" crossorigin="anonymous"></script>
+    -->
+  </body>
+</html>
