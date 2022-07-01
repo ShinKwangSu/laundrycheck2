@@ -138,10 +138,20 @@ function isLogin(req, res, next) {
 
 // 메인페이지 이동
 app.get('/', function(req, res) {
-    if (!req.session.nickname) {
-      res.render('index.ejs', {session: "true"});
-    }
-    else {
-      res.render('index.ejs', {session: "false"});
-    }
-  })
+  if (!req.session.nickname) {
+    res.render('index.ejs', {session: "true"});
+  }
+  else {
+    res.render('index.ejs', {session: "false"});
+  }
+})
+
+// 기기 현황 페이지 이동
+app.get('/macStatus', function(req, res) {
+  if (!req.session.nickname) {
+    res.render('macstatus.ejs', {session: "true"});
+  }
+  else {
+    res.render('macstatus.ejs', {session: "false"});
+  }
+})
