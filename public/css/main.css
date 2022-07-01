@@ -72,6 +72,26 @@
   }
 }
 
+@media ( min-width: 700px ) {
+  .selectMenu {
+    position: fixed;
+    width:560px; /* wrap에 속한 div의 넓이+margin값을 더한 넓이와 높이값 */
+    height:560px;
+    top: 60%;
+    left: 50%;
+    transform: translate(-50%, -60%); /* 중앙정렬 */
+  }
+  .selectMenu > div {
+    width:250px;
+    height:250px;
+    border-radius: 10px;
+    float: left;
+    margin: 15px;
+    box-sizing: border-box; 
+    font-size: 24px;
+  }
+}
+
 @media ( min-width: 992px ) {
   .selectMenu {
     position: fixed;

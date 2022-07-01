@@ -124,3 +124,21 @@ h1.req {
   50% {transform: translateX(-8px);}
   75% {transform: translateX(8px);}
 }
+
+@media ( min-width: 900px ) {
+  .login-form {
+    padding: 0 35%;
+  }
+  .login-form h2 {
+    margin-bottom: 100px;
+  }
+  .int-area {
+    margin-top: 60px;
+  }
+  .btn-area {
+    margin-top: 90px;
+  }
+  .btn-area button {
+    height: 40px;
+  }
+}
