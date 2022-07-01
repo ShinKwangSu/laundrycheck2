@@ -155,3 +155,13 @@ app.get('/macStatus', function(req, res) {
     res.render('macstatus.ejs', {session: "false"});
   }
 })
+
+// 유의사항 페이지 이동
+app.get('/caution', function(req, res) {
+  if (!req.session.nickname) {
+    res.render('caution.ejs', {session: "true"});
+  }
+  else {
+    res.render('caution.ejs', {session: "false"});
+  }
+})
