@@ -459,5 +459,16 @@ app.post('/mypage', isLogin, function(req, res) {
 
 // 지도 (카카오맵)
 app.get('/map', function(req, res) {
-  res.render('map.ejs')
+  db.collection('branch').find().toArray(function(에러, 결과) {
+    if (에러) return console.log(에러)
+
+    for (let i = 0; i < 결과.length; i++) {
+
+      var lat = 결과[i].lat
+      var lng = 결과[i].lon
+
+      console.log(lat, lng)
+    }
+    res.render('map.ejs', {lat, lng})
+  })
 })

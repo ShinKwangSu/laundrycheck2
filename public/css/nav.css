@@ -36,7 +36,7 @@ div > ul > li > a.nav-link:active {
 }
 .navbar-collapse {
   position: absolute;
-  top: 50px;
+  top: 42px;
   left: 0;
   width: 100%;
   background-color: #fff;
