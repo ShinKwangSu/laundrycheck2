@@ -127,7 +127,7 @@ app.get('/signup', function(req, res) {
 })
 
 app.post('/signup', function(req, res) {
-  db.collection('member').insertOne( { name: req.body.name, id: req.body.id, pw: req.body.pw, phone: req.body.phone }, function(error, result) {
+  db.collection('member').insertOne( { name: req.body.name, id: req.body.id, pw: req.body.pw, phone: req.body.phone, account: 0 }, function(error, result) {
     res.redirect('/login')
   })
 })
@@ -380,7 +380,15 @@ app.get('/awaituse', isLogin, function(req, res) {
 // 마이페이지
 app.get('/mypage', isLogin, function(req, res) {
   console.log(req.user)
-  res.render('mypage.ejs', {사용자 : req.user})
+
+  if (!req.session.nickname) {
+    res.render('mypage.ejs', {session: "true"});
+  }
+  else {
+    res.render('mypage.ejs', {session: "false", 사용자 : req.user});
+  }
+
+ // res.render('mypage.ejs', {사용자 : req.user})
 })
 
 app.post('/mypage', isLogin, function(req, res) {
@@ -457,18 +465,28 @@ app.post('/mypage', isLogin, function(req, res) {
   })
 })
 
+app.get('/charge', function(req, res) {
+  res.render('charge.ejs')
+})
+
 // 지도 (카카오맵)
 app.get('/map', function(req, res) {
   db.collection('branch').find().toArray(function(에러, 결과) {
     if (에러) return console.log(에러)
 
+    var store = new Array()
+    let name, lat, lng
+
     for (let i = 0; i < 결과.length; i++) {
 
-      var lat = 결과[i].lat
-      var lng = 결과[i].lon
+      name = 결과[i].name
+      lat = 결과[i].lat
+      lng = 결과[i].lng
 
-      console.log(lat, lng)
+      store[i] = {name, lat, lng}
+      
     }
-    res.render('map.ejs', {lat, lng})
+    console.log(store[0].name)
+    res.render('map.ejs', {store})
   })
 })

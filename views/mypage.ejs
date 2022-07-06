@@ -22,9 +22,15 @@
 
     <h4 class="ml-2 my-3 text-center"><%= 사용자.id %> 님의 마이페이지</h4>
 
+    <div class="text-center">
+      <h4 style="margin-bottom: 10px"><%= 사용자.id %> 님의 잔액은 <%= 사용자.account %>원 입니다.</h4>
+      <button class="btn btn-primary"><a style="text-decoration: none; color: #fff;" href="/charge">충전하기</a></button>
+    </div>
+    
+
     <form action="/mypage" method="POST">
       <div style="background-color:lightblue; padding:30px;">
-        <div class="col text-center">
+        <div class="text-center">
           <h4 style="margin-bottom: 10px;"> 안녕하세요 "<%= 사용자.id %>" 님!</h4>
           <p style="color:red; margin-bottom: 10px;"> 웨이팅 사용 시 아래 버튼을 눌러주세요. </p>
           <button class="btn btn-primary" type="submit">웨이팅사용</button>
@@ -32,6 +38,24 @@
         </div>
       </div>
     </form>
+
+    <script>
+      let loginBtnEl = document.querySelector('.login-btn')
+      let signupBtnEl = document.querySelector('.signup-btn')
+      const session = "<%= session %>";
+      if (session === "false") {
+        loginBtnEl.textContent = "로그아웃";
+        loginBtnEl.href = "/logout";
+        signupBtnEl.textContent = "마이페이지";
+        signupBtnEl.href = "/mypage";
+      }
+      else {
+        loginBtnEl.textContent = "로그인";
+        loginBtnEl.href = "/login";
+        signupBtnEl.textContent = "회원가입";
+        signupBtnEl.href = "/signup";
+      }
+    </script>
     
     <!-- Optional JavaScript; choose one of the two! -->
 
