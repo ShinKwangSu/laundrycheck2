@@ -20,6 +20,19 @@
 
     <%- include('nav.html') %>
 
+    <div class="int-area">
+      <label for="balance">현재 잔액</label>
+      <input type="text" name="balance" id="balance" autocomplete="off" required />
+    </div>
+    <div class="int-area">
+      <label for="charge">충전할 금액</label>
+      <input type="number" inputmode="numeric" pattern="[0-9]*" name="charge" id="charge" autocomplete="off" required />
+    </div>
+    <div class="int-area">
+      <label for="result">충전후 금액</label>
+      <input type="number" inputmode="numeric" pattern="[0-9]*" name="result" id="result" autocomplete="off" required />
+    </div>
+
     
     
     <!-- Optional JavaScript; choose one of the two! -->

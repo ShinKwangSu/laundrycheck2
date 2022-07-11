@@ -11,7 +11,6 @@
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reset-css@5.0.1/reset.min.css" />
 
-    <link rel="stylesheet" href="../public/css/nav.css">
     <link rel="stylesheet" href="../public/css/signup.css">
 
     <link rel="icon" href="/public/favicon.ico" />
@@ -26,10 +25,12 @@
           <input type="text" name="name" id="name" autocomplete="off" required />
           <label for="name">이름</label>
         </div>
-        <div class="int-area">
+        <div class="int-area input-id">
           <input type="text" name="id" id="id" autocomplete="off" required />
           <label for="id">아이디</label>
+          <div class="sameck" onclick="idCheck()">중복확인</div>
         </div>
+        <span class="id-check"></span>
         <div class="int-area">
           <input type="password" name="pw" id="pw" autocomplete="off" onkeyup="pwValCheck()" required />
           <label for="pw">비밀번호</label>
@@ -49,6 +50,7 @@
         </div>
       </form>
     </section>
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
 
     <script>
       const nameEl = document.querySelector('#name')
@@ -60,6 +62,7 @@
       const pwSpanEl = document.querySelector('span.pwspan')
       const pwCheckSpanEl = document.querySelector('span.pwcheckspan')
       const form = document.querySelector('form')
+      const idCheckEl = document.querySelector('.id-check')
 
       function pwValCheck() {
         let pw_passed = true
@@ -110,7 +113,22 @@
             return true
           }
         }
-        
+      }
+
+      function idCheck() {
+        if (idEl.value == "") {
+          idEl.nextElementSibling.classList.add('warning')
+          setTimeout(function() {
+            idEl.nextElementSibling.classList.remove('warning')
+          }, 1500)
+        }
+        if (idCheckEl.value == "" || idCheckEl.value == '중복된 아이디 입니다.') {
+          alert('중복확인 필수!')
+          return false
+        }
+        else {
+          return true
+        }
       }
 
       // 한글 입력 방지 -> 한글은 삭제
@@ -162,8 +180,9 @@
           }, 1500)
         }
       }
+
       function formCheck() {
-        if (pwValCheck() && pwSameCheck()){
+        if (pwValCheck() && pwSameCheck() && idCheck()){
           alert('회원가입 성공~!~!')
           return true
         }
@@ -229,6 +248,34 @@
       }
       */
     </script>
+    
+    <script>
+      $('.sameck').click(function() {
+        $.ajax({
+        method : 'post',
+        url : '/idcheck',
+        data : {id : id.value}
+        }).done(function(결과){
+          if (결과.checkRes == 1) {
+            if ($('#id').val() == '') {
+              $('.id-check').text('')
+            }
+            else {
+              $('.id-check').text('사용 가능한 아이디 입니다.')
+              $('.id-check').css('color', 'green')
+            }
+          }
+          else {
+            $('.id-check').text('중복된 아이디 입니다.')
+            $('.id-check').css('color', 'red')
+          }
+        }).fail(function() {
+
+        })
+      })
+    </script>
+
+    
 
     <!-- Optional JavaScript; choose one of the two! -->
 

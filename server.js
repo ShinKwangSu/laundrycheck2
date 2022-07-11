@@ -132,6 +132,33 @@ app.post('/signup', function(req, res) {
   })
 })
 
+// 아이디 중복 확인
+app.get('/idcheck', function(req, res) {
+  res.render('idcheck.ejs')
+})
+
+app.post('/idcheck', function(req, res) {
+  console.log(req.body)
+
+  let findRes = 1
+  db.collection('member').findOne( {id: req.body.id}, function(error, result) {
+    console.log('검색 완료')
+    if (result != undefined) {
+      findRes = 0
+    } else {
+      findRes = 1
+    }
+
+    const response = {
+      findRes
+    }
+    console.log(response)
+
+    res.send({checkRes : findRes})
+    //res.send(JSON.stringify(response))
+  })
+})
+
 // 로그인 후 세션이 있으면 req.user가 항상 있음
 function isLogin(req, res, next) {
   if (req.user) {
