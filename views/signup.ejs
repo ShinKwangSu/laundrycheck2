@@ -28,9 +28,10 @@
         <div class="int-area input-id">
           <input type="text" name="id" id="id" autocomplete="off" required />
           <label for="id">아이디</label>
-          <div class="sameck" onclick="idCheck()">중복확인</div>
+          <div class="sameck">중복확인</div>
+          <span class="id-check"></span>
         </div>
-        <span class="id-check"></span>
+        
         <div class="int-area">
           <input type="password" name="pw" id="pw" autocomplete="off" onkeyup="pwValCheck()" required />
           <label for="pw">비밀번호</label>
@@ -62,7 +63,7 @@
       const pwSpanEl = document.querySelector('span.pwspan')
       const pwCheckSpanEl = document.querySelector('span.pwcheckspan')
       const form = document.querySelector('form')
-      const idCheckEl = document.querySelector('.id-check')
+      const idCheckEl = document.querySelector('span.id-check')
 
       function pwValCheck() {
         let pw_passed = true
@@ -115,22 +116,6 @@
         }
       }
 
-      function idCheck() {
-        if (idEl.value == "") {
-          idEl.nextElementSibling.classList.add('warning')
-          setTimeout(function() {
-            idEl.nextElementSibling.classList.remove('warning')
-          }, 1500)
-        }
-        if (idCheckEl.value == "" || idCheckEl.value == '중복된 아이디 입니다.') {
-          alert('중복확인 필수!')
-          return false
-        }
-        else {
-          return true
-        }
-      }
-
       // 한글 입력 방지 -> 한글은 삭제
       idEl.onkeyup = function() {
         var v = this.value;
@@ -179,18 +164,57 @@
             phoneEl.nextElementSibling.classList.remove('warning')
           }, 1500)
         }
+        else if (idCheckEl.textContent == "" || idCheckEl.textContent == "중복된 아이디 입니다.") {
+          return false
+        }
+        else {return true}
       }
 
       function formCheck() {
-        if (pwValCheck() && pwSameCheck() && idCheck()){
+        if (pwValCheck() && pwSameCheck() && register()){
           alert('회원가입 성공~!~!')
+          console.log(idCheckEl.value)
           return true
+        }
+        else if (!register()) {
+          alert('중복중복')
+          return false
         }
         else {
           alert('다시 한번 확인해주세요~')
           return false
         }
       }
+
+      $('.sameck').click(function() {
+        $.ajax({
+        method : 'post',
+        url : '/idcheck',
+        data : {id : id.value}
+        }).done(function(결과){
+          console.log($('#id').val())
+          if ($('#id').val() == '') {
+            $('#id').next().addClass('warning')
+            setTimeout(() => {
+              $('#id').next().removeClass('warning')
+            }, 1500);
+            $('.id-check').text('')
+          }
+          else {
+            if (결과.checkRes == 1) {
+            $('.id-check').text('사용 가능한 아이디 입니다.')
+            $('.id-check').css('color', 'green')
+          }
+          else {
+            $('.id-check').text('중복된 아이디 입니다.')
+            $('.id-check').css('color', 'red')
+          }
+          }
+        }).fail(function() {
+
+        })
+      })
+
       /*
       // 상황별 입력 제한
       window.onload = function(){
@@ -250,29 +274,7 @@
     </script>
     
     <script>
-      $('.sameck').click(function() {
-        $.ajax({
-        method : 'post',
-        url : '/idcheck',
-        data : {id : id.value}
-        }).done(function(결과){
-          if (결과.checkRes == 1) {
-            if ($('#id').val() == '') {
-              $('.id-check').text('')
-            }
-            else {
-              $('.id-check').text('사용 가능한 아이디 입니다.')
-              $('.id-check').css('color', 'green')
-            }
-          }
-          else {
-            $('.id-check').text('중복된 아이디 입니다.')
-            $('.id-check').css('color', 'red')
-          }
-        }).fail(function() {
-
-        })
-      })
+      
     </script>
 
     

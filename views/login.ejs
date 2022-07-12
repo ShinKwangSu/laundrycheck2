@@ -60,15 +60,28 @@
             pwEl.nextElementSibling.classList.remove('warning')
           }, 1500)
         }
+        else if ('<%=returnRes%>' == 'ID') {
+          alert('존재하지 않는 아이디 입니다.')
+          return false
+        }
+        else if ('<%=returnRes%>' == 'PW') {
+          alert('비밀번호가 틀렸습니다.')
+          return false
+        }
       }
 
-      function loginSuccess() {
-        if (1) {
-          
+      function formCheck() {
+        alert('<%=returnRes%>')
+        if (login()){
+          alert('환영합니다~!')
           return true
         }
-        else {
-          alert('아이디 또는 비밀번호를 확인해주세요ㅠㅠ')
+        else if ('<%=returnRes%>' == 'ID') {
+          alert('존재하지 않는 아이디 입니다.')
+          return false
+        }
+        else if ('<%=returnRes%>' == 'PW') {
+          alert('비밀번호가 틀렸습니다.')
           return false
         }
       }

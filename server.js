@@ -28,6 +28,7 @@ MongoClient.connect(process.env.DB_URL, { useUnifiedTopology: true }, function(e
 // 로그인
 const passport = require('passport')
 const LocalStrategy = require('passport-local').Strategy
+const flash = require('connect-flash')
 const session = require('express-session')
 const { render } = require('express/lib/response')
 const connect = require('passport/lib/framework/connect')
@@ -41,15 +42,29 @@ app.use(session({
   resave : true, 
   saveUninitialized: false
 }));
+app.use(flash());
 app.use(passport.initialize());
 app.use(passport.session()); 
 
 app.get('/login', function(req, res) {
-  res.render('login.ejs')
+
+  let flashmsg = req.flash()
+
+  if (flashmsg.length != 0) {
+    let feedback = flashmsg.error
+
+    res.render('login.ejs', {returnRes : feedback})
+  }
+  else {
+    res.render('login.ejs')
+  }
 })
 
 app.post('/login', passport.authenticate('local', {
-  failureRedirect : '/login'
+  successRedirect : '/',
+  failureRedirect : '/login',
+  failureFlash : true,
+  successFlash : true
 }), function(req, res) {
   console.log('로그인 성공')
   req.session.nickname = req.body.id
@@ -83,15 +98,15 @@ passport.use(new LocalStrategy({
 
     if (!결과) {
       console.log('존재하지 않는 아이디 입니다.')
-      return done(null, false, { message: '존재하지않는 아이디요' })
+      return done(null, false, { message: 'ID' })
     }
 
     if (입력한비번 == 결과.pw) {
-      return done(null, 결과)
+      return done(null, 결과, { message: 'WELCOME' })
     }
     else {
       console.log('비밀번호가 틀렸습니다.')
-      return done(null, false, { message: '비번틀렸어요' })
+      return done(null, false, { message: 'PW' })
     }
   })
 }))
@@ -171,8 +186,13 @@ function isLogin(req, res, next) {
 
 // 메인페이지 이동
 app.get('/', function(req, res) {
+  let flashmsg = req.flash()
+
   if (!req.session.nickname) {
-    res.render('index.ejs', {session: "true"});
+    if (flashmsg.length != 0) {
+      let feedback = flashmsg.success
+      res.render('index.ejs', {session: "true", returnRes: feedback});
+    }
   }
   else {
     res.render('index.ejs', {session: "false"});
