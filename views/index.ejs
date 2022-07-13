@@ -53,6 +53,8 @@
       let loginBtnEl = document.querySelector('.login-btn')
       let signupBtnEl = document.querySelector('.signup-btn')
       const session = "<%= session %>";
+      const welcome = "<%=successRes%>"
+
       if (session === "false") {
         loginBtnEl.textContent = "로그아웃";
         loginBtnEl.href = "/logout";
@@ -66,7 +68,7 @@
         signupBtnEl.href = "/signup";
       }
 
-      if ('<%=returnRes%>' == 'WELCOME') {
+      if (welcome == 'WELCOME') {
         alert('환영합니다~!')
       }
     </script>

@@ -49,19 +49,20 @@ app.use(passport.session());
 app.get('/login', function(req, res) {
 
   let flashmsg = req.flash()
+  let feedback = flashmsg.error
 
-  if (flashmsg.length != 0) {
-    let feedback = flashmsg.error
+  console.log(flashmsg.error)
 
-    res.render('login.ejs', {returnRes : feedback})
+  if (feedback === undefined) {
+    feedback = 0
+    res.render('login.ejs', {returnRes : 'HI'})
   }
-  else {
-    res.render('login.ejs')
+  else if (feedback !== undefined) {
+    res.render('login.ejs', {returnRes : feedback})
   }
 })
 
 app.post('/login', passport.authenticate('local', {
-  successRedirect : '/',
   failureRedirect : '/login',
   failureFlash : true,
   successFlash : true
@@ -170,7 +171,6 @@ app.post('/idcheck', function(req, res) {
     console.log(response)
 
     res.send({checkRes : findRes})
-    //res.send(JSON.stringify(response))
   })
 })
 
@@ -187,15 +187,15 @@ function isLogin(req, res, next) {
 // 메인페이지 이동
 app.get('/', function(req, res) {
   let flashmsg = req.flash()
+  let feedback = flashmsg.success
 
-  if (!req.session.nickname) {
-    if (flashmsg.length != 0) {
-      let feedback = flashmsg.success
-      res.render('index.ejs', {session: "true", returnRes: feedback});
+  if (feedback != 0) {
+    if (!req.session.nickname) {
+      res.render('index.ejs', {session: "true", successRes: 'NOWELCOME'});
     }
-  }
-  else {
-    res.render('index.ejs', {session: "false"});
+    else {
+      res.render('index.ejs', {session: "false", successRes: feedback})
+    }
   }
 })
 

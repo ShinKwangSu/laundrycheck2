@@ -62,27 +62,12 @@
         }
         else if ('<%=returnRes%>' == 'ID') {
           alert('존재하지 않는 아이디 입니다.')
-          return false
         }
         else if ('<%=returnRes%>' == 'PW') {
-          alert('비밀번호가 틀렸습니다.')
-          return false
+          alert('비밀번호가 일치하지 않습니다.')
         }
-      }
-
-      function formCheck() {
-        alert('<%=returnRes%>')
-        if (login()){
-          alert('환영합니다~!')
-          return true
-        }
-        else if ('<%=returnRes%>' == 'ID') {
-          alert('존재하지 않는 아이디 입니다.')
-          return false
-        }
-        else if ('<%=returnRes%>' == 'PW') {
-          alert('비밀번호가 틀렸습니다.')
-          return false
+        else if ('<%=returnRes%>' == 'HI') {
+          alert('어서오세용')
         }
       }
 
