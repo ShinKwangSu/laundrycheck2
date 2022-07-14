@@ -37,50 +37,6 @@
       // 지도를 생성한다
       var map = new kakao.maps.Map(mapContainer, mapOption);
 
-      var lat;
-      var lng;
-      var options = {
-        enableHighAccuracy: true,
-        timeout: 5000,
-        maximumAge: 0
-      }
-      function success(position) {
-        console.log(position)
-
-        lat = position.coords.latitude,
-        lng = position.coords.longitude
-
-        var locPosition = new kakao.maps.LatLng(lat, lng),
-        message = '<div style="padding:5px;">여기에!?</div>'
-
-        displayMarker(locPosition, message)
-      }
-
-      function error(err) {
-        console.log(err)
-      }
-
-      if (navigator.geolocation) {
-        alert('내 위치')
-        var na = navigator.geolocation.watchPosition(success, error, options)
-        console.log(na)
-      }
-
-      var mark
-      var flag = false
-      function displayMarker(locPosition, message) {
-        if (flag) {
-          mark.setMap(null)
-        }
-        mark = new kakao.maps.Marker({
-          position: locPosition
-        })
-        mark.setMap(map)
-        flag = true
-        
-        map.setCenter(locPosition)
-      }
-
       var positions = [
         {
           title: '<%=store[0].name%>', 
