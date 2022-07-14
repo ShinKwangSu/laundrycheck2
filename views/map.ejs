@@ -154,6 +154,11 @@
         // 지도 이동(기존 위치와 가깝다면 부드럽게 이동)
         map.panTo(currentPos);
 
+        var flag = false
+        if (flag) {
+          marker.setMap(null);
+        }
+
         // 마커 생성
         var marker = new kakao.maps.Marker({
           map: map,
@@ -161,8 +166,8 @@
         });
 
         // 기존에 마커가 있다면 제거
-        marker.setMap(null);
         marker.setMap(map);
+        flag = true
       };
 
       function locationLoadError(pos){
@@ -171,8 +176,7 @@
 
       // 위치 가져오기 버튼 클릭시
       function getCurrentPosBtn(){
-        displayMarker(locPosition, message)
-        //navigator.geolocation.getCurrentPosition(locationLoadSuccess,locationLoadError);
+        navigator.geolocation.getCurrentPosition(locationLoadSuccess,locationLoadError);
       }; 
     </script>
 
