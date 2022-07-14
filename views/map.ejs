@@ -146,7 +146,11 @@
         marker.setMap(map);
         flag = true
 
-        navigator.geolocation.watchPosition(locationLoadSuccess,locationLoadError)
+        //-----------------
+        if (navigator.geolocation) {
+          navigator.geolocation.watchPosition(locationLoadSuccess,locationLoadError)
+        }
+        //-----------------
       };
 
       function locationLoadError(pos){
