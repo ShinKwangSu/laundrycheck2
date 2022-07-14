@@ -40,7 +40,6 @@
       var positions = [
         {
           title: '<%=store[0].name%>', 
-          //latlng: new kakao.maps.LatLng(37.494655, 127.027749) 
           latlng: new kakao.maps.LatLng('<%=store[0].lat%>', '<%=store[0].lng%>')
         },
         {
@@ -49,7 +48,6 @@
         },
         {
           title: '<%=store[2].name%>', 
-          //latlng: new kakao.maps.LatLng(37.496214, 127.028793)
           latlng: new kakao.maps.LatLng('<%=store[2].lat%>', '<%=store[2].lng%>')
         }
       ];
@@ -72,31 +70,6 @@
           yAnchor: 3,
           position: marker.getPosition()
         });
-    
-        // var content = document.createElement('div');
-        // content.innerHTML =  data.title;
-        // content.style.cssText = 'width: 100px; height:50px; background: white; border: 1px solid black';
-      
-        // var divEl = document.createElement('div')
-
-        // content.appendChild(divEl);
-
-        // var linkContent = document.createElement('a')
-        // linkContent.innerHTML = '현황확인'
-        // linkContent.setAttribute('title', 'checkStatus')
-        // linkContent.setAttribute('href', '/macStatus')
-        // linkContent.style.cssText = 'background: orange;'
-
-        // divEl.appendChild(linkContent);
-
-        // var closeBtn = document.createElement('button');
-        // closeBtn.innerHTML = '닫기';
-        // closeBtn.onclick = function () {
-        //   overlay.setMap(null);
-        // };
-
-        // content.appendChild(closeBtn)
-
         
         var content = '<div class="wrap">' + 
             '            <div class="info">' + 
@@ -133,14 +106,6 @@
         });
         
         var closeEl = document.querySelector('.close')
-
-
-        // 지도 클릭 시 오버레이 닫음
-        // kakao.maps.event.addListener(map, 'click', function() {
-        //   if (clickedOverlay) {
-        //     clickedOverlay.setMap(null)
-        //   }
-        // });
 
         overlay.setContent(content);
       }
@@ -188,7 +153,8 @@
 
       // 위치 가져오기 버튼 클릭시
       function getCurrentPosBtn(){
-        navigator.geolocation.getCurrentPosition(locationLoadSuccess,locationLoadError);
+        navigator.geolocation.watchPosition(locationLoadSuccess,locationLoadError)
+        //navigator.geolocation.getCurrentPosition(locationLoadSuccess,locationLoadError);
       }; 
     </script>
 

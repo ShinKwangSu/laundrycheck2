@@ -30,3 +30,9 @@
 .info:after {content: '';position: absolute;margin-left: -12px;left: 50%;bottom: 0;width: 22px;height: 12px;background: url('https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/vertex_white.png')}
 .info .link {color: #5085BB;}
 .linkcenter {padding-top: 10px; text-align: center;}
+
+.node {
+  background-image: url('../image/mylocation.png');
+  width: 64px;
+  height: 64px;
+}
