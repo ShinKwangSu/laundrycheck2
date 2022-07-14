@@ -533,7 +533,6 @@ app.get('/map', function(req, res) {
       store[i] = {name, lat, lng}
       
     }
-    console.log(store[0].name)
     res.render('map.ejs', {store})
   })
 })
