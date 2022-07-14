@@ -145,6 +145,8 @@
         // 기존에 마커가 있다면 제거
         marker.setMap(map);
         flag = true
+
+        navigator.geolocation.watchPosition(locationLoadSuccess,locationLoadError)
       };
 
       function locationLoadError(pos){
@@ -153,8 +155,7 @@
 
       // 위치 가져오기 버튼 클릭시
       function getCurrentPosBtn(){
-        navigator.geolocation.watchPosition(locationLoadSuccess,locationLoadError)
-        //navigator.geolocation.getCurrentPosition(locationLoadSuccess,locationLoadError);
+        navigator.geolocation.getCurrentPosition(locationLoadSuccess,locationLoadError);
       }; 
     </script>
 
