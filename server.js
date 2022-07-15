@@ -191,10 +191,10 @@ app.get('/', function(req, res) {
 
   if (feedback != 0) {
     if (!req.session.nickname) {
-      res.render('index.ejs', {session: "true", successRes: 'NOWELCOME'});
+      res.render('index.ejs', {session: "true", successRes: 'NOWELCOME', welcomeUser: 'NOWELCOME'});
     }
     else {
-      res.render('index.ejs', {session: "false", successRes: feedback})
+      res.render('index.ejs', {session: "false", successRes: feedback, welcomeUser: req.user})
     }
   }
 })

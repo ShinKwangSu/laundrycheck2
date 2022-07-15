@@ -30,6 +30,8 @@
 
     <%- include('nav.html') %>
 
+    <div class="usename"><%= welcomeUser.id %> 님 안녕하세요^^</div>
+
     <div class="menuarea">
 
       <div class="selectMenu">
@@ -52,8 +54,10 @@
     <script>
       let loginBtnEl = document.querySelector('.login-btn')
       let signupBtnEl = document.querySelector('.signup-btn')
+      let userNameEl = document.querySelector('.usename')
       const session = "<%= session %>";
       const welcome = "<%=successRes%>"
+      const userName = '<%=welcomeUser%>'
 
       if (session === "false") {
         loginBtnEl.textContent = "로그아웃";
@@ -70,6 +74,10 @@
 
       if (welcome == 'WELCOME') {
         alert('환영합니다~!')
+      }
+
+      if (userName == 'NOWELCOME') {
+        userNameEl.textContent = ''
       }
     </script>
 

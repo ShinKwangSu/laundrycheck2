@@ -52,6 +52,13 @@
 	background-color: rgb(180, 239, 236);
 }
 
+.usename {
+  height: 30px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 @media ( max-width: 300px ) {
   .selectMenu {
     position: fixed;
