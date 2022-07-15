@@ -138,24 +138,27 @@
           image: markerImage
         });
 
+        // 기존에 마커가 있다면 제거
         if (flag) {
           marker.setMap(null);
         }
 
-        // 기존에 마커가 있다면 제거
+        
         marker.setMap(map);
         flag = true
 
         //-----------------
-        if (navigator.geolocation) {
-          navigator.geolocation.watchPosition(locationLoadSuccess,locationLoadError)
-        }
+        // if (navigator.geolocation) {
+        //   navigator.geolocation.watchPosition(locationLoadSuccess,locationLoadError)
+        // }
         //-----------------
       };
 
       function locationLoadError(pos){
         alert('위치 정보를 가져오는데 실패했습니다.');
       };
+
+      navigator.geolocation.watchPosition(locationLoadSuccess,locationLoadError)
 
       // 위치 가져오기 버튼 클릭시
       function getCurrentPosBtn(){
