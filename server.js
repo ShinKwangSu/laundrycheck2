@@ -524,18 +524,18 @@ app.get('/map', function(req, res) {
   db.collection('branch').find().toArray(function(에러, 결과) {
     if (에러) return console.log(에러)
 
-    var store = new Array()
-    let name, lat, lng
+    var store = new Array();
+    let name, lat, lng;
 
     for (let i = 0; i < 결과.length; i++) {
 
-      name = 결과[i].name
-      lat = 결과[i].lat
-      lng = 결과[i].lng
+      name = 결과[i].name;
+      lat = 결과[i].lat;
+      lng = 결과[i].lng;
 
-      store[i] = {name, lat, lng}
+      store[i] = {name, lat, lng};
       
     }
-    res.render('map.ejs', {store, KAKAO_MAP_KEY})
+    res.render('map.ejs', {store, KAKAO_MAP_KEY});
   })
 })
