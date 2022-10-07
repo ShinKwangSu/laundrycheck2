@@ -24,15 +24,15 @@
     <div id="map"></div>
     <div class="myloc" onclick="getCurrentPosBtn()">내 위치</div>
 
-    <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=1112b85e60dc2bf67fb4c01fcd044531"></script>
-    <script defer>
+    <script type="text/javascript" src="<%=KAKAO_MAP_KEY %>"></script>
+    <script>
 
-      var mapContainer = document.getElementById('map'), // 지도를 표시할 div
-          mapOption = {
-            center: new kakao.maps.LatLng(37.495307, 127.028587), // 지도의 중심좌표
-            level:4, // 지도의 확대 레벨
-            mapTypeId : kakao.maps.MapTypeId.ROADMAP // 지도종류
-          };
+      var mapContainer = document.getElementById('map'); // 지도를 표시할 div
+      var mapOption = {
+        center: new kakao.maps.LatLng(37.495307, 127.028587), // 지도의 중심좌표
+        level:4, // 지도의 확대 레벨
+        mapTypeId : kakao.maps.MapTypeId.ROADMAP // 지도종류
+      };
 
       // 지도를 생성한다
       var map = new kakao.maps.Map(mapContainer, mapOption);

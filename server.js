@@ -13,6 +13,8 @@ require('dotenv').config()
 // public 폴더 사용하려면
 app.use('/public', express.static('public'))
 
+
+
 var db
 MongoClient.connect(process.env.DB_URL, { useUnifiedTopology: true }, function(error, client) {
   // 연결되면 할일
@@ -21,7 +23,7 @@ MongoClient.connect(process.env.DB_URL, { useUnifiedTopology: true }, function(e
   db = client.db('laundrycheck2')
 
   app.listen(process.env.PORT, function() {
-    console.log('listening on 8080')
+    console.log('listening on 9999')
   })
 })
 
@@ -518,6 +520,7 @@ app.get('/charge', function(req, res) {
 
 // 지도 (카카오맵)
 app.get('/map', function(req, res) {
+  const KAKAO_MAP_KEY = process.env.KAKAO_MAP_KEY;
   db.collection('branch').find().toArray(function(에러, 결과) {
     if (에러) return console.log(에러)
 
@@ -533,6 +536,6 @@ app.get('/map', function(req, res) {
       store[i] = {name, lat, lng}
       
     }
-    res.render('map.ejs', {store})
+    res.render('map.ejs', {store, KAKAO_MAP_KEY})
   })
 })
