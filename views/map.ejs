@@ -126,7 +126,7 @@
       var flag = false
       function locationLoadSuccess(pos){
         // 현재 위치 받아오기
-        var currentPos = new kakao.maps.LatLng(pos.coords.latitude,pos.coords.longitude);
+        var currentPos = new kakao.maps.LatLng(pos.coords.latitude, pos.coords.longitude);
 
         // 기존에 마커가 있다면 제거
         if (flag) {
