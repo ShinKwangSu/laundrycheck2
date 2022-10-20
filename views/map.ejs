@@ -131,11 +131,6 @@
       function locationLoadSuccess(pos){
         // 현재 위치 받아오기
         var currentPos = new kakao.maps.LatLng(pos.coords.latitude, pos.coords.longitude);
-
-        // 기존에 마커가 있다면 제거
-        if (flag) {
-          marker.setMap(null);
-        }
         
         // 지도 이동(기존 위치와 가깝다면 부드럽게 이동)
         map.panTo(currentPos);
@@ -147,6 +142,10 @@
           image: markerImage
         });
 
+        // 기존에 마커가 있다면 제거
+        if (flag) {
+          marker.setMap(null);
+        }
         marker.setMap(map);
         flag = true
 
@@ -165,8 +164,8 @@
 
       // 위치 가져오기 버튼 클릭시
       function getCurrentPosBtn(){
-        //navigator.geolocation.watchPosition(locationLoadSuccess,locationLoadError)
-        navigator.geolocation.getCurrentPosition(locationLoadSuccess,locationLoadError);
+        navigator.geolocation.watchPosition(locationLoadSuccess,locationLoadError)
+        //navigator.geolocation.getCurrentPosition(locationLoadSuccess,locationLoadError);
       }; 
     </script>
 
