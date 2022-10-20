@@ -151,9 +151,9 @@
         flag = true
 
         //-----------------
-        // if (navigator.geolocation) {
-        //   navigator.geolocation.watchPosition(locationLoadSuccess,locationLoadError)
-        // }
+        if (navigator.geolocation) {
+          navigator.geolocation.watchPosition(locationLoadSuccess,locationLoadError)
+        }
         //-----------------
       };
 
@@ -165,8 +165,8 @@
 
       // 위치 가져오기 버튼 클릭시
       function getCurrentPosBtn(){
-        navigator.geolocation.watchPosition(locationLoadSuccess,locationLoadError)
-        //navigator.geolocation.getCurrentPosition(locationLoadSuccess,locationLoadError);
+        //navigator.geolocation.watchPosition(locationLoadSuccess,locationLoadError)
+        navigator.geolocation.getCurrentPosition(locationLoadSuccess,locationLoadError);
       }; 
     </script>
 
