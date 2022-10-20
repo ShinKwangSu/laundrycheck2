@@ -151,9 +151,10 @@ app.post('/signup', function(req, res) {
 })
 
 // 아이디 중복 확인
-app.get('/idcheck', function(req, res) {
-  res.render('idcheck.ejs')
-})
+// get은 필요없음
+// app.get('/idcheck', function(req, res) {
+//   res.render('idcheck.ejs')
+// })
 
 app.post('/idcheck', function(req, res) {
   console.log(req.body)
