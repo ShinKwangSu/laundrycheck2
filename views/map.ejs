@@ -37,6 +37,8 @@
       // 지도를 생성한다
       var map = new kakao.maps.Map(mapContainer, mapOption);
 
+      // ////////////////////////지점별 위치 마커////////////////////////
+      // db.branch의 (이름, 위도, 경도)를 positions 배열에 넣음
       var positions = [
         {
           title: '<%=store[0].name%>', 
@@ -54,27 +56,29 @@
           title: '<%=store[3].name%>', 
           latlng: new kakao.maps.LatLng('<%=store[3].lat%>', '<%=store[3].lng%>')
         }
-      ];
+      ]; 
       
-
       for(let i=0; i < positions.length; i++){
         var data = positions[i];
-        displayMarker(data);
+        displayMarker(data);    //지점별 위치를 지도에 마커로 표시
       }
 
       var clickedOverlay = null
-
-      // 지도에 마커를 표시하는 함수입니다    
+      // 지도에 마커를 표시하는 함수   
       function displayMarker(data) { 
+        //마커 생성
         var marker = new kakao.maps.Marker({
           map: map,
           position: data.latlng
         });
+
+        //마커 위에 커스텀오버레이 표시
         var overlay = new kakao.maps.CustomOverlay({
           yAnchor: 3,
           position: marker.getPosition()
         });
-        
+
+        //커스텀오버레이에 표시할 컨텐츠
         var content = '<div class="wrap">' + 
             '            <div class="info">' + 
             '              <div class="title">' + 
@@ -96,14 +100,13 @@
             '  </div>';
           
 
-
         // 마커를 클릭했을 때 커스텀 오버레이를 표시하고 이전 오버레이 닫음
         kakao.maps.event.addListener(marker, 'click', function() {
-          if (clickedOverlay) {
+          if (clickedOverlay) {   //이전 오버레이 닫음
             clickedOverlay.setMap(null)
           }
           
-          overlay.setMap(map);
+          overlay.setMap(map);    //오버레이를 지도 위에 표시
           map.panTo(data.latlng)
 
           clickedOverlay = overlay
@@ -119,15 +122,25 @@
           clickedOverlay.setMap(null)
         }
       }
+      // ///////////////////////////////////////////////////////////////
    
 
+      // ////////////////////////현재 내 위치 마커///////////////////////
       var imageSrc = '../public/image/mylocation.png', // 마커이미지의 주소입니다    
           imageSize = new kakao.maps.Size(40, 40) // 마커이미지의 크기입니다
           //imageOption = {offset: new kakao.maps.Point(27, 69)}; // 마커이미지의 옵션입니다. 마커의 좌표와 일치시킬 이미지 안에서의 좌표를 설정합니다.
 
       var markerImage = new kakao.maps.MarkerImage(imageSrc, imageSize)
       
+
+      // 내 위치 버튼 클릭 시, geolocation으로 접속 위치 가져옴
+      function getCurrentPosBtn(){
+        //navigator.geolocation.watchPosition(locationLoadSuccess,locationLoadError)
+        navigator.geolocation.getCurrentPosition(locationLoadSuccess,locationLoadError);
+      }; 
+
       var flag = false
+      //접속 위치 가져오기 성공
       function locationLoadSuccess(pos){
         // 현재 위치 받아오기
         var currentPos = new kakao.maps.LatLng(pos.coords.latitude, pos.coords.longitude);
@@ -157,17 +170,12 @@
         //-----------------
       };
 
+      //접속 위치 가져오기 실패
       function locationLoadError(pos){
         alert('위치 정보를 가져오는데 실패했습니다.');
       };
+      // ///////////////////////////////////////////////////////////////
 
-      
-
-      // 위치 가져오기 버튼 클릭시
-      function getCurrentPosBtn(){
-        //navigator.geolocation.watchPosition(locationLoadSuccess,locationLoadError)
-        navigator.geolocation.getCurrentPosition(locationLoadSuccess,locationLoadError);
-      }; 
     </script>
 
     <!-- Optional JavaScript; choose one of the two! -->
