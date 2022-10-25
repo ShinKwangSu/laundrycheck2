@@ -666,3 +666,79 @@ app.get('/map', function(req, res) {
 app.get('/branchinfo', function(req, res) {
   res.render('branchinfo.ejs')
 })
+
+app.post('/branchinfo', function(req, res) {
+  //유저의 웨이팅 신청수에 따라..
+  // ------------------- 웨이팅 등록 최초 1회 -------------------
+  db.collection('waitinfo').findOne({userid : req.user.id}, function(에러, 결과2) {
+    if(에러) return done(에러)
+
+    //로그인한 유저가 waitinfo에 없다면.. -> 웨이팅 신청 한 번도 안함
+    if(결과2 == null) {
+      res.redirect('/awaituse')
+      console.log('최초 1회 - 웨이팅 사용 후 확인(미신청 후 waitcheck)');
+      return
+    }
+    else{
+      console.log('null값이 아니면 등록 재사용으로..')
+    }
+  })
+
+  // ------------------- 웨이팅 등록 재사용 -------------------
+  //db.waitinfo에 로그인한 유저의 id를 array로 찾아서.. 
+  db.collection('waitinfo').find({userid : req.user.id}).toArray(function(에러, 결과2) {
+    if(에러) return done(에러)
+
+    console.log("유저의웨이팅신청수(arr.length) : " + 결과2.length);
+
+    var 찾았니
+    var 찾은고유번호
+    for (let i = 0; i < 결과2.length; i++) {
+      if (결과2[i].isUseWait == true) {
+        찾았니 = "못찾음"         //유저의 재신청을 못찾음(true) -> 웨이팅 신청 후(웨이팅 신청해라)
+      }
+      else {
+        찾은고유번호 = 결과2[i].myNumber
+        찾았니 = "찾음"          //유저의 재신청을 찾음(false) -> 웨이팅 신청 전(웨이팅 정보 확인)
+      }
+    }
+
+    //로그인한 유저가 이전에 사용했고 재신청하지 않은 경우.. 웨이팅 신청 하도록 /bwaitcheck로..
+    if (찾았니 == "못찾음") {
+      res.redirect('/awaituse')
+      console.log('재사용 - 웨이팅 사용 후 확인')
+    }
+    else if(찾았니 == "찾음"){
+      db.collection('waitinfo').updateOne({myNumber : 찾은고유번호}, { $set: {isUseWait:true} }, function(에러3, 결과){
+        if(에러3){return console.log(에러3)}
+
+        db.collection('waitinfo').find({userid : req.user.id}).toArray(function(에러, 결과3) {
+          var 웨이팅사용여부 = 결과3[결과3.length - 1].isUseWait
+          console.log(결과3[결과3.length - 1].myNumber)
+          console.log("웨이팅사용여부 - true로 바뀌었는가 : " + 웨이팅사용여부);
+
+          //사용한 회원 관리
+          if(웨이팅사용여부){ //웨이팅을 사용했다면..
+            //db.counter 내의 totalWait -1 감소(대기인원수-1)
+            db.collection('counter').updateOne({name: '대기인원수'}, { $inc: {totalWait:-1} }, function(에러1, 결과) {
+              if(에러1){return console.log(에러1)}
+    
+              //db.counter 내의 totalUse +1 증가(대기사용수+1)
+              db.collection('counter').updateOne({name: '대기인원수'}, { $inc: {totalUse:1} }, function(에러2, 결과) {
+                if(에러2){return console.log(에러2)}
+    
+                console.log('사용했기 때문에 true로 바뀌고 사용회원관리')
+                console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>')
+                //res.redirect('/branchinfo')
+                //res.send("타이머 실행 완료--------------------------------")
+              })
+            })
+          }
+          else {
+            res.redirect('/mypage')
+          }
+        })
+      })
+    }
+  })
+})

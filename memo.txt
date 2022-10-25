@@ -1,0 +1,60 @@
+만들어야 하는 기능>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+1) branchinfo에 웨이팅 사용코드 추가(mypage에 있음)
+- branchinfo에서 비밀번호 입력 후 일치 > 시작버튼 클릭
+  > macstatus와 branchinfo의 타이머 실행
+  > 웨이팅 사용 코드 실행(총웨이팅인원-1, isUseWait true로 변경) 
+
+2) 지점마다 macstatus 생성
+- 쿼리스트링 ? 특정이름 붙이기 	ex) ?mname=변수명 -> map.ejs
+- 변수를 a,b,c 설정 -> server.js의 get요청에서 /부분에 변수사용
+
+3) macstatus에서 wmac 사용해서 세탁기마다 branchinfo 사용
+  ex) macStatusA(A지점) wmac1 > branchinfoA1, wmac2 > branchinfoA2, ...
+       macStatusB(B지점) wmac1 > branchinfoB1, wmac2 > branchinfoB2, ...
+
+4) macstatus에서 신청O일 때 순서 구분
+- macstatus에서 '세탁기 img 하단에 버튼 추가하여 해당 버튼 클릭 시 branchinfo로 post 요청' 으로 구현한 경우,..
+  자신의 차례 : branchinfo로 이동 / 자신의 차례X : bwaituse로 이동 추가하기
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+10/25>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+1. info 브랜치 생성
+2. branchinfo 페이지 생성 ===============> 디자인 수정
+3. index.ejs에서 현황 확인 > 지점 찾기로 수정
+
+4. macstatus에서 branchinfo로 redirect 연결
+1) macstatus에서 웨이팅 신청여부에 따라 웨이팅 신청버튼과 세탁기 img 활성화 여부 => 실패
+  > 신청X, 웨이팅 하러가기 버튼 활성화 + 세탁기 이미지 버튼 비활성화
+  > 신청O, 웨이팅 하러가기 버튼 비활성화 + 세탁기 이미지 버튼 활성화
+- 세탁기 img와 div에 disabled 사용 불가
+
+2) macstatus에서 '세탁기 img 클릭 시' /branchinfo로 이동===================> 실패
+- 세탁기 img와 그를 감싸는 div를 이용해 클릭 시 redirect는 가능함(but 조건에 따라 이동해야 함)
+   (onclick="javascript:location.href='/branchinfo';" 사용함)
+- img와 div의 class로 querySelector를 통해 href 사용했지만 정상적으로 실행되지 않음
+
+3) macstatus에서 '세탁기 img 하단에 버튼 추가하여 해당 버튼 클릭 시 branchinfo로 post 요청' => 성공
+- 현재 웨이팅 신청X이면 awaituse로 이동, 현재 웨이팅 신청O이면 branchinfo로 이동
+  +) 신청O일 때 순서를 구분 > 자신의 차례 : branchinfo로 이동 / 자신의 차례X : bwaituse로 이동 =====> 코드 수정
+
+4-1)-------------------------------------------------------------------------------------------
+- session: "false" 일 때 로그인O (웨이팅 신청은 로그인 한 경우만 가능)
+- waitinfo에서 웨이팅 신청 여부를 가져와서 render 시 session과 같이 전송
+- 받아온 웨이팅 신청 여부를 ejs에서 사용
+  > 웨이팅 신청 여부 false이면, 웨이팅 신청X, 세탁기 이미지 버튼 활성화
+  > 웨이팅 신청 여부 true이면, 웨이팅 신청O, 세탁기 이미지 버튼 비활성화
+++) wmac도 받아와서 render 후, 해당 번호에 맞는 세탁기 img 비활성화하기
+------------------------------------------------------------------------------------------------
+
+5. branchinfo 타이머
+- setInterval : 일정 시간 (millisecond) 마다 반복하여 함수 실행
+- clearInterval : 일정 시간 마다 반복되는 setInterval 실행 종료
+- setTimeout : 만료된 후 함수나 지정한 코드 조각을 실행하는 타이머 설정
+
+https://twinklehwa.tistory.com/426 - 3분 카운트다운 ==> 참고
+https://wonpaper.tistory.com/319 - 1초마다 자동갱신되는 타이머
+https://goodmemory.tistory.com/116 - 10초 카운트 다운 + stop
+
+---> ajax가 제대로 실행되고 있는지 모르겠음
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
