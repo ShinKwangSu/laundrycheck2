@@ -203,14 +203,135 @@ app.get('/', function(req, res) {
 })
 
 // 기기 현황 페이지 이동
-app.get('/macStatus', function(req, res) {
+app.get('/macstatus', function(req, res) {
   if (!req.session.nickname) {
+    //로그인X
     res.render('macstatus.ejs', {session: "true"});
   }
   else {
+    //로그인O
     res.render('macstatus.ejs', {session: "false"});
   }
 })
+
+/* app.get('/macstatus', function(req, res) {
+  if (!req.session.nickname) {
+    //로그인X
+    res.render('macstatus.ejs', {session: "true", 웨이팅여부: null});
+    console.log("웨이팅여부 = null")
+  }
+  else {
+    //로그인O
+    //res.render('macstatus.ejs', {session: "false"});
+    
+    // ------------------- 웨이팅 등록 최초 1회 -------------------
+    //db.waitinfo에 로그인한 유저의 id를 찾아서..
+    db.collection('waitinfo').findOne({userid : req.user.id}, function(에러, 결과2) {
+      if(에러) return done(에러)
+
+      //로그인한 유저가 waitinfo에 없다면.. -> 웨이팅 신청 한 번도 안함
+      if(결과2 == null) {
+        //res.redirect('/awaituse')
+        res.render('macstatus.ejs', {session: "false", 웨이팅여부: "null"});
+        console.log('최초 1회 - 현재 웨이팅 신청X')
+        return
+      }
+      // else{
+      //   res.render('macstatus.ejs', {session: "false", 웨이팅여부: "true"});
+      //   console.log('최초 1회 - 현재 웨이팅 신청O')
+      // }
+    })
+
+    // ------------------- 웨이팅 등록 재사용 -------------------
+    //db.waitinfo에 로그인한 유저의 id를 array로 찾아서.. 
+    db.collection('waitinfo').find({userid : req.user.id}).toArray(function(에러, 결과2) {
+      if(에러) return done(에러)
+
+      var 유저의웨이팅신청수 = 결과2.length
+      console.log("유저의웨이팅신청수(arr.length) : " + 유저의웨이팅신청수);
+
+      var 찾았니
+      for (let i = 0; i < 결과2.length; i++) {
+        if (결과2[i].isUseWait == true) {
+        찾았니 = "못찾음"         //유저의 재신청을 못찾음(true) -> 웨이팅 신청 후(웨이팅 신청해라)
+        }
+        else {
+          찾았니 = "찾음"         //유저의 재신청을 찾음(false) -> 웨이팅 신청 전(웨이팅 정보 확인)
+        }
+      }
+
+      //로그인한 유저가 이전에 사용했고 재신청하지 않은 경우.. 웨이팅 신청 하도록 /bwaitcheck로..
+      if (찾았니 == "못찾음") {
+        res.render('macstatus.ejs', {session: "false", 웨이팅여부: "false"});
+        console.log('재사용 - 현재 웨이팅 신청X')
+      }
+      else if(찾았니 == "찾음"){
+        res.render('macstatus.ejs', {session: "false", 웨이팅여부: "true"});
+        console.log('재사용 - 현재 웨이팅 신청O')
+      }
+    })
+  } 
+}) */
+
+app.post('/macstatus', function(req, res) {
+  if (!req.session.nickname) {
+    //로그인X
+    res.redirect('/awaituse');
+    console.log("웨이팅여부 = null")
+  }
+  else {
+    //로그인O
+    // ------------------- 웨이팅 등록 최초 1회 -------------------
+    //db.waitinfo에 로그인한 유저의 id를 찾아서..
+    db.collection('waitinfo').findOne({userid : req.user.id}, function(에러, 결과2) {
+      if(에러) return done(에러)
+
+      //로그인한 유저가 waitinfo에 없다면.. -> 웨이팅 신청 한 번도 안함
+      if(결과2 == null) {
+        res.redirect('/awaituse')
+        console.log('최초 1회 - 현재 웨이팅 신청X')
+        return
+      }
+      // else{
+      //   res.render('macstatus.ejs', {session: "false", 웨이팅여부: "true"});
+      //   console.log('최초 1회 - 현재 웨이팅 신청O')
+      // }
+    })
+
+    // ------------------- 웨이팅 등록 재사용 -------------------
+    //db.waitinfo에 로그인한 유저의 id를 array로 찾아서.. 
+    db.collection('waitinfo').find({userid : req.user.id}).toArray(function(에러, 결과2) {
+      if(에러) return done(에러)
+
+      var 유저의웨이팅신청수 = 결과2.length
+      console.log("유저의웨이팅신청수(arr.length) : " + 유저의웨이팅신청수);
+
+      var 찾았니
+      for (let i = 0; i < 결과2.length; i++) {
+        if (결과2[i].isUseWait == true) {
+        찾았니 = "못찾음"         //유저의 재신청을 못찾음(true) -> 웨이팅 신청 후(웨이팅 신청해라)
+        }
+        else {
+          찾았니 = "찾음"         //유저의 재신청을 찾음(false) -> 웨이팅 신청 전(웨이팅 정보 확인)
+        }
+      }
+
+      //로그인한 유저가 이전에 사용했고 재신청하지 않은 경우.. 웨이팅 신청 하도록 /bwaitcheck로..
+      if (찾았니 == "못찾음") {
+        res.redirect('awaituse');
+        console.log('재사용 - 현재 웨이팅 신청X')
+      }
+      else if(찾았니 == "찾음"){
+        //자신의 차례이면 branchinfo, 자신의 차례가 아니면 bwaituse
+        //res.redirect('/bwaituse');
+        res.redirect('/branchinfo');
+        console.log('재사용 - 현재 웨이팅 신청O')
+      }
+    })
+  } 
+})
+
+
 
 // 유의사항 페이지 이동
 app.get('/caution', function(req, res) {
@@ -539,4 +660,9 @@ app.get('/map', function(req, res) {
     }
     res.render('map.ejs', {store, KAKAO_MAP_KEY});
   })
+})
+
+// 지점 상세정보 페이지 이동
+app.get('/branchinfo', function(req, res) {
+  res.render('branchinfo.ejs')
 })

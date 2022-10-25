@@ -16,59 +16,68 @@
 
     <link rel="icon" href="/public/favicon.ico" />
     <title>현황 확인</title>
+
   </head>
   <body style="overflow-x: hidden;">
 
     <%- include('nav.html') %>
 
-    <div class="imgarea">
+    <form action="/macstatus" method="POST">
+      <div class="imgarea">
 
-      <div class="washarea">
-        <h2>세탁기</h2>
-        <span>00:00</span>
-        <div class="washmac">
-          <img src="/public/image/wash-machine.png" alt="" width="100" height="100">
+        <div class="washarea">
+          <h2>세탁기</h2>
+          <span>00:00</span>
+          <div class="washmac">
+            <img src="/public/image/wash-machine.png" alt="" width="100" height="100">
+            <button class="btn btn-primary" type="submit">세탁기1</button>
+          </div>
+  
+          <span>00:00</span>
+          <div class="washmac">
+            <img src="/public/image/wash-machine.png" alt="" width="100" height="100">
+          </div>
+          <span>00:00</span>
+          <div class="washmac">
+            <img src="/public/image/wash-machine.png" alt="" width="100" height="100">
+          </div>
         </div>
-        <span>00:00</span>
-        <div class="washmac">
-          <img src="/public/image/wash-machine.png" alt="" width="100" height="100">
+  
+        <div class="dryarea">
+          <h2>건조기</h2>
+          <span>00:00</span>
+          <div class="drymac">
+            <img src="/public/image/dry-machine.png" alt="" width="120" height="100">
+          </div>
+          <span>00:00</span>
+          <div class="drymac">
+            <img src="/public/image/dry-machine.png" alt="" width="120" height="100">
+          </div>
+          <span>00:00</span>
+          <div class="drymac">
+            <img src="/public/image/dry-machine.png" alt="" width="120" height="100">
+          </div>
         </div>
-        <span>00:00</span>
-        <div class="washmac">
-          <img src="/public/image/wash-machine.png" alt="" width="100" height="100">
-        </div>
+  
+        <button type="button" class="btn btn-primary gowait"><a href="/wait">웨이팅 하러 가기</a></button>
+  
       </div>
-      <div class="dryarea">
-        <h2>건조기</h2>
-        <span>00:00</span>
-        <div class="drymac">
-          <img src="/public/image/dry-machine.png" alt="" width="120" height="100">
-        </div>
-        <span>00:00</span>
-        <div class="drymac">
-          <img src="/public/image/dry-machine.png" alt="" width="120" height="100">
-        </div>
-        <span>00:00</span>
-        <div class="drymac">
-          <img src="/public/image/dry-machine.png" alt="" width="120" height="100">
-        </div>
-      </div>
+    </form>
 
-      <button type="button" class="btn btn-primary gowait"><a href="/wait">웨이팅 하러 가기</a></button>
+    
 
-    </div>
     
     <script>
       let loginBtnEl = document.querySelector('.login-btn')
       let signupBtnEl = document.querySelector('.signup-btn')
       const session = "<%= session %>";
-      if (session === "false") {
+      if (session === "false") {  //로그인O
         loginBtnEl.textContent = "로그아웃";
         loginBtnEl.href = "/logout";
         signupBtnEl.textContent = "마이페이지";
         signupBtnEl.href = "/mypage";
       }
-      else {
+      else {                      //로그인X
         loginBtnEl.textContent = "로그인";
         loginBtnEl.href = "/login";
         signupBtnEl.textContent = "회원가입";
