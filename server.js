@@ -1,9 +1,19 @@
+//server 생성
 const express = require('express')
 const req = require('express/lib/request')
 const app = express()
+
+//bodyParser
 const bodyParser = require('body-parser')
 app.use(bodyParser.urlencoded({extended: true}))
 // app.use(express.urlencoded({extended: true}))
+
+//socket.io
+const http = require('http').createServer(app);
+const { Server } = require("socket.io");
+const io = new Server(http);
+
+//MongoDB
 const MongoClient = require('mongodb').MongoClient
 const methodOverride = require('method-override')
 app.use(methodOverride('_method'))
@@ -14,7 +24,7 @@ require('dotenv').config()
 app.use('/public', express.static('public'))
 
 
-
+//MongoDB 연결
 var db
 MongoClient.connect(process.env.DB_URL, { useUnifiedTopology: true }, function(error, client) {
   // 연결되면 할일
@@ -22,12 +32,13 @@ MongoClient.connect(process.env.DB_URL, { useUnifiedTopology: true }, function(e
 
   db = client.db('laundrycheck2')
 
-  app.listen(process.env.PORT, function() {
+  //app.listen(process.env.PORT, function() {   //express(http를 쉽게 사용하기 위한 도구)로 서버 띄움
+  http.listen(process.env.PORT, function() {  //http(nodejs 기본 라이브러리) + socket.io로 서버 띄움
     console.log('listening on 9999')
   })
 })
 
-// 로그인
+//1. 로그인
 const passport = require('passport')
 const LocalStrategy = require('passport-local').Strategy
 const flash = require('connect-flash')
@@ -128,7 +139,7 @@ passport.deserializeUser(function (아이디, done) {  // 아이디는 위에 �
   })
 }); 
 
-// 로그아웃
+//2. 로그아웃
 app.get('/logout', function(req, res) {
   req.logout()
   
@@ -139,7 +150,7 @@ app.get('/logout', function(req, res) {
   })
 })
 
-// 회원가입
+//3. 회원가입
 app.get('/signup', function(req, res) {
   res.render('signup.ejs')
 })
@@ -151,11 +162,6 @@ app.post('/signup', function(req, res) {
 })
 
 // 아이디 중복 확인
-// get은 필요없음
-// app.get('/idcheck', function(req, res) {
-//   res.render('idcheck.ejs')
-// })
-
 app.post('/idcheck', function(req, res) {
   console.log(req.body)
 
@@ -187,22 +193,36 @@ function isLogin(req, res, next) {
   }
 }
 
-// 메인페이지 이동
-app.get('/', function(req, res) {
+//4. 메인페이지(express)
+// app.get('/', function(req, res) {
+//   let flashmsg = req.flash()
+//   let feedback = flashmsg.success
+
+//   if (feedback != 0) {
+//     if (!req.session.nickname) {
+//       res.render('index.ejs', {session: "true", successRes: 'NOWELCOME', welcomeUser: 'NOWELCOME'});
+//     }
+//     else {
+//       res.render('index.ejs', {session: "false", successRes: feedback, welcomeUser: req.user})
+//     }
+//   }
+// })
+//4. 메인페이지(socket)
+app.get('/', function(req, res){
   let flashmsg = req.flash()
   let feedback = flashmsg.success
 
   if (feedback != 0) {
     if (!req.session.nickname) {
-      res.render('index.ejs', {session: "true", successRes: 'NOWELCOME', welcomeUser: 'NOWELCOME'});
+      res.render('socket.ejs', {session: "true", successRes: 'NOWELCOME', welcomeUser: 'NOWELCOME'});
     }
     else {
-      res.render('index.ejs', {session: "false", successRes: feedback, welcomeUser: req.user})
+      res.render('socket.ejs', {session: "false", successRes: feedback, welcomeUser: req.user})
     }
   }
-})
+});
 
-// 기기 현황 페이지 이동
+//5. 기기 현황 페이지 이동
 app.get('/macstatus', function(req, res) {
   if (!req.session.nickname) {
     //로그인X
@@ -333,7 +353,7 @@ app.post('/macstatus', function(req, res) {
 
 
 
-// 유의사항 페이지 이동
+//6. 유의사항 페이지 이동
 app.get('/caution', function(req, res) {
   if (!req.session.nickname) {
     res.render('caution.ejs', {session: "true"});
@@ -343,7 +363,7 @@ app.get('/caution', function(req, res) {
   }
 })
 
-// 웨이팅 등록 페이지 이동
+//7. 웨이팅 등록 페이지 이동
 app.get('/wait', isLogin, function(req, res) {
   console.log(req.user);
 
@@ -434,19 +454,19 @@ app.post('/wait', isLogin, function(req, res){
   })
 })
 
-// 웨이팅 신청이 되어있으면 뿌려주는 페이지
+//7-1. 웨이팅 신청이 되어있으면 뿌려주는 페이지
 app.get('/waitalready', isLogin, function(req, res) {
   console.log(req.user)
   res.render('waitalready.ejs')
 })
 
-// 웨이팅 신청 성공하면 뿌려주는 페이지
+//7-2. 웨이팅 신청 성공하면 뿌려주는 페이지
 app.get('/waitsuccess', isLogin, function(req, res) {
   console.log(req.user)
   res.render('waitsuccess.ejs')
 })
 
-// 웨이팅 확인 페이지 이동
+//8. 웨이팅 확인 페이지 이동
 app.get('/waitcheck', isLogin, function(req, res) {
   console.log(req.user)
 
@@ -496,7 +516,7 @@ app.get('/waitcheck', isLogin, function(req, res) {
   })
 })
 
-// 웨이팅 등록하고 기기 작동시키기 전
+//8-1. 웨이팅 등록하고 기기 작동시키기 전
 // 본인 대기번호와 앞에 몊명 남았는지 확인 가능
 app.get('/bwaituse', isLogin, function(req, res) {
   console.log(req.user)
@@ -542,13 +562,13 @@ app.get('/bwaituse', isLogin, function(req, res) {
   })
 })
 
-// 웨이팅 등록하고 기기 작동시킨 후
+//8-2. 웨이팅 등록하고 기기 작동시킨 후
 app.get('/awaituse', isLogin, function(req, res) {
   console.log(req.user)
   res.render('awaituse.ejs')
 })
 
-// 마이페이지
+//9. 마이페이지
 app.get('/mypage', isLogin, function(req, res) {
   console.log(req.user)
 
@@ -636,11 +656,12 @@ app.post('/mypage', isLogin, function(req, res) {
   })
 })
 
+// 요금정산 페이지
 app.get('/charge', function(req, res) {
   res.render('charge.ejs')
 })
 
-// 지도 (카카오맵)
+//10. 지도 (카카오맵)
 app.get('/map', function(req, res) {
   const KAKAO_MAP_KEY = process.env.KAKAO_MAP_KEY;
   db.collection('branch').find().toArray(function(에러, 결과) {
@@ -662,7 +683,7 @@ app.get('/map', function(req, res) {
   })
 })
 
-// 지점 상세정보 페이지 이동
+//11. 지점 상세정보 페이지 이동
 app.get('/branchinfo', function(req, res) {
   res.render('branchinfo.ejs')
 })
