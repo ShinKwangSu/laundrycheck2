@@ -94,5 +94,41 @@ https://webisfree.com/2015-10-14/ajax%EB%A5%BC-%EC%82%AC%EC%9A%A9%ED%95%B4-%EC%8
 
 10/27(목)>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 1. 웹소켓 공부..
-2. socket.io 라이브러리 설치
+2. socket.io 라이브러리 설치 -> npm install socket.io
+
+- 아래 코드는 페이지 로드 시 한번 쭉 실행됨 -> ejs
+<script>
+      var socket = io();  //유저가 웹소켓에 접속
+</script>
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+10/31(월)>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+1. branchinfo에서 버튼 클릭 > macstatus에서 타이머 실행
+- branchinfo 버튼 클릭 시 server.js로 버튼 클릭 여부 전달 -> 웹소켓 사용? (서버에세 웹소켓으로 실시간 메세지 보냄)
+  > server.js에서 버튼 클릭 여부에 따라 ture(클릭O)이면..
+    > branchinfo에 있는 유저는 웨이팅 사용했으니 /socket으로 이동
+    > server.js에서는 타이머 실행... 그 값을 macstatus.ejs로 render --> ajax 사용?
+
+- 타이머 코드 : branchinfo에서 server.js로 이동
+- 타이머 코드 실행한 Timer1을 macStatus get할 때 render{타이머}해서 출력 --> 추후 ajax 사용으로 새로고침
+
+2. 웹소켓
+1) socket.io 라이브러리 설치
+2) server.js에서
+- socket.io에 대한 const 부분 추가
+- 서버 띄우는 코드에서 app.listen -> http.listen으로 수정
+- index.ejs 대신 socket.ejs 사용
+- 웹소켓 접속 시 서버가 실행하는 부분 추가
+  io.on('connection', function(){
+    console.log('웹소켓 연결로 유저 접속됨');
+  });
+3) socket.ejs
+- index.ejs 복붙
+4) macstatus.ejs
+- 유저에 웹소켓 접속하는 부분 추가
+  <script>
+    var socket = io();  
+  </script>
+
 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
