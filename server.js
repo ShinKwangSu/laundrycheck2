@@ -183,6 +183,7 @@ app.post('/idcheck', function(req, res) {
   })
 })
 
+
 // 로그인 후 세션이 있으면 req.user가 항상 있음
 function isLogin(req, res, next) {
   if (req.user) {
@@ -237,43 +238,45 @@ let time = 60000;    //setInterval(1000) = 1초인데, *3분(180초)하면 180,0
 let min = 1;
 let sec = 60;
 
-function TIMER1() {
-  PLAYTIME = setInterval(function () {
-    time = time - 1000;       //1초씩 감소
-    min = time / (60 * 1000);   //초를 분으로 나눔
-
-    if (sec > 0) {   //sec=60 에서 1씩 빼서 출력
-      //sec = sec - 1;
-      //Timer1.value = Math.floor(min) + ':' + sec;   //실수로 계산 > 소숫점 아래를 버리고 출력
-      // --------------------------------------
-      min = Math.floor(min);
-      sec = sec - 1;
-
-      console.log("타이머(??:??) " + min + ":" + sec);
-      Timer1 = min + ":" + sec;
-      console.log("타이머(?:?) " + Timer1);
-    }
-    if (sec == 0) {
-      //sec(60) 기준으로 0에서 -1하면 -59 출력
-      //따라서 0이면 sec을 60으로 변경하고, value는 0으로 출력
-      sec = 60;
-      Timer1.value = Math.floor(min) + ':' + '00'
-      // --------------------------------------
-      min = Math.floor(min);
-      sec = 60;
-
-      console.log("타이머(??:??) " + min + ":" + sec);
-      Timer1 = min + ":" + "00";
-      console.log("타이머(?:00) " + Timer1);
-    }
-  }, 1000)  //1초마다
+function StartTimer() {
+  function TIMER1() {
+    PLAYTIME = setInterval(function () {
+      time = time - 1000;       //1초씩 감소
+      min = time / (60 * 1000);   //초를 분으로 나눔
+  
+      if (sec > 0) {   //sec=60 에서 1씩 빼서 출력
+        //sec = sec - 1;
+        //Timer1.value = Math.floor(min) + ':' + sec;   //실수로 계산 > 소숫점 아래를 버리고 출력
+        // --------------------------------------
+        min = Math.floor(min);
+        sec = sec - 1;
+        console.log("타이머(??:??) " + min + ":" + sec);
+        // --------------------------------------
+        // Timer1 = min + ":" + sec;
+        // console.log("타이머(?:?) " + Timer1);
+      }
+      if (sec == 0) {
+        //sec(60) 기준으로 0에서 -1하면 -59 출력
+        //따라서 0이면 sec을 60으로 변경하고, value는 0으로 출력
+        // sec = 60;
+        // Timer1.value = Math.floor(min) + ':' + '00'
+        // --------------------------------------
+        min = Math.floor(min);
+        sec = 60;
+        console.log("타이머(??:??) " + min + ":" + sec);
+        // --------------------------------------
+        // Timer1 = min + ":" + "00";
+        // console.log("타이머(?:00) " + Timer1);
+      }
+    }, 1000)  //1초마다
+  }
+  
+  TIMER1();
+  setTimeout(function () {
+    clearInterval(PLAYTIME);
+    console.log("타이머 삭제");
+  }, 60000);   //3분(180,000)되면 타이머 삭제
 }
-
-TIMER1();
-setTimeout(function () {
-  clearInterval(PLAYTIME);
-  console.log("타이머 삭제");
-}, 60000);   //3분(180,000)되면 타이머 삭제
 // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
 // var timer1 = 30;
@@ -299,14 +302,14 @@ setTimeout(function () {
 }) */
 
 app.get('/macstatus', function (req, res) {
-  StartTimer();
+  //StartTimer();
   if (!req.session.nickname) {
     //로그인X
-    res.render('macstatus.ejs', { session: "true", 타이머: Timer1, 분: min, 초: sec });
+    res.render('macstatus.ejs', { session: "true", 분: min, 초: sec });
   }
   else {
     //로그인O
-    res.render('macstatus.ejs', { session: "false", 타이머: Timer1, 분: min, 초: sec });
+    res.render('macstatus.ejs', { session: "false", 분: min, 초: sec });
   }
 })
 
@@ -821,7 +824,7 @@ app.post('/branchinfo', function(req, res) {
 
         db.collection('waitinfo').find({userid : req.user.id}).toArray(function(에러, 결과3) {
           var 웨이팅사용여부 = 결과3[결과3.length - 1].isUseWait
-          console.log(결과3[결과3.length - 1].myNumber)
+          console.log("mynumber : " + 결과3[결과3.length - 1].myNumber)
           console.log("웨이팅사용여부 - true로 바뀌었는가 : " + 웨이팅사용여부);
 
           //사용한 회원 관리
@@ -842,11 +845,24 @@ app.post('/branchinfo', function(req, res) {
             })
           }
           else {
-            res.redirect('/mypage')
+            res.redirect('/')
           }
         })
       })
     }
   })
+})
+
+//branchinfo 버튼 클릭 확인
+app.post('/btncheck', function(req, res) {
+  req.body.ClickRes = parseInt(req.body.ClickRes)
+  console.log("req.body.ClickRes>>>>>>>>>>>>")
+  console.log("req.body.ClickRes : " + req.body.ClickRes)
+  console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+  
+  if(req.body.ClickRes == 1) {
+    console.log("ClickRes 1이라서 타이머 실행")
+    StartTimer();
+  }
 })
 
