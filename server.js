@@ -839,7 +839,7 @@ app.post('/branchinfo', function(req, res) {
     
                 console.log('사용했기 때문에 true로 바뀌고 사용회원관리')
                 console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>')
-                //res.redirect('/branchinfo')
+                res.redirect('/macstatus')
                 //res.send("타이머 실행 완료--------------------------------")
               })
             })
@@ -855,14 +855,7 @@ app.post('/branchinfo', function(req, res) {
 
 //branchinfo 버튼 클릭 확인
 app.post('/btncheck', function(req, res) {
-  req.body.ClickRes = parseInt(req.body.ClickRes)
-  console.log("req.body.ClickRes>>>>>>>>>>>>")
-  console.log("req.body.ClickRes : " + req.body.ClickRes)
-  console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
-  
-  if(req.body.ClickRes == 1) {
-    console.log("ClickRes 1이라서 타이머 실행")
-    StartTimer();
-  }
+  console.log("branchinfo 버튼 클릭 -> 타이머 실행")
+  StartTimer();
 })
 
