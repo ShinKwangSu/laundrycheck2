@@ -222,6 +222,12 @@ app.get('/', function(req, res){
   }
 });
 
+//유저가 웹소켓 접속 시 서버가 캐치
+io.on('connection', function() {  
+  //누군가 웹소켓 접속 시 내부 코드 실행
+  console.log("유저접속됨")
+})
+
 //5. 기기 현황 페이지 이동
 app.get('/macstatus', function(req, res) {
   if (!req.session.nickname) {
@@ -763,3 +769,13 @@ app.post('/branchinfo', function(req, res) {
     }
   })
 })
+
+// var timer1 = 30;
+// app.get('/branchinfo', function(req, res) {
+//   if (timer1 != 0) {
+//     setTimeout(() => {
+//       res.send({timer : timer1});
+//       timer1 -= 1;
+//     }, 60000);
+//   }
+// })
