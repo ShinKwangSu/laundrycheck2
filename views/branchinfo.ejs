@@ -21,74 +21,52 @@
 
     <%- include('nav.html') %>
 
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+
     <form action="/branchinfo" method="POST">   <!-- branchinfo의 post 요청 실행-->
       <div style="background-color:lightblue; padding:30px;">
         <div class="text-center">
           <p style="color:red; margin-bottom: 10px;"> 웨이팅 사용 시 시작버튼을 눌러주세요. </p>
           <img src="/public/image/wash-machine.png" alt="" width="200" height="200">
-          <!-- <button class="btn btn-primary" type="submit" onclick="StartTimer()">시작버튼</button> -->
           <!-- <button class="btn btn-primary" type="submit">시작버튼</button> -->
-          <!-- <button class="startBtn" type="submit" onclick="StartTimer()">시작버튼</button> -->
           <!-- <button class="startBtn" type="submit">시작버튼</button> -->
           <button class="btn btn-primary" id="startBtn" type="submit">시작버튼</button>
-          <p>
-            <label for="Timer1">남은시간:</label>
-            <input id="Timer1" type="text" value="" readonly> 
-          </p>
         </div>
       </div>
     </form>
 
-    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
 
     <script>
       $('#startBtn').click(function() {   //startBtn을 click했을 때
-        StartTimer();
-        // $.ajax({  // branchinfo로 post요청 시 해당 data도 같이 보냄
-        //   method : 'POST',
-        //   url : '/branchinfo',
-        //   data : {id:Timer1}
-        // }).done(function(결과){
-        //   //AJAX 성공시 실행할 코드는 여기
-        //   console("ajax 성공>> " + " 결과 : " + 결과 + " data : " + data);
-        // }).fail(function(에러){
-        //   //실패시 실행할 코드는 여기
-        //   console("ajax 실패>> " + " 결과 : " + 결과);
-        // });
+        $.ajax({  // branchinfo로 post요청 시 해당 data도 같이 보냄
+          method : 'POST',
+          url : '/branchinfo',
+          data : {id:startBtn}
+        }).done(function(결과){
+          //AJAX 성공시 실행할 코드는 여기
+          console("ajax 성공>> " + " 결과 : " + 결과 + " data : " + data);
+        }).fail(function(에러){
+          //실패시 실행할 코드는 여기
+          console("ajax 실패>> " + " 결과 : " + 결과);
+        });
       })
+    </script>
 
-
-      //카운트다운 타이머
-      function StartTimer() {
-        const Timer1 = document.getElementById('Timer1');
-        let time = 60000;    //setInterval(1000) = 1초인데, *3분(180초)하면 180,000
-        let min = 1;
-        let sec = 60;
-
-        Timer1.value = min + ":" + '00';
-
-        function TIMER1() {
-          PLAYTIME = setInterval(function() {
-            time = time - 1000;       //1초씩 감소
-            min = time / (60*1000);   //초를 분으로 나눔
-
-            if(sec > 0) {   //sec=60 에서 1씩 빼서 출력
-              sec = sec - 1;
-              Timer1.value = Math.floor(min) + ':' + sec;   //실수로 계산 > 소숫점 아래를 버리고 출력
-            }
-            if(sec == 0) {
-              //sec(60) 기준으로 0에서 -1하면 -59 출력
-              //따라서 0이면 sec을 60으로 변경하고, value는 0으로 출력
-              sec = 60;
-              Timer1.value = Math.floor(min)+':'+'00'
-            }
-          }, 1000)  //1초마다
-        }
-
-        TIMER1();
-        setTimeout(function() {
-          clearInterval(PLAYTIME);
-        }, 60000);   //3분되면 타이머 삭제
+    <script>
+      let loginBtnEl = document.querySelector('.login-btn')
+      let signupBtnEl = document.querySelector('.signup-btn')
+      const session = "<%= session %>";
+      if (session === "false") {  //로그인O
+        loginBtnEl.textContent = "로그아웃";
+        loginBtnEl.href = "/logout";
+        signupBtnEl.textContent = "마이페이지";
+        signupBtnEl.href = "/mypage";
+      }
+      else {                      //로그인X
+        loginBtnEl.textContent = "로그인";
+        loginBtnEl.href = "/login";
+        signupBtnEl.textContent = "회원가입";
+        signupBtnEl.href = "/signup";
       }
     </script>
 

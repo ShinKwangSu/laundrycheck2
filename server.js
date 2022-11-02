@@ -87,10 +87,10 @@ app.post('/login', passport.authenticate('local', {
   })
 })
 
-// app.get('/fail', function(req, res) {
-//   res.redirect('/login')
-//   console.log('로그인 실패')
-// })
+/* app.get('/fail', function(req, res) {
+  res.redirect('/login')
+  console.log('로그인 실패')
+}) */
 
 // 인증하는 방법을 Strategy라 칭함
 // done() 함수의 파라미터는 3개가 올 수 있다.
@@ -194,51 +194,122 @@ function isLogin(req, res, next) {
 }
 
 //4. 메인페이지(express)
-// app.get('/', function(req, res) {
-//   let flashmsg = req.flash()
-//   let feedback = flashmsg.success
-
-//   if (feedback != 0) {
-//     if (!req.session.nickname) {
-//       res.render('index.ejs', {session: "true", successRes: 'NOWELCOME', welcomeUser: 'NOWELCOME'});
-//     }
-//     else {
-//       res.render('index.ejs', {session: "false", successRes: feedback, welcomeUser: req.user})
-//     }
-//   }
-// })
-//4. 메인페이지(socket)
-app.get('/', function(req, res){
+/* app.get('/', function(req, res) {
   let flashmsg = req.flash()
   let feedback = flashmsg.success
 
   if (feedback != 0) {
     if (!req.session.nickname) {
-      res.render('socket.ejs', {session: "true", successRes: 'NOWELCOME', welcomeUser: 'NOWELCOME'});
+      res.render('index.ejs', {session: "true", successRes: 'NOWELCOME', welcomeUser: 'NOWELCOME'});
     }
     else {
-      res.render('socket.ejs', {session: "false", successRes: feedback, welcomeUser: req.user})
+      res.render('index.ejs', {session: "false", successRes: feedback, welcomeUser: req.user})
+    }
+  }
+}) */
+
+//4. 메인페이지(socket)
+app.get('/', function (req, res) {
+  let flashmsg = req.flash()
+  let feedback = flashmsg.success
+
+  if (feedback != 0) {
+    if (!req.session.nickname) {
+      res.render('socket.ejs', { session: "true", successRes: 'NOWELCOME', welcomeUser: 'NOWELCOME' });
+    }
+    else {
+      res.render('socket.ejs', { session: "false", successRes: feedback, welcomeUser: req.user })
     }
   }
 });
 
-//유저가 웹소켓 접속 시 서버가 캐치
-io.on('connection', function() {  
-  //누군가 웹소켓 접속 시 내부 코드 실행
-  console.log("유저접속됨")
-})
+//웹소켓 접속 시 서버가 실행하는 부분>>>>>>>>
+// io.on('connection', function() {    
+//   //누군가 웹소켓 접속 시 내부 코드 실행
+//   console.log("웹소켓 연결로 유저접속됨")
+// })
+//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+// 카운트다운 타이머>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+let Timer1;
+let time = 60000;    //setInterval(1000) = 1초인데, *3분(180초)하면 180,000
+let min = 1;
+let sec = 60;
+
+function TIMER1() {
+  PLAYTIME = setInterval(function () {
+    time = time - 1000;       //1초씩 감소
+    min = time / (60 * 1000);   //초를 분으로 나눔
+
+    if (sec > 0) {   //sec=60 에서 1씩 빼서 출력
+      //sec = sec - 1;
+      //Timer1.value = Math.floor(min) + ':' + sec;   //실수로 계산 > 소숫점 아래를 버리고 출력
+      // --------------------------------------
+      min = Math.floor(min);
+      sec = sec - 1;
+
+      console.log("타이머(??:??) " + min + ":" + sec);
+      Timer1 = min + ":" + sec;
+      console.log("타이머(?:?) " + Timer1);
+    }
+    if (sec == 0) {
+      //sec(60) 기준으로 0에서 -1하면 -59 출력
+      //따라서 0이면 sec을 60으로 변경하고, value는 0으로 출력
+      sec = 60;
+      Timer1.value = Math.floor(min) + ':' + '00'
+      // --------------------------------------
+      min = Math.floor(min);
+      sec = 60;
+
+      console.log("타이머(??:??) " + min + ":" + sec);
+      Timer1 = min + ":" + "00";
+      console.log("타이머(?:00) " + Timer1);
+    }
+  }, 1000)  //1초마다
+}
+
+TIMER1();
+setTimeout(function () {
+  clearInterval(PLAYTIME);
+  console.log("타이머 삭제");
+}, 60000);   //3분(180,000)되면 타이머 삭제
+// >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+// var timer1 = 30;
+// app.get('/branchinfo', function(req, res) {
+//   if (timer1 != 0) {
+//     setTimeout(() => {
+//       res.send({timer : timer1});
+//       timer1 -= 1;
+//     }, 60000);
+//   }
+// })
+
 
 //5. 기기 현황 페이지 이동
-app.get('/macstatus', function(req, res) {
+/* app.get('/macstatus', function(req, res) {
   if (!req.session.nickname) {
     //로그인X
     res.render('macstatus.ejs', {session: "true"});
-  }
   else {
     //로그인O
     res.render('macstatus.ejs', {session: "false"});
   }
+}) */
+
+app.get('/macstatus', function (req, res) {
+  StartTimer();
+  if (!req.session.nickname) {
+    //로그인X
+    res.render('macstatus.ejs', { session: "true", 타이머: Timer1, 분: min, 초: sec });
+  }
+  else {
+    //로그인O
+    res.render('macstatus.ejs', { session: "false", 타이머: Timer1, 분: min, 초: sec });
+  }
 })
+
 
 /* app.get('/macstatus', function(req, res) {
   if (!req.session.nickname) {
@@ -690,8 +761,17 @@ app.get('/map', function(req, res) {
 })
 
 //11. 지점 상세정보 페이지 이동
-app.get('/branchinfo', function(req, res) {
-  res.render('branchinfo.ejs')
+app.get('/branchinfo', function (req, res) {
+  //res.render('branchinfo.ejs')
+
+  if (!req.session.nickname) {
+    //로그인X
+    res.render('branchinfo.ejs', { session: "true" });
+  }
+  else {
+    //로그인O
+    res.render('branchinfo.ejs', { session: "false" });
+  }
 })
 
 app.post('/branchinfo', function(req, res) {
@@ -770,12 +850,3 @@ app.post('/branchinfo', function(req, res) {
   })
 })
 
-// var timer1 = 30;
-// app.get('/branchinfo', function(req, res) {
-//   if (timer1 != 0) {
-//     setTimeout(() => {
-//       res.send({timer : timer1});
-//       timer1 -= 1;
-//     }, 60000);
-//   }
-// })

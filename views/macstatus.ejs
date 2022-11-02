@@ -22,12 +22,20 @@
 
     <%- include('nav.html') %>
 
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.5.3/socket.io.js"></script>
+
+    <script>
+      //var socket = io();  //유저가 웹소켓에 접속
+    </script>
+
     <form action="/macstatus" method="POST">
       <div class="imgarea">
 
         <div class="washarea">
           <h2>세탁기</h2>
-          <span>00:00</span>
+          <span><%= 타이머 %></span>
+          <span><%= 분 %>:<%= 초 %></span>
           <div class="washmac">
             <img src="/public/image/wash-machine.png" alt="" width="100" height="100">
             <button class="btn btn-primary" id="wmac1" type="submit">세탁기1</button>
@@ -63,12 +71,37 @@
       </div>
     </form>
 
-    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.5.3/socket.io.js"></script> 
+    
     <script>
-      var socket = io(); //유저가 웹소켓에 접속
+      //카운트다운 타이머
+      // function StartTimer() {
+      //   const Timer1 = document.getElementById('Timer1');
+      //   let time = 60000;    //setInterval(1000) = 1초인데, *3분(180초)하면 180,000
+      //   let min = 1;
+      //   let sec = 60;
+      //   Timer1.value = min + ":" + '00';
+      //   function TIMER1() {
+      //     PLAYTIME = setInterval(function() {
+      //       time = time - 1000;       //1초씩 감소
+      //       min = time / (60*1000);   //초를 분으로 나눔
+      //       if(sec > 0) {   //sec=60 에서 1씩 빼서 출력
+      //         sec = sec - 1;
+      //         Timer1.value = Math.floor(min) + ':' + sec;   //실수로 계산 > 소숫점 아래를 버리고 출력
+      //       }
+      //       if(sec == 0) {
+      //         //sec(60) 기준으로 0에서 -1하면 -59 출력
+      //         //따라서 0이면 sec을 60으로 변경하고, value는 0으로 출력
+      //         sec = 60;
+      //         Timer1.value = Math.floor(min)+':'+'00'
+      //       }
+      //     }, 1000)  //1초마다
+      //   }
+      //   TIMER1();
+      //   setTimeout(function() {
+      //     clearInterval(PLAYTIME);
+      //   }, 60000);   //3분되면 타이머 삭제
+      // }
     </script>
-
     
     <script>
       let loginBtnEl = document.querySelector('.login-btn')
