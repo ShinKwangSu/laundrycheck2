@@ -32,8 +32,8 @@ MongoClient.connect(process.env.DB_URL, { useUnifiedTopology: true }, function(e
 
   db = client.db('laundrycheck2')
 
-  //app.listen(process.env.PORT, function() {   //express(http를 쉽게 사용하기 위한 도구)로 서버 띄움
-  http.listen(process.env.PORT, function() {  //http(nodejs 기본 라이브러리) + socket.io로 서버 띄움
+  app.listen(process.env.PORT, function() {   //express(http를 쉽게 사용하기 위한 도구)로 서버 띄움
+  //http.listen(process.env.PORT, function() {  //http(nodejs 기본 라이브러리) + socket.io로 서버 띄움
     console.log('listening on 9999')
   })
 })
