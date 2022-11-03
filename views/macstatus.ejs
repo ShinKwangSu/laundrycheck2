@@ -72,17 +72,17 @@
 
 
     <script>
-      $.ajax({  // branchinfo로 post요청 시 해당 data도 같이 보냄
-          method : 'GET',
-          url : '/macstatus',
-          //data : {분, 초}
-        }).done(function(결과){
-          //AJAX 성공시 실행할 코드는 여기
-          console("ajax 성공>> " + " 결과 : " + 결과 + " data : " + data);
-        }).fail(function(에러){
-          //실패시 실행할 코드는 여기
-          console("ajax 실패>> " + " 결과 : " + 에러);
-        });
+      $.ajax({  
+        method : 'GET',
+        url : '/macstatus',
+        //data : {분, 초}
+      }).done(function(결과){
+        //AJAX 성공시 실행할 코드는 여기
+        console("ajax 성공>> " + " 결과 : " + 결과 + " data : " + data);
+      }).fail(function(에러){
+        //실패시 실행할 코드는 여기
+        console("ajax 실패>> " + " 결과 : " + 에러);
+      });
     </script>
 
 

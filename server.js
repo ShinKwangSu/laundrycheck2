@@ -443,6 +443,7 @@ app.get('/caution', function(req, res) {
   }
 })
 
+
 //7. 웨이팅 등록 페이지 이동
 app.get('/wait', isLogin, function(req, res) {
   console.log(req.user);
@@ -839,7 +840,7 @@ app.post('/branchinfo', function(req, res) {
     
                 console.log('사용했기 때문에 true로 바뀌고 사용회원관리')
                 console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>')
-                res.redirect('/macstatus')
+                res.redirect('/')
                 //res.send("타이머 실행 완료--------------------------------")
               })
             })

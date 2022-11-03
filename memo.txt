@@ -161,5 +161,16 @@ https://webisfree.com/2015-10-14/ajax%EB%A5%BC-%EC%82%AC%EC%9A%A9%ED%95%B4-%EC%8
   > 타이머 값이 ajax가 되지 않아 타이머의 처음 값만 render된 상태
   > server.js에서 타이머는 돌아가고 있음
 
+2. vhost 사용 => 실행 오류
+: 도메인별로 다른 express 사용해서 서버 띄우기
+- 모듈 설치 : npm install --save express vhost
 
+3. 웨이팅 사용 조건 세부화 코드 구상
+- 모든 기기가 사용중인지 아닌지 구분하는 코드
+  >/btncheck에서 타이머 실행 후, db에서 isUseW1(wmac1의 사용여부) true로 update 
+  >isUseW1이 false로 변경되는건.... 타이머가 끝난 경우....!... => 이게 좀 애매함
+
+- '모든 기기가 사용중인 경우' 웨이팅 사용(mypage에 있음)하는 코드
+  > macstatus의 타이머 실행
+  > 웨이팅 사용 코드 실행(총웨이팅인원-1, isUseWait true로 변경) 
 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
