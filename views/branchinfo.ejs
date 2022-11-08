@@ -28,8 +28,6 @@
         <div class="text-center">
           <p style="color:red; margin-bottom: 10px;"> 웨이팅 사용 시 시작버튼을 눌러주세요. </p>
           <img src="/public/image/wash-machine.png" alt="" width="200" height="200">
-          <!-- <button class="btn btn-primary" type="submit">시작버튼</button> -->
-          <!-- <button class="startBtn" type="submit">시작버튼</button> -->
           <button class="btn btn-primary" id="startBtn" type="submit">시작버튼</button>
         </div>
       </div>
@@ -42,6 +40,7 @@
           method : 'POST',
           url : '/btncheck',
           //data : {isUse1:"사용중"}
+          //data : {isClick:true}
         }).done(function(결과){
           //AJAX 성공시 실행할 코드는 여기
           console("ajax 성공>> " + " 결과 : " + 결과);

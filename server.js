@@ -17,10 +17,14 @@ const io = new Server(http);
 const MongoClient = require('mongodb').MongoClient
 const methodOverride = require('method-override')
 app.use(methodOverride('_method'))
+
+//ejs 사용 - npm install ejs
 app.set('view engine', 'ejs')
+
+//dotenv로 환경변수 관리
 require('dotenv').config()
 
-// public 폴더 사용하려면
+// public 폴더 사용
 app.use('/public', express.static('public'))
 
 
@@ -37,6 +41,7 @@ MongoClient.connect(process.env.DB_URL, { useUnifiedTopology: true }, function(e
     console.log('listening on 9999')
   })
 })
+
 
 //1. 로그인
 const passport = require('passport')
@@ -139,6 +144,7 @@ passport.deserializeUser(function (아이디, done) {  // 아이디는 위에 �
   })
 }); 
 
+
 //2. 로그아웃
 app.get('/logout', function(req, res) {
   req.logout()
@@ -149,6 +155,7 @@ app.get('/logout', function(req, res) {
     res.redirect('/')
   })
 })
+
 
 //3. 회원가입
 app.get('/signup', function(req, res) {
@@ -183,7 +190,6 @@ app.post('/idcheck', function(req, res) {
   })
 })
 
-
 // 로그인 후 세션이 있으면 req.user가 항상 있음
 function isLogin(req, res, next) {
   if (req.user) {
@@ -193,6 +199,7 @@ function isLogin(req, res, next) {
     res.render('loginreq.ejs')
   }
 }
+
 
 //4. 메인페이지(express)
 /* app.get('/', function(req, res) {
@@ -224,24 +231,22 @@ app.get('/', function (req, res) {
   }
 });
 
-//웹소켓 접속 시 서버가 실행하는 부분>>>>>>>>
-// io.on('connection', function() {    
-//   //누군가 웹소켓 접속 시 내부 코드 실행
-//   console.log("웹소켓 연결로 유저접속됨")
-// })
-//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-
 
 // 카운트다운 타이머>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 let Timer1;
-let time = 60000;    //setInterval(1000) = 1초인데, *3분(180초)하면 180,000
-let min = 1;
-let sec = 60;
+let time;
+let min;
+let sec;
+let btnClick = 0;                 //branchinfo 버튼 클릭 여부
 
 function StartTimer() {
+  time = 60000;                   //setInterval(1000) = 1초인데, *3분(180초)하면 180,000
+  min = 1;
+  sec = 60;
   function TIMER1() {
     PLAYTIME = setInterval(function () {
-      time = time - 1000;       //1초씩 감소
+      btnClick = 1;               //branchinfo 버튼 클릭 여부(true)
+      time = time - 1000;         //1초씩 감소
       min = time / (60 * 1000);   //초를 분으로 나눔
   
       if (sec > 0) {   //sec=60 에서 1씩 빼서 출력
@@ -250,9 +255,10 @@ function StartTimer() {
         // --------------------------------------
         min = Math.floor(min);
         sec = sec - 1;
+        
         console.log("타이머(??:??) " + min + ":" + sec);
         // --------------------------------------
-        // Timer1 = min + ":" + sec;
+        // Timer1 = min + " : " + sec;
         // console.log("타이머(?:?) " + Timer1);
       }
       if (sec == 0) {
@@ -263,19 +269,21 @@ function StartTimer() {
         // --------------------------------------
         min = Math.floor(min);
         sec = 60;
+
         console.log("타이머(??:??) " + min + ":" + sec);
         // --------------------------------------
-        // Timer1 = min + ":" + "00";
+        // Timer1 = min + " : " + "00";
         // console.log("타이머(?:00) " + Timer1);
       }
     }, 1000)  //1초마다
   }
   
   TIMER1();
+  btnClick = 0;                    //branchinfo 버튼 클릭 여부(false)
   setTimeout(function () {
     clearInterval(PLAYTIME);
     console.log("타이머 삭제");
-  }, 60000);   //3분(180,000)되면 타이머 삭제
+  }, 60000);                      //3분(180,000)되면 타이머 삭제
 }
 // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
@@ -291,87 +299,24 @@ function StartTimer() {
 
 
 //5. 기기 현황 페이지 이동
-/* app.get('/macstatus', function(req, res) {
-  if (!req.session.nickname) {
-    //로그인X
-    res.render('macstatus.ejs', {session: "true"});
-  else {
-    //로그인O
-    res.render('macstatus.ejs', {session: "false"});
-  }
-}) */
-
 app.get('/macstatus', function (req, res) {
-  //StartTimer();
+
+  if(btnClick == 1){
+    console.log("btnClick 1이라서 >>>>>>>>>> " + btnClick );
+  }
+  else {
+    console.log("btnClick 1아니라서 >>>>>>>>>> " + req.body.isClick);
+  }
+
   if (!req.session.nickname) {
     //로그인X
-    res.render('macstatus.ejs', { session: "true", 분: min, 초: sec });
+    res.render('macstatus.ejs', { session: "true", 시간 : time, 분 : min, 초 : sec, 클릭여부 : btnClick});
   }
   else {
     //로그인O
-    res.render('macstatus.ejs', { session: "false", 분: min, 초: sec });
+    res.render('macstatus.ejs', { session: "false", 시간 : time, 분 : min, 초 : sec, 클릭여부 : btnClick});
   }
 })
-
-
-/* app.get('/macstatus', function(req, res) {
-  if (!req.session.nickname) {
-    //로그인X
-    res.render('macstatus.ejs', {session: "true", 웨이팅여부: null});
-    console.log("웨이팅여부 = null")
-  }
-  else {
-    //로그인O
-    //res.render('macstatus.ejs', {session: "false"});
-    
-    // ------------------- 웨이팅 등록 최초 1회 -------------------
-    //db.waitinfo에 로그인한 유저의 id를 찾아서..
-    db.collection('waitinfo').findOne({userid : req.user.id}, function(에러, 결과2) {
-      if(에러) return done(에러)
-
-      //로그인한 유저가 waitinfo에 없다면.. -> 웨이팅 신청 한 번도 안함
-      if(결과2 == null) {
-        //res.redirect('/awaituse')
-        res.render('macstatus.ejs', {session: "false", 웨이팅여부: "null"});
-        console.log('최초 1회 - 현재 웨이팅 신청X')
-        return
-      }
-      // else{
-      //   res.render('macstatus.ejs', {session: "false", 웨이팅여부: "true"});
-      //   console.log('최초 1회 - 현재 웨이팅 신청O')
-      // }
-    })
-
-    // ------------------- 웨이팅 등록 재사용 -------------------
-    //db.waitinfo에 로그인한 유저의 id를 array로 찾아서.. 
-    db.collection('waitinfo').find({userid : req.user.id}).toArray(function(에러, 결과2) {
-      if(에러) return done(에러)
-
-      var 유저의웨이팅신청수 = 결과2.length
-      console.log("유저의웨이팅신청수(arr.length) : " + 유저의웨이팅신청수);
-
-      var 찾았니
-      for (let i = 0; i < 결과2.length; i++) {
-        if (결과2[i].isUseWait == true) {
-        찾았니 = "못찾음"         //유저의 재신청을 못찾음(true) -> 웨이팅 신청 후(웨이팅 신청해라)
-        }
-        else {
-          찾았니 = "찾음"         //유저의 재신청을 찾음(false) -> 웨이팅 신청 전(웨이팅 정보 확인)
-        }
-      }
-
-      //로그인한 유저가 이전에 사용했고 재신청하지 않은 경우.. 웨이팅 신청 하도록 /bwaitcheck로..
-      if (찾았니 == "못찾음") {
-        res.render('macstatus.ejs', {session: "false", 웨이팅여부: "false"});
-        console.log('재사용 - 현재 웨이팅 신청X')
-      }
-      else if(찾았니 == "찾음"){
-        res.render('macstatus.ejs', {session: "false", 웨이팅여부: "true"});
-        console.log('재사용 - 현재 웨이팅 신청O')
-      }
-    })
-  } 
-}) */
 
 app.post('/macstatus', function(req, res) {
   if (!req.session.nickname) {
@@ -432,7 +377,6 @@ app.post('/macstatus', function(req, res) {
 })
 
 
-
 //6. 유의사항 페이지 이동
 app.get('/caution', function(req, res) {
   if (!req.session.nickname) {
@@ -457,7 +401,6 @@ app.get('/wait', isLogin, function(req, res) {
       res.render('wait.ejs', {사용자 : req.user, counters : 결과})
     })
 })
-
 
 app.post('/wait', isLogin, function(req, res){
   //db에서 데이터 꺼내기 - db.counter에서 name이 대기인원수인 데이터 찾기
@@ -535,11 +478,13 @@ app.post('/wait', isLogin, function(req, res){
   })
 })
 
+
 //7-1. 웨이팅 신청이 되어있으면 뿌려주는 페이지
 app.get('/waitalready', isLogin, function(req, res) {
   console.log(req.user)
   res.render('waitalready.ejs')
 })
+
 
 //7-2. 웨이팅 신청 성공하면 뿌려주는 페이지
 app.get('/waitsuccess', isLogin, function(req, res) {
@@ -597,6 +542,7 @@ app.get('/waitcheck', isLogin, function(req, res) {
   })
 })
 
+
 //8-1. 웨이팅 등록하고 기기 작동시키기 전
 // 본인 대기번호와 앞에 몊명 남았는지 확인 가능
 app.get('/bwaituse', isLogin, function(req, res) {
@@ -648,6 +594,7 @@ app.get('/awaituse', isLogin, function(req, res) {
   console.log(req.user)
   res.render('awaituse.ejs')
 })
+
 
 //9. 마이페이지
 app.get('/mypage', isLogin, function(req, res) {
@@ -737,10 +684,12 @@ app.post('/mypage', isLogin, function(req, res) {
   })
 })
 
+
 // 요금정산 페이지
 app.get('/charge', function(req, res) {
   res.render('charge.ejs')
 })
+
 
 //10. 지도 (카카오맵)
 app.get('/map', function(req, res) {
@@ -764,10 +713,9 @@ app.get('/map', function(req, res) {
   })
 })
 
+
 //11. 지점 상세정보 페이지 이동
 app.get('/branchinfo', function (req, res) {
-  //res.render('branchinfo.ejs')
-
   if (!req.session.nickname) {
     //로그인X
     res.render('branchinfo.ejs', { session: "true" });
@@ -857,6 +805,5 @@ app.post('/branchinfo', function(req, res) {
 //branchinfo 버튼 클릭 확인
 app.post('/btncheck', function(req, res) {
   console.log("branchinfo 버튼 클릭 -> 타이머 실행")
-  StartTimer();
+  StartTimer(); 
 })
-

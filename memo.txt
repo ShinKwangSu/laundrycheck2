@@ -175,3 +175,66 @@ https://webisfree.com/2015-10-14/ajax%EB%A5%BC-%EC%82%AC%EC%9A%A9%ED%95%B4-%EC%8
   > macstatus의 타이머 실행
   > 웨이팅 사용 코드 실행(총웨이팅인원-1, isUseWait true로 변경) 
 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+11/04(금)>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+1. 11/03(목) 1번 <<수정 부분>>
+* server.js에서 실행된 타이머를 macstatus에 출력하기
+- 문제점 및 진행현황
+  > 타이머 값이 ajax가 되지 않아 타이머의 처음 값만 render된 상태
+  > server.js에서 타이머는 돌아가고 있음
+
+- 해결하기 위해 수정중..
+  1) server와 browser 모두 타이머 코드 사용 -> 자원 절약을 위해 아래 참고
+  2) server에서 시간만 render해주고 browser에서 해당 시간 받아서 타이머 코드에 사용
+     > server에서 /macstatus로 get요청할 때 서버시간 render
+     > /macstatus로 get요청할 때마다 서버시간 받아온 결과를 1초에 1씩 감소
+  3) server에서 render한 데이터를 ejs의 <script> 내에서 사용할 때 아래처럼 쓰기
+     <script>
+        var aaa = "<%= AAA %>";
+     </script>
+
+- 여기까지 코드의 문제점
+  > macstatus get하면 바로 브라우저의 타이머 실행
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+11/05-6(토-일)>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+1. /macstatus로 get 요청 > server의 시간을 기준으로 /macstatus의 타이머 실행
+ > macstatus로 get 요청하면 브라우저의 타이머가 바로 실행됨
+ > branchinfo의 버튼 체크 여부에 따라 브라우저의 타이머를 실행해야 함
+
+- 해결방안
+1) branchinfo 버튼 클릭하면 /btnChek로 post 요청되니 /macstatus로도 여부를 전달
+   > branchinfo에서 버튼 클릭하면, /macstatus에 ajax로 get 요청하면 isClick : true 전달!!
+   > server.js에서 /macstatus에 get할 때 req.body.isClick를 btnClick에 담아 render할 때 클릭여부 : btnClick으로 보냄
+     해당 ajax가 실행되지 않는듯
+
+* ajax에서 done과 success의 차이 (https://string.tistory.com/128)
+- 성공 시 : success > complete > done > always
+- 실패 시 : error > complete > fail > always
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+11/7-8(월-화)>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+1. 11/5-6의 해결방안 1이 되지 않는 이유를 찾음
+- 이유 : post요청만 서버로 req.body 데이터를 보낼 수 있음
+
+2. 이에 따른 다른 해결방안 생각해보기
+1) /branchinfo에서 /btnCheck로 post ajax할 때 data 전송해서 사용해보기
+- server.js의 btncheck.post에서 해당 데이터를 받아지는지 확인
+- server.js에서 AAA()만들고 btncheck.post에서 AAA()호출하면 data를 사용해 return data하도록 만듬
+- server.js에서 /macstatus.get할 때 AAA()를 호출해서 return된 데이터 사용하도록 함
+
+2) server.js의 StartTimer() 실행 여부에 따른 변수를 받아와서 사용해보기 => 사용
+- 아래 흐름에 맞게 코드 변경
+  1) branchinfo.ejs에서 '시작버튼'을 누르면 server의 StartTimer() 실행(/btnCheck에서)
+  2) let isClick을 전역변수로 만들어서.. (StartTimer() 내부에 TIMER() 있음)
+     TIMER()가 실행되면 btnClick=1이 되고, TIMER()가 끝나면 btnClick=0이 됨
+  3) /macstatus get요청할 때 {클릭여부:btnClick}으로 render
+  4) macstatus.ejs에서 btnClick = "<%= 클릭여부 %>"로 받아옴
+  5) btnClick = 1일 때, 브라우저의 TIMER() 실행 및 삭제
+=> 유저1, 2명 접속했을 때 잘 돌아가는 것 확인
+=> n초 정도 차이나는 문제 있음
+
+
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
