@@ -295,11 +295,16 @@ https://webisfree.com/2015-10-14/ajax%EB%A5%BC-%EC%82%AC%EC%9A%A9%ED%95%B4-%EC%8
 11/16(수)>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 1. 11/15 3번 해결해보기 => 일단 야매로 해결
 1) 버튼마다 다른 form post요청으로 묶어보기 => 사용
+- macstatusA1, macstatusA2 post요청 추가(macstatusA를 복제함)
 - 버튼1 클릭 > macstatusA1으로 post요청 > branchinfoA1으로 redirect
 - 버튼2 클릭 > macstatusA2으로 post요청 > branchinfoA2으로 redirect
 2) async : false 를 ajax 요청보낼때 설정
 
-2. 11/15 1번 만들어보기
+2. macstatusA 프론트 구조(?) 변경 => 추후 css로 정렬 맞추기 등 하기
+- macstatus.css 수정
+  > span 말고 input(text type css에서 정렬하는 방법) 정렬하기
+
+3. 11/15 1번 만들어보기
 1) 모든 기기가 사용중인지 아닌지 구분하는 코드
    > /btncheck에서 타이머 실행 후, db에서 isUseW1(wmac1의 사용여부) true로 update 
    > isUseW1이 false로 변경되는건.... 타이머가 끝난 경우....!... => 이게 좀 애매함 => 타이머가 삭제될 때?
