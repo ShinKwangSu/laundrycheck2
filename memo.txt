@@ -25,10 +25,7 @@ ex2) 웨이팅 순서가 아닌 경우 /bwaituse(웨이팅 사용 전)로 이동
 ----------------------------------------------------------------------------------
 4. mypage에 넣을 내용 구상
 ----------------------------------------------------------------------------------
-5. 웹소켓(아두이노 대체)
-- 사용여부, 잔여시간 출력
-----------------------------------------------------------------------------------
-6. 웨이팅 알람 기능 및 잔여시간 알람 기능
+5. 웨이팅 알람 기능 및 잔여시간 알람 기능
 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
 
@@ -235,6 +232,76 @@ https://webisfree.com/2015-10-14/ajax%EB%A5%BC-%EC%82%AC%EC%9A%A9%ED%95%B4-%EC%8
 => 유저1, 2명 접속했을 때 잘 돌아가는 것 확인
 => n초 정도 차이나는 문제 있음
 
+3. 웨이팅 사용 조건 세부화 코드 구상
+- 모든 기기가 사용중인지 아닌지 구분하는 코드
+  > /btncheck에서 타이머 실행 후, db에서 isUseW1(wmac1의 사용여부) true로 update 
+  > isUseW1이 false로 변경되는건.... 타이머가 끝난 경우....!... => 이게 좀 애매함
 
+- '모든 기기가 사용중인 경우' 웨이팅 사용(mypage에 있음)'하는 코드
+  > macstatus의 타이머 실행
+  > 웨이팅 사용 코드 실행(총웨이팅인원-1, isUseWait true로 변경)
+
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+11/15(화)>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+1. 웨이팅 사용 조건 세부화 코드 구상
+- 모든 기기가 사용중인지 아닌지 구분하는 코드
+  > /btncheck에서 타이머 실행 후, db에서 isUseW1(wmac1의 사용여부) true로 update 
+  > isUseW1이 false로 변경되는건.... 타이머가 끝난 경우....!... => 이게 좀 애매함
+
+- '모든 기기가 사용중인 경우' 웨이팅 사용(mypage에 있음)'하는 코드
+  > macstatus의 타이머 실행
+  > 웨이팅 사용 코드 실행(총웨이팅인원-1, isUseWait true로 변경)
+
+2. 1번의 1번 하기 위해 A지점에 wmac1과 wmac2의 타이머 생성
+1) A지점의 wmac1과 wmac2 페이지 생성
+- macstatusA, branchinfoA1, branchinfoA2로 생성
+
+2) macstatusA에서 wmac1과 wmac2의 각 branchinfo(branchinfoA1, branchinfoA2)로 이동
+- macstatus.ejs에서 ajax post로 data 넘겨서 server에서 if문 이용해서 사용
+  > ajax로 data : {macNumber:"A1"}, data : {macNumber:"A2"} 넘김
+  > server에서 macNumber가 A1이면 branchinfoA1으로 이동, A2이면 branchinfoA2로 이동(macstatusA의 post요청 부분)
+
+3) wmac1과 wmac2의 각 branchinfo(branchinfoA1, branchinfoA2)에서 시작버튼 클릭 시,
+   branchinfo로 post요청해서 웨이팅 사용(페이지 이동 없기 때문에 공통으로 사용해보자)
+   각 btnCheck로 ajax post요청해서 각 StartTimer 실행 -> btnCheck에 따라 다른 타이머를 실행하기 위함
+- branchinfo의 StartBtn 클릭 시 btnCheck로 ajax post요청해서 StartTimer() 실행
+  > branchinfoA1의 StartBtn버튼 클릭 > StartTimerA1() 실행 > btnClick1 == 1
+  > branchinfoA2의 StartBtn버튼 클릭 > StartTimerA2() 실행 > btnClick2 == 1
+
+4) 각 StartTimer()의 각 time, min, sec을 macstatusA get요청 시 render하여 macstatusA에서 출력
+  > StartTimerA1() 실행 > time1, min1, sec1, btnClick1 사용 > macstatusA로 모두 render
+  > StartTimerA2() 실행 > time2, min2, sec2, btnClick2 사용 > macstatusA로 모두 render
+
+5) macstatus.ejs의 타이머 부분도 render 받은거에 맞게 수정해주기
+
+3. 2번처럼 수정한 결과..
+- macstatus의 ajax에 문제가 있는 것 같음
+  > macstatus의 post요청의 if문에서 문제 발생(macNumber 받아지는데 그에 따라 redirect 안됨)
+  > 오류 시 jquery 문제가 뜨기 때문
+- macstatus의 post요청의 if문 말고 macNumber 출력과 redirect만 각 사용해봄
+  > macNumber가 A1인 경우, branchinfoA1으로 redirect 잘 되고 타이머 문제 없음
+  > macNumber가 A2인 경우, branchinfoA2으로 redirect는 잘 되지만 타이머 문제 있음(타이머 출력X, 타이머 삭제됨) => 해결
+- macstatusA의 post요청이 두번 실행됨, db는 바뀌지 않고 redirect도 되지 않음
+
+4. 3번의 해결방안
+- ajax 사용시 서버에서 .redirect말고 프론트엔드에서 window.location.href="/" 실행해서 페이지이동
+  (window.location.href와 location.href는 같음, windows만 생략될 뿐)
+  > 안됨
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+11/16(수)>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+1. 11/15 3번 해결해보기 => 일단 야매로 해결
+1) 버튼마다 다른 form post요청으로 묶어보기 => 사용
+- 버튼1 클릭 > macstatusA1으로 post요청 > branchinfoA1으로 redirect
+- 버튼2 클릭 > macstatusA2으로 post요청 > branchinfoA2으로 redirect
+2) async : false 를 ajax 요청보낼때 설정
+
+2. 11/15 1번 만들어보기
+1) 모든 기기가 사용중인지 아닌지 구분하는 코드
+   > /btncheck에서 타이머 실행 후, db에서 isUseW1(wmac1의 사용여부) true로 update 
+   > isUseW1이 false로 변경되는건.... 타이머가 끝난 경우....!... => 이게 좀 애매함 => 타이머가 삭제될 때?
 
 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>

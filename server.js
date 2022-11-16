@@ -36,8 +36,8 @@ MongoClient.connect(process.env.DB_URL, { useUnifiedTopology: true }, function(e
 
   db = client.db('laundrycheck2')
 
-  app.listen(process.env.PORT, function() {   //express(http를 쉽게 사용하기 위한 도구)로 서버 띄움
-  //http.listen(process.env.PORT, function() {  //http(nodejs 기본 라이브러리) + socket.io로 서버 띄움
+  //app.listen(process.env.PORT, function() {   //express(http를 쉽게 사용하기 위한 도구)로 서버 띄움
+  http.listen(process.env.PORT, function() {  //http(nodejs 기본 라이브러리) + socket.io로 서버 띄움
     console.log('listening on 9999')
   })
 })
@@ -202,7 +202,7 @@ function isLogin(req, res, next) {
 
 
 //4. 메인페이지(express)
-/* app.get('/', function(req, res) {
+/*app.get('/', function(req, res) {
   let flashmsg = req.flash()
   let feedback = flashmsg.success
 
@@ -214,7 +214,7 @@ function isLogin(req, res, next) {
       res.render('index.ejs', {session: "false", successRes: feedback, welcomeUser: req.user})
     }
   }
-}) */
+})*/
 
 //4. 메인페이지(socket)
 app.get('/', function (req, res) {
@@ -233,72 +233,109 @@ app.get('/', function (req, res) {
 
 
 // 카운트다운 타이머>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-let Timer1;
-let time;
-let min;
-let sec;
-let btnClick = 0;                 //branchinfo 버튼 클릭 여부
+//let Timer1, Timer2;
+let time1, time2;
+let min1, min2;
+let sec1, sec2;
+let btnClick1 = 0;    let btnClick2 = 0;    //branchinfo 버튼 클릭 여부
 
-function StartTimer() {
-  time = 60000;                   //setInterval(1000) = 1초인데, *3분(180초)하면 180,000
-  min = 1;
-  sec = 60;
+function StartTimerA1() {
+  time1 = 60000;                   //setInterval(1000) = 1초인데, *3분(180초)하면 180,000
+  min1 = 1;
+  sec1 = 60;
   function TIMER1() {
     PLAYTIME = setInterval(function () {
-      btnClick = 1;               //branchinfo 버튼 클릭 여부(true)
-      time = time - 1000;         //1초씩 감소
-      min = time / (60 * 1000);   //초를 분으로 나눔
+      btnClick1 = 1;               //branchinfo 버튼 클릭 여부(true)
+      time1 = time1 - 1000;         //1초씩 감소
+      min1 = time1 / (60 * 1000);   //초를 분으로 나눔
   
-      if (sec > 0) {   //sec=60 에서 1씩 빼서 출력
-        //sec = sec - 1;
-        //Timer1.value = Math.floor(min) + ':' + sec;   //실수로 계산 > 소숫점 아래를 버리고 출력
+      if (sec1 > 0) {   //sec=60 에서 1씩 빼서 출력
+        //sec1 = sec1 - 1;
+        //Timer1.value = Math.floor(min1) + ':' + sec1;   //실수로 계산 > 소숫점 아래를 버리고 출력
         // --------------------------------------
-        min = Math.floor(min);
-        sec = sec - 1;
+        min1 = Math.floor(min1);
+        sec1 = sec1 - 1;
         
-        console.log("타이머(??:??) " + min + ":" + sec);
+        console.log("타이머1(??:??) " + min1 + ":" + sec1);
         // --------------------------------------
-        // Timer1 = min + " : " + sec;
+        // Timer1 = min1 + " : " + sec1;
         // console.log("타이머(?:?) " + Timer1);
       }
-      if (sec == 0) {
+      if (sec1 == 0) {
         //sec(60) 기준으로 0에서 -1하면 -59 출력
         //따라서 0이면 sec을 60으로 변경하고, value는 0으로 출력
-        // sec = 60;
-        // Timer1.value = Math.floor(min) + ':' + '00'
+        // sec1 = 60;
+        // Timer1.value = Math.floor(min1) + ':' + '00'
         // --------------------------------------
-        min = Math.floor(min);
-        sec = 60;
+        min1 = Math.floor(min1);
+        sec1 = 60;
 
-        console.log("타이머(??:??) " + min + ":" + sec);
+        console.log("타이머1(??:??) " + min1 + ":" + sec1);
         // --------------------------------------
-        // Timer1 = min + " : " + "00";
+        // Timer1 = min1 + " : " + "00";
         // console.log("타이머(?:00) " + Timer1);
       }
     }, 1000)  //1초마다
   }
   
   TIMER1();
-  btnClick = 0;                    //branchinfo 버튼 클릭 여부(false)
+  btnClick1 = 0;                    //branchinfo 버튼 클릭 여부(false)
   setTimeout(function () {
     clearInterval(PLAYTIME);
-    console.log("타이머 삭제");
+    console.log("타이머1 삭제");
+  }, 60000);                      //3분(180,000)되면 타이머 삭제
+}
+
+function StartTimerA2() {
+  time2 = 60000;                   //setInterval(1000) = 1초인데, *3분(180초)하면 180,000
+  min2 = 1;
+  sec2 = 60;
+  function TIMER2() {
+    PLAYTIME = setInterval(function () {
+      btnClick2 = 1;               //branchinfo 버튼 클릭 여부(true)
+      time2 = time2 - 1000;         //1초씩 감소
+      min2 = time2 / (60 * 1000);   //초를 분으로 나눔
+  
+      if (sec2 > 0) {   //sec=60 에서 1씩 빼서 출력
+        //sec2 = sec2 - 1;
+        //Timer2.value = Math.floor(min2) + ':' + sec2;   //실수로 계산 > 소숫점 아래를 버리고 출력
+        // --------------------------------------
+        min2 = Math.floor(min2);
+        sec2 = sec2 - 1;
+        
+        console.log("타이머2(??:??) " + min2 + ":" + sec2);
+        // --------------------------------------
+        // Timer2 = min2 + " : " + sec2;
+        // console.log("타이머(?:?) " + Timer2);
+      }
+      if (sec2 == 0) {
+        //sec(60) 기준으로 0에서 -1하면 -59 출력
+        //따라서 0이면 sec을 60으로 변경하고, value는 0으로 출력
+        // sec2 = 60;
+        // Timer2.value = Math.floor(min2) + ':' + '00'
+        // --------------------------------------
+        min2 = Math.floor(min2);
+        sec2 = 60;
+
+        console.log("타이머2(??:??) " + min2 + ":" + sec2);
+        // --------------------------------------
+        // Timer2 = min2 + " : " + "00";
+        // console.log("타이머(?:00) " + Timer2);
+      }
+    }, 1000)  //1초마다
+  }
+  
+  TIMER2();
+  btnClick2 = 0;                    //branchinfo 버튼 클릭 여부(false)
+  setTimeout(function () {
+    clearInterval(PLAYTIME);
+    console.log("타이머2 삭제");
   }, 60000);                      //3분(180,000)되면 타이머 삭제
 }
 // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
-// var timer1 = 30;
-// app.get('/branchinfo', function(req, res) {
-//   if (timer1 != 0) {
-//     setTimeout(() => {
-//       res.send({timer : timer1});
-//       timer1 -= 1;
-//     }, 60000);
-//   }
-// })
 
-
-//5. 기기 현황 페이지 이동
+//5. 기기 현황 페이지 이동 - 원본
 app.get('/macstatus', function (req, res) {
 
   if(btnClick == 1){
@@ -308,24 +345,20 @@ app.get('/macstatus', function (req, res) {
     console.log("btnClick 1아니라서 >>>>>>>>>> " + req.body.isClick);
   }
 
-  if (!req.session.nickname) {
-    //로그인X
+  if (!req.session.nickname) {    //로그인X
     res.render('macstatus.ejs', { session: "true", 시간 : time, 분 : min, 초 : sec, 클릭여부 : btnClick});
   }
-  else {
-    //로그인O
+  else {    //로그인O
     res.render('macstatus.ejs', { session: "false", 시간 : time, 분 : min, 초 : sec, 클릭여부 : btnClick});
   }
 })
 
 app.post('/macstatus', function(req, res) {
-  if (!req.session.nickname) {
-    //로그인X
+  if (!req.session.nickname) {    //로그인X
     res.redirect('/awaituse');
     console.log("웨이팅여부 = null")
   }
-  else {
-    //로그인O
+  else {    //로그인O
     // ------------------- 웨이팅 등록 최초 1회 -------------------
     //db.waitinfo에 로그인한 유저의 id를 찾아서..
     db.collection('waitinfo').findOne({userid : req.user.id}, function(에러, 결과2) {
@@ -375,6 +408,217 @@ app.post('/macstatus', function(req, res) {
     })
   } 
 })
+
+//기기 현황 페이지 - A지점
+app.get('/macstatusA', function (req, res) {
+
+  if(btnClick1 == 1){
+    console.log("btnClick1 == 1 >>>>>>>>>> " + btnClick1 );
+  }
+  else {
+    console.log("btnClick1 != 1 >>>>>>>>>> " + req.body.isClick1);
+  }
+
+  if(btnClick2 == 1){
+    console.log("btnClick2 == 1 >>>>>>>>>> " + btnClick2 );
+  }
+  else {
+    console.log("btnClick2 != 1 >>>>>>>>>> " + req.body.isClick2);
+  }
+
+  if (!req.session.nickname) {    //로그인X
+    res.render('macstatusA.ejs', { session: "true", //});
+    시간1 : time1, 분1 : min1, 초1 : sec1, 클릭여부1 : btnClick1,
+    시간2 : time2, 분2 : min2, 초2 : sec2, 클릭여부2 : btnClick2});
+  }
+  else {    //로그인O
+    res.render('macstatusA.ejs', { session: "false", //});
+    시간1 : time1, 분1 : min1, 초1 : sec1, 클릭여부1 : btnClick1,
+    시간2 : time2, 분2 : min2, 초2 : sec2, 클릭여부2 : btnClick2});
+  }
+})
+
+app.post('/macstatusA', function(req, res) {
+  if (!req.session.nickname) {    //로그인X
+    res.redirect('/awaituse');
+    console.log("웨이팅여부 = null")
+  }
+  else {                          //로그인O
+    // ------------------- 웨이팅 등록 최초 1회 -------------------
+    //db.waitinfo에 로그인한 유저의 id를 찾아서..
+    db.collection('waitinfo').findOne({userid : req.user.id}, function(에러, 결과2) {
+      if(에러) return done(에러)
+
+      //로그인한 유저가 waitinfo에 없다면.. -> 웨이팅 신청 한 번도 안함
+      if(결과2 == null) {
+        res.redirect('/awaituse')
+        console.log('최초 1회 - 현재 웨이팅 신청X')
+        return
+      }
+      // else{
+      //   res.render('macstatus.ejs', {session: "false", 웨이팅여부: "true"});
+      //   console.log('최초 1회 - 현재 웨이팅 신청O')
+      // }
+    })
+
+    // ------------------- 웨이팅 등록 재사용 -------------------
+    //db.waitinfo에 로그인한 유저의 id를 array로 찾아서.. 
+    db.collection('waitinfo').find({userid : req.user.id}).toArray(function(에러, 결과2) {
+      if(에러) return done(에러)
+
+      var 유저의웨이팅신청수 = 결과2.length
+      console.log("유저의웨이팅신청수(arr.length) : " + 유저의웨이팅신청수);
+
+      var 찾았니
+      for (let i = 0; i < 결과2.length; i++) {
+        if (결과2[i].isUseWait == true) {
+        찾았니 = "못찾음"         //유저의 재신청을 못찾음(true) -> 웨이팅 신청 후(웨이팅 신청해라)
+        }
+        else {
+          찾았니 = "찾음"         //유저의 재신청을 찾음(false) -> 웨이팅 신청 전(웨이팅 정보 확인)
+        }
+      }
+
+      //로그인한 유저가 이전에 사용했고 재신청하지 않은 경우.. 웨이팅 신청 하도록 /bwaitcheck로..
+      if (찾았니 == "못찾음") {
+        res.redirect('awaituse');
+        console.log('재사용 - 현재 웨이팅 신청X')
+      }
+      else if(찾았니 == "찾음"){
+        //자신의 차례이면 branchinfo, 자신의 차례가 아니면 bwaituse
+        //res.redirect('/branchinfo');
+        console.log('재사용 - 현재 웨이팅 신청O')
+        //res.redirect('/branchinfoA1');
+        
+        // console.log("macstatusA에서 클릭한 macNumber : " + req.body.macNumber)
+  
+        // if(req.body.macNumber == "A1"){
+        //   res.redirect('/branchinfoA1');
+        //   console.log("req.body.macNumber is A1")
+        // }
+        // if(req.body.macNumber == "A2"){
+        //   res.redirect('/branchinfoA2');
+        //   console.log("req.body.macNumber is A2")
+        // }
+      }
+    })
+  } 
+})
+
+//branchfinfoA1으로 redirect
+app.post('/macstatusA1', function(req, res) {
+  if (!req.session.nickname) {    //로그인X
+    res.redirect('/awaituse');
+    console.log("웨이팅여부 = null")
+  }
+  else {                          //로그인O
+    // ------------------- 웨이팅 등록 최초 1회 -------------------
+    //db.waitinfo에 로그인한 유저의 id를 찾아서..
+    db.collection('waitinfo').findOne({userid : req.user.id}, function(에러, 결과2) {
+      if(에러) return done(에러)
+
+      //로그인한 유저가 waitinfo에 없다면.. -> 웨이팅 신청 한 번도 안함
+      if(결과2 == null) {
+        res.redirect('/awaituse')
+        console.log('최초 1회 - 현재 웨이팅 신청X')
+        return
+      }
+      // else{
+      //   res.render('macstatus.ejs', {session: "false", 웨이팅여부: "true"});
+      //   console.log('최초 1회 - 현재 웨이팅 신청O')
+      // }
+    })
+
+    // ------------------- 웨이팅 등록 재사용 -------------------
+    //db.waitinfo에 로그인한 유저의 id를 array로 찾아서.. 
+    db.collection('waitinfo').find({userid : req.user.id}).toArray(function(에러, 결과2) {
+      if(에러) return done(에러)
+
+      var 유저의웨이팅신청수 = 결과2.length
+      console.log("유저의웨이팅신청수(arr.length) : " + 유저의웨이팅신청수);
+
+      var 찾았니
+      for (let i = 0; i < 결과2.length; i++) {
+        if (결과2[i].isUseWait == true) {
+        찾았니 = "못찾음"         //유저의 재신청을 못찾음(true) -> 웨이팅 신청 후(웨이팅 신청해라)
+        }
+        else {
+          찾았니 = "찾음"         //유저의 재신청을 찾음(false) -> 웨이팅 신청 전(웨이팅 정보 확인)
+        }
+      }
+
+      //로그인한 유저가 이전에 사용했고 재신청하지 않은 경우.. 웨이팅 신청 하도록 /bwaitcheck로..
+      if (찾았니 == "못찾음") {
+        res.redirect('awaituse');
+        console.log('재사용 - 현재 웨이팅 신청X')
+      }
+      else if(찾았니 == "찾음"){
+        //자신의 차례이면 branchinfo, 자신의 차례가 아니면 bwaituse
+        //res.redirect('/branchinfo');
+        console.log('재사용 - 현재 웨이팅 신청O')
+        res.redirect('/branchinfoA1');
+      }
+    })
+  } 
+})
+
+//branchinfoA2로 redirect
+app.post('/macstatusA', function(req, res) {
+  if (!req.session.nickname) {    //로그인X
+    res.redirect('/awaituse');
+    console.log("웨이팅여부 = null")
+  }
+  else {                          //로그인O
+    // ------------------- 웨이팅 등록 최초 1회 -------------------
+    //db.waitinfo에 로그인한 유저의 id를 찾아서..
+    db.collection('waitinfo').findOne({userid : req.user.id}, function(에러, 결과2) {
+      if(에러) return done(에러)
+
+      //로그인한 유저가 waitinfo에 없다면.. -> 웨이팅 신청 한 번도 안함
+      if(결과2 == null) {
+        res.redirect('/awaituse')
+        console.log('최초 1회 - 현재 웨이팅 신청X')
+        return
+      }
+      // else{
+      //   res.render('macstatus.ejs', {session: "false", 웨이팅여부: "true"});
+      //   console.log('최초 1회 - 현재 웨이팅 신청O')
+      // }
+    })
+
+    // ------------------- 웨이팅 등록 재사용 -------------------
+    //db.waitinfo에 로그인한 유저의 id를 array로 찾아서.. 
+    db.collection('waitinfo').find({userid : req.user.id}).toArray(function(에러, 결과2) {
+      if(에러) return done(에러)
+
+      var 유저의웨이팅신청수 = 결과2.length
+      console.log("유저의웨이팅신청수(arr.length) : " + 유저의웨이팅신청수);
+
+      var 찾았니
+      for (let i = 0; i < 결과2.length; i++) {
+        if (결과2[i].isUseWait == true) {
+        찾았니 = "못찾음"         //유저의 재신청을 못찾음(true) -> 웨이팅 신청 후(웨이팅 신청해라)
+        }
+        else {
+          찾았니 = "찾음"         //유저의 재신청을 찾음(false) -> 웨이팅 신청 전(웨이팅 정보 확인)
+        }
+      }
+
+      //로그인한 유저가 이전에 사용했고 재신청하지 않은 경우.. 웨이팅 신청 하도록 /bwaitcheck로..
+      if (찾았니 == "못찾음") {
+        res.redirect('awaituse');
+        console.log('재사용 - 현재 웨이팅 신청X')
+      }
+      else if(찾았니 == "찾음"){
+        //자신의 차례이면 branchinfo, 자신의 차례가 아니면 bwaituse
+        //res.redirect('/branchinfo');
+        console.log('재사용 - 현재 웨이팅 신청O')
+        res.redirect('/branchinfoA2');
+      }
+    })
+  } 
+})
+
 
 
 //6. 유의사항 페이지 이동
@@ -714,14 +958,12 @@ app.get('/map', function(req, res) {
 })
 
 
-//11. 지점 상세정보 페이지 이동
+//11. 지점 상세정보 페이지 이동 - 원본
 app.get('/branchinfo', function (req, res) {
-  if (!req.session.nickname) {
-    //로그인X
+  if (!req.session.nickname) {    //로그인X
     res.render('branchinfo.ejs', { session: "true" });
   }
-  else {
-    //로그인O
+  else {    //로그인O
     res.render('branchinfo.ejs', { session: "false" });
   }
 })
@@ -802,8 +1044,40 @@ app.post('/branchinfo', function(req, res) {
   })
 })
 
-//branchinfo 버튼 클릭 확인
+
+// 지점 상세정보 페이지 - A지점 wmac1
+app.get('/branchinfoA1', function (req, res) {
+  if (!req.session.nickname) {    //로그인X
+    res.render('branchinfoA1.ejs', { session: "true" });
+  }
+  else {                          //로그인O
+    res.render('branchinfoA1.ejs', { session: "false" });
+  }
+})
+// 지점 상세정보 페이지 - A지점 wmac2
+app.get('/branchinfoA2', function (req, res) {
+  if (!req.session.nickname) {    //로그인X
+    res.render('branchinfoA2.ejs', { session: "true" });
+  }
+  else {                          //로그인O
+    res.render('branchinfoA2.ejs', { session: "false" });
+  }
+})
+
+
+//branchinfo 버튼 클릭 확인 - 원본
 app.post('/btncheck', function(req, res) {
   console.log("branchinfo 버튼 클릭 -> 타이머 실행")
   StartTimer(); 
+})
+
+//branchinfoA1 버튼 클릭 확인
+app.post('/btncheckA1', function(req, res) {
+  console.log("branchinfoA1 버튼 클릭 -> 타이머1 실행")
+  StartTimerA1(); 
+})
+//branchinfoA2 버튼 클릭 확인
+app.post('/btncheckA2', function(req, res) {
+  console.log("branchinfoA2 버튼 클릭 -> 타이머2 실행")
+  StartTimerA2(); 
 })
