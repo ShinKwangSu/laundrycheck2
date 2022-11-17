@@ -174,7 +174,7 @@ app.post('/idcheck', function(req, res) {
 
   let findRes = 1
   db.collection('member').findOne( {id: req.body.id}, function(error, result) {
-    console.log('검색 완료')
+    console.log('/idcheck.post >> db.member에서 id가 로그인한 유저의 id인 데이터의 검색 성공')
     if (result != undefined) {
       findRes = 0
     } else {
@@ -256,10 +256,10 @@ function StartTimerA1() {
         min1 = Math.floor(min1);
         sec1 = sec1 - 1;
         
-        console.log("타이머1(??:??) " + min1 + ":" + sec1);
+        console.log("StartTimerA1() >> 타이머1(??:??) " + min1 + ":" + sec1);
         // --------------------------------------
         // Timer1 = min1 + " : " + sec1;
-        // console.log("타이머(?:?) " + Timer1);
+        // console.log("StartTimerA1() >> 타이머1(?:?) " + Timer1);
       }
       if (sec1 == 0) {
         //sec(60) 기준으로 0에서 -1하면 -59 출력
@@ -270,10 +270,10 @@ function StartTimerA1() {
         min1 = Math.floor(min1);
         sec1 = 60;
 
-        console.log("타이머1(??:??) " + min1 + ":" + sec1);
+        console.log("StartTimerA1() >> 타이머1(??:??) " + min1 + ":" + sec1);
         // --------------------------------------
         // Timer1 = min1 + " : " + "00";
-        // console.log("타이머(?:00) " + Timer1);
+        // console.log("StartTimerA1() >> 타이머1(?:00) " + Timer1);
       }
     }, 1000)  //1초마다
   }
@@ -282,7 +282,14 @@ function StartTimerA1() {
   btnClick1 = 0;                    //branchinfo 버튼 클릭 여부(false)
   setTimeout(function () {
     clearInterval(PLAYTIME);
-    console.log("타이머1 삭제");
+    console.log("StartTimerA1() >> 타이머1 삭제");
+
+    //서버의 타이머1이 삭제될 때 db.branchUsage에서 branchName이 A인 isUseWmac1을 false로 변경 => 사용중아님
+    db.collection('branchUsage').updateOne({branchName : 'A'}, {$set : {isUseWmac1:false} }, function(에러, 결과){
+      if(에러){return console.log(에러)}
+      console.log('StartTimerA1() >> db.branchUsage - A지점의 Wmac1이 false로 수정(즉, A지점 1번 세탁기 사용끝)')
+    })
+
   }, 60000);                      //3분(180,000)되면 타이머 삭제
 }
 
@@ -303,10 +310,10 @@ function StartTimerA2() {
         min2 = Math.floor(min2);
         sec2 = sec2 - 1;
         
-        console.log("타이머2(??:??) " + min2 + ":" + sec2);
+        console.log("StartTimerA2() >> 타이머2(??:??) " + min2 + ":" + sec2);
         // --------------------------------------
         // Timer2 = min2 + " : " + sec2;
-        // console.log("타이머(?:?) " + Timer2);
+        // console.log("StartTimerA2() >> 타이머2(?:?) " + Timer2);
       }
       if (sec2 == 0) {
         //sec(60) 기준으로 0에서 -1하면 -59 출력
@@ -317,10 +324,10 @@ function StartTimerA2() {
         min2 = Math.floor(min2);
         sec2 = 60;
 
-        console.log("타이머2(??:??) " + min2 + ":" + sec2);
+        console.log("StartTimerA2() >> 타이머2(??:??) " + min2 + ":" + sec2);
         // --------------------------------------
         // Timer2 = min2 + " : " + "00";
-        // console.log("타이머(?:00) " + Timer2);
+        // console.log("StartTimerA2() >> 타이머2(?:00) " + Timer2);
       }
     }, 1000)  //1초마다
   }
@@ -329,7 +336,14 @@ function StartTimerA2() {
   btnClick2 = 0;                    //branchinfo 버튼 클릭 여부(false)
   setTimeout(function () {
     clearInterval(PLAYTIME);
-    console.log("타이머2 삭제");
+    console.log("StartTimerA2() >> 타이머2 삭제");
+
+    //서버의 타이머2가 삭제될 때 db.branchUsage에서 branchName이 A인 isUseWmac2를 false로 변경 => 사용중아님
+    db.collection('branchUsage').updateOne({branchName : 'A'}, {$set : {isUseWmac1:false} }, function(에러, 결과){
+      if(에러){return console.log(에러)}
+      console.log('StartTimerA2() >> db.branchUsage - A지점의 Wmac2이 false로 수정(즉, A지점 2번 세탁기 사용끝)')
+    })
+
   }, 60000);                      //3분(180,000)되면 타이머 삭제
 }
 // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
@@ -338,72 +352,62 @@ function StartTimerA2() {
 //5. 기기 현황 페이지 이동 - 원본
 app.get('/macstatus', function (req, res) {
 
-  if(btnClick == 1){
-    console.log("btnClick 1이라서 >>>>>>>>>> " + btnClick );
-  }
-  else {
-    console.log("btnClick 1아니라서 >>>>>>>>>> " + req.body.isClick);
-  }
+  if(btnClick == 1){ console.log("/macstatus.get >> btnClick is 1 : " + btnClick ); }
+  else             { console.log("/macstatus.get >> btnClick is not 1 : " + btnClick); }
 
   if (!req.session.nickname) {    //로그인X
     res.render('macstatus.ejs', { session: "true", 시간 : time, 분 : min, 초 : sec, 클릭여부 : btnClick});
   }
-  else {    //로그인O
+  else {                          //로그인O
     res.render('macstatus.ejs', { session: "false", 시간 : time, 분 : min, 초 : sec, 클릭여부 : btnClick});
   }
 })
 
 app.post('/macstatus', function(req, res) {
   if (!req.session.nickname) {    //로그인X
-    res.redirect('/awaituse');
-    console.log("웨이팅여부 = null")
+    res.redirect('/awaituse'); 
+    console.log("/macstatus.post >> 로그인X - 웨이팅 신청 불가")
   }
-  else {    //로그인O
+  else {                          //로그인O
     // ------------------- 웨이팅 등록 최초 1회 -------------------
-    //db.waitinfo에 로그인한 유저의 id를 찾아서..
+    //db.waitinfo에서 userid가 로그인한 유저의 id인 데이터를 조회
     db.collection('waitinfo').findOne({userid : req.user.id}, function(에러, 결과2) {
       if(에러) return done(에러)
 
-      //로그인한 유저가 waitinfo에 없다면.. -> 웨이팅 신청 한 번도 안함
-      if(결과2 == null) {
+      if(결과2 == null) { //신청 이력이 없음
         res.redirect('/awaituse')
-        console.log('최초 1회 - 현재 웨이팅 신청X')
+        console.log('/macstatus.post >> 최초 1회 - 현재 웨이팅 신청 가능')
         return
       }
-      // else{
-      //   res.render('macstatus.ejs', {session: "false", 웨이팅여부: "true"});
-      //   console.log('최초 1회 - 현재 웨이팅 신청O')
-      // }
     })
 
-    // ------------------- 웨이팅 등록 재사용 -------------------
-    //db.waitinfo에 로그인한 유저의 id를 array로 찾아서.. 
+    // ------------------- 웨이팅 등록 1회 이상(재사용) ------------
+    //db.waitinfo에서 userid가 로그인한 유저의 id인 데이터를 조회
     db.collection('waitinfo').find({userid : req.user.id}).toArray(function(에러, 결과2) {
       if(에러) return done(에러)
 
       var 유저의웨이팅신청수 = 결과2.length
-      console.log("유저의웨이팅신청수(arr.length) : " + 유저의웨이팅신청수);
+      console.log("/macstatus.post >> 1회 이상 - " + req.user.id + "의 웨이팅신청수(arr.length) : " + 유저의웨이팅신청수);
 
       var 찾았니
       for (let i = 0; i < 결과2.length; i++) {
         if (결과2[i].isUseWait == true) {
-        찾았니 = "못찾음"         //유저의 재신청을 못찾음(true) -> 웨이팅 신청 후(웨이팅 신청해라)
+        찾았니 = "못찾음"         //로그인한 유저가 waitinfo에 없거나 이전에 사용 => 웨이팅 신청 가능
         }
         else {
-          찾았니 = "찾음"         //유저의 재신청을 찾음(false) -> 웨이팅 신청 전(웨이팅 정보 확인)
+          찾았니 = "찾음"         //로그인한 유저가 waitinfo에 있음 => 웨이팅 신청 불가
         }
       }
 
-      //로그인한 유저가 이전에 사용했고 재신청하지 않은 경우.. 웨이팅 신청 하도록 /bwaitcheck로..
       if (찾았니 == "못찾음") {
         res.redirect('awaituse');
-        console.log('재사용 - 현재 웨이팅 신청X')
+        console.log('/macstatus.post >> 1회 이상 - 현재 웨이팅 신청 가능')
       }
       else if(찾았니 == "찾음"){
         //자신의 차례이면 branchinfo, 자신의 차례가 아니면 bwaituse
         //res.redirect('/bwaituse');
         res.redirect('/branchinfo');
-        console.log('재사용 - 현재 웨이팅 신청O')
+        console.log('/macstatus.post >> 1회 이상 - 현재 웨이팅 신청 불가')
       }
     })
   } 
@@ -412,26 +416,18 @@ app.post('/macstatus', function(req, res) {
 //기기 현황 페이지 - A지점
 app.get('/macstatusA', function (req, res) {
 
-  if(btnClick1 == 1){
-    console.log("btnClick1 == 1 >>>>>>>>>> " + btnClick1 );
-  }
-  else {
-    console.log("btnClick1 != 1 >>>>>>>>>> " + req.body.isClick1);
-  }
+  if(btnClick1 == 1){ console.log("/macstatusA.get >> btnClick1 is 1 : " + btnClick1 ); }
+  else              { console.log("/macstatusA.get >> btnClick1 is not 1 : " + btnClick1); }
 
-  if(btnClick2 == 1){
-    console.log("btnClick2 == 1 >>>>>>>>>> " + btnClick2 );
-  }
-  else {
-    console.log("btnClick2 != 1 >>>>>>>>>> " + req.body.isClick2);
-  }
+  if(btnClick2 == 1){ console.log("/macstatusA.get >> btnClick2 is 1 : " + btnClick2 ); }
+  else              { console.log("/macstatusA.get >> btnClick2 is not 1 : " + btnClick2); }
 
   if (!req.session.nickname) {    //로그인X
     res.render('macstatusA.ejs', { session: "true", //});
     시간1 : time1, 분1 : min1, 초1 : sec1, 클릭여부1 : btnClick1,
     시간2 : time2, 분2 : min2, 초2 : sec2, 클릭여부2 : btnClick2});
   }
-  else {    //로그인O
+  else {                          //로그인O
     res.render('macstatusA.ejs', { session: "false", //});
     시간1 : time1, 분1 : min1, 초1 : sec1, 클릭여부1 : btnClick1,
     시간2 : time2, 분2 : min2, 초2 : sec2, 클릭여부2 : btnClick2});
@@ -441,64 +437,57 @@ app.get('/macstatusA', function (req, res) {
 app.post('/macstatusA', function(req, res) {
   if (!req.session.nickname) {    //로그인X
     res.redirect('/awaituse');
-    console.log("웨이팅여부 = null")
+    console.log("/macstatusA.post >> 로그인X - 웨이팅 신청 불가")
   }
   else {                          //로그인O
     // ------------------- 웨이팅 등록 최초 1회 -------------------
-    //db.waitinfo에 로그인한 유저의 id를 찾아서..
+    //db.waitinfo에서 userid가 로그인한 유저의 id인 데이터를 조회
     db.collection('waitinfo').findOne({userid : req.user.id}, function(에러, 결과2) {
       if(에러) return done(에러)
 
-      //로그인한 유저가 waitinfo에 없다면.. -> 웨이팅 신청 한 번도 안함
-      if(결과2 == null) {
+      if(결과2 == null) { //신청 이력이 없음
         res.redirect('/awaituse')
-        console.log('최초 1회 - 현재 웨이팅 신청X')
+        console.log('/macstatusA.post >> 최초 1회 - 현재 웨이팅 신청 가능')
         return
       }
-      // else{
-      //   res.render('macstatus.ejs', {session: "false", 웨이팅여부: "true"});
-      //   console.log('최초 1회 - 현재 웨이팅 신청O')
-      // }
     })
 
     // ------------------- 웨이팅 등록 재사용 -------------------
-    //db.waitinfo에 로그인한 유저의 id를 array로 찾아서.. 
+    //db.waitinfo에서 userid가 로그인한 유저의 id인 데이터를 조회
     db.collection('waitinfo').find({userid : req.user.id}).toArray(function(에러, 결과2) {
       if(에러) return done(에러)
 
       var 유저의웨이팅신청수 = 결과2.length
-      console.log("유저의웨이팅신청수(arr.length) : " + 유저의웨이팅신청수);
+      console.log("/macstatusA.post >> 1회 이상 - " + req.user.id + "의 웨이팅신청수(arr.length) : " + 유저의웨이팅신청수);
 
       var 찾았니
       for (let i = 0; i < 결과2.length; i++) {
         if (결과2[i].isUseWait == true) {
-        찾았니 = "못찾음"         //유저의 재신청을 못찾음(true) -> 웨이팅 신청 후(웨이팅 신청해라)
+        찾았니 = "못찾음"         //로그인한 유저가 waitinfo에 없거나 이전에 사용 => 웨이팅 신청 가능
         }
         else {
-          찾았니 = "찾음"         //유저의 재신청을 찾음(false) -> 웨이팅 신청 전(웨이팅 정보 확인)
+          찾았니 = "찾음"         //로그인한 유저가 waitinfo에 있음 => 웨이팅 신청 불가
         }
       }
 
-      //로그인한 유저가 이전에 사용했고 재신청하지 않은 경우.. 웨이팅 신청 하도록 /bwaitcheck로..
       if (찾았니 == "못찾음") {
         res.redirect('awaituse');
-        console.log('재사용 - 현재 웨이팅 신청X')
+        console.log('/macstatusA.post >> 1회 이상 - 현재 웨이팅 신청 가능')
       }
       else if(찾았니 == "찾음"){
         //자신의 차례이면 branchinfo, 자신의 차례가 아니면 bwaituse
-        //res.redirect('/branchinfo');
-        console.log('재사용 - 현재 웨이팅 신청O')
-        //res.redirect('/branchinfoA1');
-        
-        // console.log("macstatusA에서 클릭한 macNumber : " + req.body.macNumber)
+        console.log('/macstatusA.post >> 1회 이상 - 현재 웨이팅 신청 불가')
+
+        //macstatusA.ejs의 ajax로 받은 macNumber(클릭된 버튼 번호)에 따라 다른 branchinfo로 redirect하는 부분
+        // console.log("/macstatusA.post >> macstatusA에서 클릭된 macNumber : " + req.body.macNumber)
   
         // if(req.body.macNumber == "A1"){
         //   res.redirect('/branchinfoA1');
-        //   console.log("req.body.macNumber is A1")
+        //   console.log("/macstatusA.post >> req.body.macNumber is A1 AND redirect to /branchinfoA1")
         // }
         // if(req.body.macNumber == "A2"){
         //   res.redirect('/branchinfoA2');
-        //   console.log("req.body.macNumber is A2")
+        //   console.log("/macstatusA.post >> req.body.macNumber is A2 AND redirect to /branchinfoA2")
         // }
       }
     })
@@ -509,116 +498,100 @@ app.post('/macstatusA', function(req, res) {
 app.post('/macstatusA1', function(req, res) {
   if (!req.session.nickname) {    //로그인X
     res.redirect('/awaituse');
-    console.log("웨이팅여부 = null")
+    console.log("/macstatusA.post >> 로그인X - 웨이팅 신청 불가")
   }
   else {                          //로그인O
     // ------------------- 웨이팅 등록 최초 1회 -------------------
-    //db.waitinfo에 로그인한 유저의 id를 찾아서..
+    //db.waitinfo에서 userid가 로그인한 유저의 id인 데이터를 조회
     db.collection('waitinfo').findOne({userid : req.user.id}, function(에러, 결과2) {
       if(에러) return done(에러)
 
-      //로그인한 유저가 waitinfo에 없다면.. -> 웨이팅 신청 한 번도 안함
-      if(결과2 == null) {
+      if(결과2 == null) { //신청 이력이 없음
         res.redirect('/awaituse')
-        console.log('최초 1회 - 현재 웨이팅 신청X')
+        console.log('/macstatusA.post >> 최초 1회 - 현재 웨이팅 신청 가능')
         return
       }
-      // else{
-      //   res.render('macstatus.ejs', {session: "false", 웨이팅여부: "true"});
-      //   console.log('최초 1회 - 현재 웨이팅 신청O')
-      // }
     })
 
     // ------------------- 웨이팅 등록 재사용 -------------------
-    //db.waitinfo에 로그인한 유저의 id를 array로 찾아서.. 
+    //db.waitinfo에서 userid가 로그인한 유저의 id인 데이터를 조회
     db.collection('waitinfo').find({userid : req.user.id}).toArray(function(에러, 결과2) {
       if(에러) return done(에러)
 
       var 유저의웨이팅신청수 = 결과2.length
-      console.log("유저의웨이팅신청수(arr.length) : " + 유저의웨이팅신청수);
+      console.log("/macstatusA.post >> 1회 이상 - " + req.user.id + "의 웨이팅신청수(arr.length) : " + 유저의웨이팅신청수);
 
       var 찾았니
       for (let i = 0; i < 결과2.length; i++) {
         if (결과2[i].isUseWait == true) {
-        찾았니 = "못찾음"         //유저의 재신청을 못찾음(true) -> 웨이팅 신청 후(웨이팅 신청해라)
+        찾았니 = "못찾음"         //로그인한 유저가 waitinfo에 없거나 이전에 사용 => 웨이팅 신청 가능
         }
         else {
-          찾았니 = "찾음"         //유저의 재신청을 찾음(false) -> 웨이팅 신청 전(웨이팅 정보 확인)
+          찾았니 = "찾음"         //로그인한 유저가 waitinfo에 있음 => 웨이팅 신청 불가
         }
       }
 
-      //로그인한 유저가 이전에 사용했고 재신청하지 않은 경우.. 웨이팅 신청 하도록 /bwaitcheck로..
       if (찾았니 == "못찾음") {
         res.redirect('awaituse');
-        console.log('재사용 - 현재 웨이팅 신청X')
+        console.log('/macstatusA.post >> 1회 이상 - 현재 웨이팅 신청 가능')
       }
       else if(찾았니 == "찾음"){
         //자신의 차례이면 branchinfo, 자신의 차례가 아니면 bwaituse
-        //res.redirect('/branchinfo');
-        console.log('재사용 - 현재 웨이팅 신청O')
         res.redirect('/branchinfoA1');
+        console.log('/macstatusA.post >> 1회 이상 - 현재 웨이팅 신청 불가')
       }
     })
   } 
 })
-
 //branchinfoA2로 redirect
-app.post('/macstatusA', function(req, res) {
+app.post('/macstatusA2', function(req, res) {
   if (!req.session.nickname) {    //로그인X
     res.redirect('/awaituse');
-    console.log("웨이팅여부 = null")
+    console.log("/macstatusA.post >> 로그인X - 웨이팅 신청 불가")
   }
   else {                          //로그인O
     // ------------------- 웨이팅 등록 최초 1회 -------------------
-    //db.waitinfo에 로그인한 유저의 id를 찾아서..
+    //db.waitinfo에서 userid가 로그인한 유저의 id인 데이터를 조회
     db.collection('waitinfo').findOne({userid : req.user.id}, function(에러, 결과2) {
       if(에러) return done(에러)
 
-      //로그인한 유저가 waitinfo에 없다면.. -> 웨이팅 신청 한 번도 안함
-      if(결과2 == null) {
+      if(결과2 == null) { //신청 이력이 없음
         res.redirect('/awaituse')
-        console.log('최초 1회 - 현재 웨이팅 신청X')
+        console.log('/macstatusA.post >> 최초 1회 - 현재 웨이팅 신청 가능')
         return
       }
-      // else{
-      //   res.render('macstatus.ejs', {session: "false", 웨이팅여부: "true"});
-      //   console.log('최초 1회 - 현재 웨이팅 신청O')
-      // }
     })
 
     // ------------------- 웨이팅 등록 재사용 -------------------
-    //db.waitinfo에 로그인한 유저의 id를 array로 찾아서.. 
+    //db.waitinfo에서 userid가 로그인한 유저의 id인 데이터를 조회
     db.collection('waitinfo').find({userid : req.user.id}).toArray(function(에러, 결과2) {
       if(에러) return done(에러)
 
       var 유저의웨이팅신청수 = 결과2.length
-      console.log("유저의웨이팅신청수(arr.length) : " + 유저의웨이팅신청수);
+      console.log("/macstatusA.post >> 1회 이상 - " + req.user.id + "의 웨이팅신청수(arr.length) : " + 유저의웨이팅신청수);
 
       var 찾았니
       for (let i = 0; i < 결과2.length; i++) {
         if (결과2[i].isUseWait == true) {
-        찾았니 = "못찾음"         //유저의 재신청을 못찾음(true) -> 웨이팅 신청 후(웨이팅 신청해라)
+        찾았니 = "못찾음"         //로그인한 유저가 waitinfo에 없거나 이전에 사용 => 웨이팅 신청 가능
         }
         else {
-          찾았니 = "찾음"         //유저의 재신청을 찾음(false) -> 웨이팅 신청 전(웨이팅 정보 확인)
+          찾았니 = "찾음"         //로그인한 유저가 waitinfo에 있음 => 웨이팅 신청 불가
         }
       }
 
-      //로그인한 유저가 이전에 사용했고 재신청하지 않은 경우.. 웨이팅 신청 하도록 /bwaitcheck로..
       if (찾았니 == "못찾음") {
         res.redirect('awaituse');
-        console.log('재사용 - 현재 웨이팅 신청X')
+        console.log('/macstatusA.post >> 1회 이상 - 현재 웨이팅 신청 가능')
       }
       else if(찾았니 == "찾음"){
         //자신의 차례이면 branchinfo, 자신의 차례가 아니면 bwaituse
-        //res.redirect('/branchinfo');
-        console.log('재사용 - 현재 웨이팅 신청O')
         res.redirect('/branchinfoA2');
+        console.log('/macstatusA.post >> 1회 이상 - 현재 웨이팅 신청 불가')
       }
     })
   } 
 })
-
 
 
 //6. 유의사항 페이지 이동
@@ -634,11 +607,11 @@ app.get('/caution', function(req, res) {
 
 //7. 웨이팅 등록 페이지 이동
 app.get('/wait', isLogin, function(req, res) {
-  console.log(req.user);
+  console.log("/wait.get >> req.user : " + req.user);
 
     //DB에서 데이터 꺼내기 - DB.counter 내의 대기인원수를 찾음
     db.collection('counter').findOne({name : '대기인원수'}, function(에러, 결과){
-      console.log("/wait 대기인원수 : " + 결과.totalWait) //결과.totalWait = 대기인원수
+      console.log("/wait.get >> 웨이팅 총대기인원수 : " + 결과.totalWait) //결과.totalWait = 대기인원수
     
       //찾은 데이터를 wait.ejs 안에 넣기
       //req.user를 사용자라는 이름으로, 결과를 counters라는 이름으로 보내기
@@ -646,31 +619,32 @@ app.get('/wait', isLogin, function(req, res) {
     })
 })
 
-app.post('/wait', isLogin, function(req, res){
-  //db에서 데이터 꺼내기 - db.counter에서 name이 대기인원수인 데이터 찾기
+//원본
+/* app.post('/wait', isLogin, function(req, res){
+  //db.counter에서 name이 대기인원수인 데이터를 조회
   db.collection('counter').findOne({name: '대기인원수'}, function(에러, 결과1){
     var waitinfo개수 = 결과1.totalWait + 결과1.totalUse
 
-    //db.waitinfo에 로그인한 유저의 id를 찾아서.. --------> find()로 변경해야할듯 
+    //db.waitinfo에서 userid가 로그인한 유저의 id인 데이터를 조회 
     db.collection('waitinfo').find({userid : req.user.id}).toArray(function(에러, 결과2) {
       if(에러) return done(에러)
 
       // ------------------- 웨이팅 등록 최초 1회 ---------------
-      if(결과2.length == 0) {
+      if(결과2.length == 0) { //신청 이력이 없음
 
-        //db 저장 - 웨이팅 신청 가능으로 db에.waitinfo에 저장 (_id : waitinfo개수+1로 새로운 데이터를 저장)
+        //db.waitinfo에 웨이팅 신청 정보를 저장(_id : waitinfo개수+1로 새로운 데이터를 저장)
         db.collection('waitinfo').insertOne( {_id : waitinfo개수 + 1, myNumber : waitinfo개수 + 1, userid : req.user.id, wmac : 0, isUseWait : false} , function(에러, 결과){
-          console.log("결과 : " + 결과)
-          console.log("에러 : " + 에러)
+          console.log("/wait.post >> 결과 : " + 결과)
+          console.log("/wait.post >> 에러 : " + 에러)
 
           if (결과 != undefined) {
-            console.log('대기인원 데이터 저장완료');
-            //db 수정 - db.counter 내의 totalWait이라는 항목도 +1 증가(총대기인원수+1)
+            console.log('/wait.post >> 최초 1회 - 대기인원 데이터 저장 성공');
+            //db.counter에서 name이 대기인원수인 totalWait을 +1 증가하여 수정(즉, 총대기인원수+1)
             //operator 종류 : $set(변경), $inc(증가), $min(기존값보다 적을 때만 변경), $rename(key값 이름변경)
             db.collection('counter').updateOne({name: '대기인원수'}, {$inc: {totalWait:1} }, function(에러, 결과){
               if(에러){return console.log(에러)}
               res.redirect('/waitsuccess')
-              console.log('웨이팅 신청 성공')
+              console.log('/wait.post >> 최초 1회 - 웨이팅 신청 성공')
             })
           }
           else {
@@ -678,34 +652,32 @@ app.post('/wait', isLogin, function(req, res){
           }
         })
       }
-      // ------------------- 웨이팅 등록 재사용 ---------------
+      // ------------------- 웨이팅 등록 1회 이상(재사용) ---------------
       else {
         var 찾았니
         for (let i = 0; i < 결과2.length; i++) {
           if (결과2[i].isUseWait == true) {
-            찾았니 = "못찾음"
+            찾았니 = "못찾음"   //로그인한 유저가 waitinfo에 없거나 이전에 사용 => 웨이팅 신청 가능
           }
           else {
-            찾았니 = "찾음"
+            찾았니 = "찾음"     //로그인한 유저가 waitinfo에 있음 => 웨이팅 신청 불가
           }
         }
 
-        //로그인한 유저가 waitinfo에 없거나 이전에 사용한 사람이라면.. 웨이팅 신청 가능으로 db에.waitinfo에 저장
         if (찾았니 == "못찾음") {
 
-          //db 저장 - 웨이팅 신청 가능으로 db에.waitinfo에 저장 (_id : 총대기인원수+1로 새로운 데이터를 저장)
+          //db.waitinfo에 웨이팅 신청 정보를 저장(_id : waitinfo개수+1로 새로운 데이터를 저장)
           db.collection('waitinfo').insertOne( {_id : waitinfo개수 + 1, myNumber : waitinfo개수 + 1, userid : req.user.id, wmac : 0, isUseWait : false} , function(에러, 결과){
-            console.log('대기인원 데이터 저장완료');
-            console.log("결과 : " + 결과)
-            console.log("에러 : " + 에러)
+            console.log('/wait.post >> 1회 이상 - 대기인원 데이터 저장 성공');
+            console.log("/wait.post >> 결과 : " + 결과)
+            console.log("/wait.post >> 에러 : " + 에러)
 
             if (결과 != undefined) {
-              //db 수정 - db.counter 내의 totalWait이라는 항목도 +1 증가(총대기인원수+1)
-              //operator 종류 : $set(변경), $inc(증가), $min(기존값보다 적을 때만 변경), $rename(key값 이름변경)
+              //db.counter에서 name이 대기인원수인 totalWait을 +1 증가하여 수정(즉, 총대기인원수+1)
               db.collection('counter').updateOne({name: '대기인원수'}, {$inc: {totalWait:1} }, function(에러, 결과){
                 if(에러){return console.log(에러)}
                 res.redirect('/waitsuccess')
-                console.log('웨이팅 신청성공')
+                console.log('/wait.post >> 1회 이상 - 웨이팅 신청 성공')
               })
             }
             else {
@@ -715,11 +687,116 @@ app.post('/wait', isLogin, function(req, res){
         }
         else if (찾았니 == "찾음") {
           res.redirect('/waitalready')
-          console.log('웨이팅 신청 되어있음')
+          console.log('/wait.post >> 1회 이상 - 웨이팅 신청 실패(이유 : 웨이팅 신청 되어있음)')
         }
       }
     })
   })
+}) */
+
+//수정본 - 모든 기기가 작동중인 경우만 웨이팅 신청 가능
+app.post('/wait', isLogin, function(req, res){
+  //지점별로 모든 기기가 작동중인지 확인 -> 모두 작동중일 경우만 웨이팅 신청 가능
+  //A지점---------------------------------------------------------------------------------------
+  //db.branchUsage에서 branchName이 A인 데이터를 조회
+  db.collection('branchUsage').findOne({branchName: 'A'}, function(에러, 결과){
+    if (에러) return done(에러)
+  
+    if(결과 != null) {
+      if(결과.isUseWmac1 == true && 결과.isUseWmac2 == true) {
+        console.log('/wait.post >> db.branchUsage - A지점의 모든 기기가 사용중')
+
+        //웨이팅 신청 함수 호출
+        WaitReq();
+      }
+      else {
+        res.render('waitfail.ejs')
+        console.log('/wait.post >> db.branchUsage - A지점의 모든 기기가 사용중이지 않음')
+        console.log('/wait.post >> db.branchUsage - A지점의 Wmac1의 상태 >>> ' + 결과.isUseWmac1)
+        console.log('/wait.post >> db.branchUsage - A지점의 Wmac2의 상태 >>> ' + 결과.isUseWmac2)
+      }   
+    }
+    else {
+      console.log('/wait.post >> db.branchUsage - A지점의 조회 결과가 null')
+    }
+  })
+
+  //웨이팅 신청하는 함수
+  function WaitReq() {
+    //db.counter에서 name이 대기인원수인 데이터를 조회
+    db.collection('counter').findOne({name: '대기인원수'}, function(에러, 결과1){
+      var waitinfo개수 = 결과1.totalWait + 결과1.totalUse
+
+      //db.waitinfo에서 userid가 로그인한 유저의 id인 데이터를 조회 
+      db.collection('waitinfo').find({userid : req.user.id}).toArray(function(에러, 결과2) {
+        if(에러) return done(에러)
+
+        // ------------------- 웨이팅 등록 최초 1회 ---------------
+        if(결과2.length == 0) { //신청 이력이 없음
+
+          //db.waitinfo에 웨이팅 신청 정보를 저장(_id : waitinfo개수+1로 새로운 데이터를 저장)
+          db.collection('waitinfo').insertOne( {_id : waitinfo개수 + 1, myNumber : waitinfo개수 + 1, userid : req.user.id, wmac : 0, isUseWait : false} , function(에러, 결과){
+            console.log("/wait.post >> 결과 : " + 결과)
+            console.log("/wait.post >> 에러 : " + 에러)
+
+            if (결과 != undefined) {
+              console.log('/wait.post >> 최초 1회 - 대기인원 데이터 저장 성공');
+              //db.counter에서 name이 대기인원수인 totalWait을 +1 증가하여 수정(즉, 총대기인원수+1)
+              //operator 종류 : $set(변경), $inc(증가), $min(기존값보다 적을 때만 변경), $rename(key값 이름변경)
+              db.collection('counter').updateOne({name: '대기인원수'}, {$inc: {totalWait:1} }, function(에러, 결과){
+                if(에러){return console.log(에러)}
+                res.redirect('/waitsuccess')
+                console.log('/wait.post >> 최초 1회 - 웨이팅 신청 성공')
+              })
+            }
+            else {
+              res.redirect('/wait')
+            }
+          })
+
+        }
+        // ------------------- 웨이팅 등록 1회 이상(재사용) ---------------
+        else {
+          var 찾았니
+          for (let i = 0; i < 결과2.length; i++) {
+            if (결과2[i].isUseWait == true) {
+              찾았니 = "못찾음"   //로그인한 유저가 waitinfo에 없거나 이전에 사용 => 웨이팅 신청 가능
+            }
+            else {
+              찾았니 = "찾음"     //로그인한 유저가 waitinfo에 있음 => 웨이팅 신청 불가
+            }
+          }
+
+          if (찾았니 == "못찾음") {
+            //db.waitinfo에 웨이팅 신청 정보를 저장(_id : waitinfo개수+1로 새로운 데이터를 저장)
+            db.collection('waitinfo').insertOne( {_id : waitinfo개수 + 1, myNumber : waitinfo개수 + 1, userid : req.user.id, wmac : 0, isUseWait : false} , function(에러, 결과){
+              console.log('/wait.post >> 1회 이상 - 대기인원 데이터 저장 성공');
+              console.log("/wait.post >> 결과 : " + 결과)
+              console.log("/wait.post >> 에러 : " + 에러)
+
+              if (결과 != undefined) {
+                //db.counter에서 name이 대기인원수인 totalWait을 +1 증가하여 수정(즉, 총대기인원수+1)
+                db.collection('counter').updateOne({name: '대기인원수'}, {$inc: {totalWait:1} }, function(에러, 결과){
+                  if(에러){return console.log(에러)}
+                  res.redirect('/waitsuccess')
+                  console.log('/wait.post >> 1회 이상 - 웨이팅 신청 성공')
+                })
+              }
+              else {
+                res.redirect('/wait')
+              }
+            })
+          }
+          else if (찾았니 == "찾음") {
+            res.redirect('/waitalready')
+            console.log('/wait.post >> 1회 이상 - 웨이팅 신청 실패(이유 : 웨이팅 신청 되어있음)')
+          }
+        }
+
+      })
+    })
+  }
+
 })
 
 
@@ -736,52 +813,50 @@ app.get('/waitsuccess', isLogin, function(req, res) {
   res.render('waitsuccess.ejs')
 })
 
-//8. 웨이팅 확인 페이지 이동
+//8. 웨이팅 확인 페이지 이동 - 
 app.get('/waitcheck', isLogin, function(req, res) {
-  console.log(req.user)
+  console.log("/waitcheck.get >> req.user : " + req.user);
 
   // ------------------- 웨이팅 등록 최초 1회 -------------------
-  //db.waitinfo에 로그인한 유저의 id를 찾아서..
+  //db.waitinfo에서 userid가 로그인한 유저의 id인 데이터를 조회
   db.collection('waitinfo').findOne({userid : req.user.id}, function(에러, 결과2) {
     if(에러) return done(에러)
 
-    //로그인한 유저가 waitinfo에 없다면.. -> 웨이팅 신청 한 번도 안함
-    if(결과2 == null) {
+    if(결과2 == null) { //신청 이력이 없음
       res.redirect('/awaituse')
-      console.log('최초 1회 - 웨이팅 사용 후 확인(미신청 후 waitcheck)');
+      console.log('/waitcheck.get >> 최초 1회 - 웨이팅 사용 후 확인(미신청 후 확인)');
       return
     }
     else{
-      console.log('최초 1회 - 웨이팅 사용 전 확인')
+      console.log('/waitcheck.get >> 최초 1회 - 웨이팅 사용 전 확인')
     }
   })
 
   // ------------------- 웨이팅 등록 재사용 -------------------
-  //db.waitinfo에 로그인한 유저의 id를 array로 찾아서.. 
+  //db.waitinfo에서 userid가 로그인한 유저의 id인 데이터를 조회
   db.collection('waitinfo').find({userid : req.user.id}).toArray(function(에러, 결과2) {
     if(에러) return done(에러)
 
     var 유저의웨이팅신청수 = 결과2.length
-    console.log("유저의웨이팅신청수(arr.length) : " + 유저의웨이팅신청수);
+    console.log("/waitcheck.get >> 1회 이상 - " + req.user.id + "의 웨이팅신청수(arr.length) : " + 유저의웨이팅신청수);
 
     var 찾았니
     for (let i = 0; i < 결과2.length; i++) {
       if (결과2[i].isUseWait == true) {
-        찾았니 = "못찾음"         //유저의 재신청을 못찾음(true) -> 웨이팅 신청 후(웨이팅 신청해라)
+        찾았니 = "못찾음"         //로그인한 유저가 waitinfo에 없거나 이전에 사용 => 웨이팅 신청 가능
       }
       else {
-        찾았니 = "찾음"          //유저의 재신청을 찾음(false) -> 웨이팅 신청 전(웨이팅 정보 확인)
+        찾았니 = "찾음"          //로그인한 유저가 waitinfo에 있음 => 웨이팅 신청 불가
       }
     }
 
-    //로그인한 유저가 이전에 사용했고 재신청하지 않은 경우.. 웨이팅 신청 하도록 /bwaitcheck로..
     if (찾았니 == "못찾음") {
       res.redirect('/awaituse')
-      console.log('재사용 - 웨이팅 사용 후 확인')
+      console.log('/waitcheck.get >> 1회 이상 - 웨이팅 사용 후 확인')
     }
     else if(찾았니 == "찾음"){
       res.redirect('/bwaituse')
-      console.log('재사용 - 웨이팅 사용 전 확인')
+      console.log('/waitcheck.get >> 1회 이상 - 웨이팅 사용 전 확인')
     }
   })
 })
@@ -790,27 +865,27 @@ app.get('/waitcheck', isLogin, function(req, res) {
 //8-1. 웨이팅 등록하고 기기 작동시키기 전
 // 본인 대기번호와 앞에 몊명 남았는지 확인 가능
 app.get('/bwaituse', isLogin, function(req, res) {
-  console.log(req.user)
+  console.log("/bwaituse.get >> req.user : " + req.user);
   
-  //db.waitinfo에 로그인한 유저의 id를 array로 찾아서.. 
+  //db.waitinfo에서 userid가 로그인한 유저의 id인 데이터를 조회
   db.collection('waitinfo').find({userid : req.user.id}).toArray(function(에러, 결과2) {
     if(에러) return done(에러)
 
-    console.log("유저의웨이팅신청수(arr.length) : " + 결과2.length);
+    console.log("/bwaituse.get >> " + req.user.id + "의 웨이팅신청수 : " + 결과2.length);
 
     var 찾았니
     for (let i = 0; i < 결과2.length; i++) {
       if (결과2[i].isUseWait == true) {
-        찾았니 = "못찾음"         //유저의 재신청을 못찾음(true) -> 웨이팅 신청 후(웨이팅 신청해라)
+        찾았니 = "못찾음"         //로그인한 유저가 waitinfo에 없거나 이전에 사용 => 웨이팅 신청 가능
       }
       else {
-        찾았니 = "찾음"          //유저의 재신청을 찾음(false) -> 웨이팅 신청 전(웨이팅 정보 확인)
+        찾았니 = "찾음"         //로그인한 유저가 waitinfo에 있음 => 웨이팅 신청 불가
       }
     }
 
     if (찾았니 == "찾음") {
       var myNumber = 결과2[결과2.length - 1].myNumber
-      console.log("/bwaituse 본인웨이팅번호 : " + myNumber)
+      console.log("/bwaituse.get >> 본인웨이팅번호 : " + myNumber)
 
       //db.counter에서 name이 대기인원수인 데이터 찾기
       db.collection('counter').findOne({name: '대기인원수'}, function(에러, 결과3){
@@ -818,12 +893,11 @@ app.get('/bwaituse', isLogin, function(req, res) {
         var totalUse = 결과3.totalUse
         var left = myNumber - totalUse - 1
 
-        console.log("/bwaituse 대기인원수 : " + totalWait)
-        console.log("/bwaituse 대기사용수 : " + totalUse)
-        console.log("/bwaituse 앞에남은인원수 : " + left)
+        console.log("/bwaituse.get >> 총대기인원수 : " + totalWait)
+        console.log("/bwaituse.get >> 총대기사용수 : " + totalUse)
+        console.log("/bwaituse.get >> 앞에남은인원수 : " + left)
 
-      //찾은 데이터를 bwaituse.ejs 안에 넣기
-        //req.user를 사용자라는 이름으로 보내기
+        //찾은 데이터를 bwaituse.ejs 안에 넣기(req.user를 사용자라는 이름으로 보내기)
         res.render('bwaituse.ejs', {사용자 : req.user, 본인웨이팅번호 : myNumber, 대기사용수 : totalUse})
       })
     }
@@ -835,86 +909,81 @@ app.get('/bwaituse', isLogin, function(req, res) {
 
 //8-2. 웨이팅 등록하고 기기 작동시킨 후
 app.get('/awaituse', isLogin, function(req, res) {
-  console.log(req.user)
+  console.log("/awaituse.get >> req.user : " + req.user);
   res.render('awaituse.ejs')
 })
 
 
 //9. 마이페이지
 app.get('/mypage', isLogin, function(req, res) {
-  console.log(req.user)
+  console.log("/mypage.get >> req.user : " + req.user);
 
-  if (!req.session.nickname) {
-    res.render('mypage.ejs', {session: "true"});
-  }
-  else {
-    res.render('mypage.ejs', {session: "false", 사용자 : req.user});
-  }
-
- // res.render('mypage.ejs', {사용자 : req.user})
+  if (!req.session.nickname) { res.render('mypage.ejs', {session: "true"}); }
+  else                       { res.render('mypage.ejs', {session: "false", 사용자 : req.user}); }
 })
 
 app.post('/mypage', isLogin, function(req, res) {
-  //유저의 웨이팅 신청수에 따라..
+  //db.waitinfo에서 userid가 로그인한 유저의 id인 데이터를 조회
   // ------------------- 웨이팅 등록 최초 1회 -------------------
   db.collection('waitinfo').findOne({userid : req.user.id}, function(에러, 결과2) {
     if(에러) return done(에러)
 
-    //로그인한 유저가 waitinfo에 없다면.. -> 웨이팅 신청 한 번도 안함
-    if(결과2 == null) {
+    if(결과2 == null) { //신청 이력이 없음
       res.redirect('/awaituse')
-      console.log('최초 1회 - 웨이팅 사용 후 확인(미신청 후 waitcheck)');
+      console.log('/mypage.post >> 최초 1회 - 웨이팅 사용 후 확인(미신청 후 waitcheck)');
       return
     }
     else{
-      console.log('null값이 아니면 등록 재사용으로..')
+      console.log('/mypage.post >> 신청 이력이 있으므로 등록 재사용으로..')
     }
   })
 
   // ------------------- 웨이팅 등록 재사용 -------------------
-  //db.waitinfo에 로그인한 유저의 id를 array로 찾아서.. 
+  //db.waitinfo에서 userid가 로그인한 유저의 id인 데이터를 조회
   db.collection('waitinfo').find({userid : req.user.id}).toArray(function(에러, 결과2) {
     if(에러) return done(에러)
 
-    console.log("유저의웨이팅신청수(arr.length) : " + 결과2.length);
+    console.log("/mypage.post >>  1회 이상 - " + req.user.id + "의 웨이팅신청수 : " + 결과2.length);
 
     var 찾았니
     var 찾은고유번호
     for (let i = 0; i < 결과2.length; i++) {
       if (결과2[i].isUseWait == true) {
-        찾았니 = "못찾음"         //유저의 재신청을 못찾음(true) -> 웨이팅 신청 후(웨이팅 신청해라)
+        찾았니 = "못찾음"         //로그인한 유저가 waitinfo에 없거나 이전에 사용 => 웨이팅 신청 가능
       }
       else {
         찾은고유번호 = 결과2[i].myNumber
-        찾았니 = "찾음"          //유저의 재신청을 찾음(false) -> 웨이팅 신청 전(웨이팅 정보 확인)
+        찾았니 = "찾음"          //로그인한 유저가 waitinfo에 있음 => 웨이팅 신청 불가
       }
     }
 
-    //로그인한 유저가 이전에 사용했고 재신청하지 않은 경우.. 웨이팅 신청 하도록 /bwaitcheck로..
     if (찾았니 == "못찾음") {
       res.redirect('/awaituse')
-      console.log('재사용 - 웨이팅 사용 후 확인')
+      console.log('/mypage.post >>  1회 이상 - 웨이팅 사용 후 확인(미신청 후 확인)')
     }
     else if(찾았니 == "찾음"){
+      //db.waitinfo에서 myNumber가 찾은고유번호인 isUseWait을 true로 수정(즉, 웨이팅 사용함)
       db.collection('waitinfo').updateOne({myNumber : 찾은고유번호}, { $set: {isUseWait:true} }, function(에러3, 결과){
         if(에러3){return console.log(에러3)}
 
+        //db.waitinfo에서 userid가 로그인한 유저의 id인 데이터를 조회
         db.collection('waitinfo').find({userid : req.user.id}).toArray(function(에러, 결과3) {
+          var 대기번호 = 결과3[결과3.length - 1].myNumber
           var 웨이팅사용여부 = 결과3[결과3.length - 1].isUseWait
-          console.log(결과3[결과3.length - 1].myNumber)
-          console.log("웨이팅사용여부 - true로 바뀌었는가 : " + 웨이팅사용여부);
+          console.log("/mypage.post >> 대기번호 : " + 대기번호)
+          console.log("/mypage.post >> 웨이팅사용여부 is true : " + 웨이팅사용여부);
 
           //사용한 회원 관리
           if(웨이팅사용여부){ //웨이팅을 사용했다면..
-            //db.counter 내의 totalWait -1 감소(대기인원수-1)
+            //db.counter에서 name이 대기인원수인 totalWait를 -1하여 수정(즉, 총대기인원수-1)
             db.collection('counter').updateOne({name: '대기인원수'}, { $inc: {totalWait:-1} }, function(에러1, 결과) {
               if(에러1){return console.log(에러1)}
     
-              //db.counter 내의 totalUse +1 증가(대기사용수+1)
+              //db.counter에서 name이 대기인원수인 totalUse를 +1하여 수정(즉, 총대기사용자수+1)
               db.collection('counter').updateOne({name: '대기인원수'}, { $inc: {totalUse:1} }, function(에러2, 결과) {
                 if(에러2){return console.log(에러2)}
     
-                console.log('사용했기 때문에 true로 바뀌고 사용회원관리')
+                console.log('/mypage.post >> 웨이팅 사용(isUseWait is true) 후 사용한 회원 관리(db.counter 수정) 성공')
                 res.redirect('/')
               })
             })
@@ -969,7 +1038,7 @@ app.get('/branchinfo', function (req, res) {
 })
 
 app.post('/branchinfo', function(req, res) {
-  //유저의 웨이팅 신청수에 따라..
+  //db.waitinfo에서 userid가 로그인한 유저의 id인 데이터를 조회
   // ------------------- 웨이팅 등록 최초 1회 -------------------
   db.collection('waitinfo').findOne({userid : req.user.id}, function(에러, 결과2) {
     if(에러) return done(에러)
@@ -977,61 +1046,61 @@ app.post('/branchinfo', function(req, res) {
     //로그인한 유저가 waitinfo에 없다면.. -> 웨이팅 신청 한 번도 안함
     if(결과2 == null) {
       res.redirect('/awaituse')
-      console.log('최초 1회 - 웨이팅 사용 후 확인(미신청 후 waitcheck)');
+      console.log('/branchinfo.post >> 최초 1회 - 웨이팅 사용 후 확인(미신청 후 waitcheck)');
       return
     }
     else{
-      console.log('null값이 아니면 등록 재사용으로..')
+      console.log('/branchinfo.post >> null값이 아니면 등록 재사용으로..')
     }
   })
 
   // ------------------- 웨이팅 등록 재사용 -------------------
-  //db.waitinfo에 로그인한 유저의 id를 array로 찾아서.. 
+  //db.waitinfo에서 userid가 로그인한 유저의 id인 데이터를 조회
   db.collection('waitinfo').find({userid : req.user.id}).toArray(function(에러, 결과2) {
     if(에러) return done(에러)
 
-    console.log("유저의웨이팅신청수(arr.length) : " + 결과2.length);
+    console.log("/branchinfo.post >> 1회 이상 - " + req.user.id + "의 웨이팅신청수 : " + 결과2.length);
 
     var 찾았니
     var 찾은고유번호
     for (let i = 0; i < 결과2.length; i++) {
       if (결과2[i].isUseWait == true) {
-        찾았니 = "못찾음"         //유저의 재신청을 못찾음(true) -> 웨이팅 신청 후(웨이팅 신청해라)
+        찾았니 = "못찾음"         //로그인한 유저가 waitinfo에 없거나 이전에 사용 => 웨이팅 신청 가능
       }
       else {
         찾은고유번호 = 결과2[i].myNumber
-        찾았니 = "찾음"          //유저의 재신청을 찾음(false) -> 웨이팅 신청 전(웨이팅 정보 확인)
+        찾았니 = "찾음"           //로그인한 유저가 waitinfo에 있음 => 웨이팅 신청 불가
       }
     }
 
-    //로그인한 유저가 이전에 사용했고 재신청하지 않은 경우.. 웨이팅 신청 하도록 /bwaitcheck로..
     if (찾았니 == "못찾음") {
       res.redirect('/awaituse')
-      console.log('재사용 - 웨이팅 사용 후 확인')
+      console.log('/branchinfo.post >> 1회 이상 - 웨이팅 사용 후 확인(미신청 후 확인)')
     }
     else if(찾았니 == "찾음"){
+      //db.waitinfo에서 myNumber가 찾은고유번호인 isUseWait을 true로 수정(즉, 웨이팅 사용함)
       db.collection('waitinfo').updateOne({myNumber : 찾은고유번호}, { $set: {isUseWait:true} }, function(에러3, 결과){
         if(에러3){return console.log(에러3)}
 
+        //db.waitinfo에서 userid가 로그인한 유저의 id인 데이터를 조회
         db.collection('waitinfo').find({userid : req.user.id}).toArray(function(에러, 결과3) {
+          var 대기번호 = 결과3[결과3.length - 1].myNumber
           var 웨이팅사용여부 = 결과3[결과3.length - 1].isUseWait
-          console.log("mynumber : " + 결과3[결과3.length - 1].myNumber)
-          console.log("웨이팅사용여부 - true로 바뀌었는가 : " + 웨이팅사용여부);
+          console.log("/branchinfo.post >> 대기번호 : " + 대기번호)
+          console.log("/branchinfo.post >> 웨이팅사용여부 is true : " + 웨이팅사용여부);
 
           //사용한 회원 관리
           if(웨이팅사용여부){ //웨이팅을 사용했다면..
-            //db.counter 내의 totalWait -1 감소(대기인원수-1)
+            //db.counter에서 name이 대기인원수인 totalWait를 -1하여 수정(즉, 총대기인원수-1)
             db.collection('counter').updateOne({name: '대기인원수'}, { $inc: {totalWait:-1} }, function(에러1, 결과) {
               if(에러1){return console.log(에러1)}
-    
-              //db.counter 내의 totalUse +1 증가(대기사용수+1)
+              
+              //db.counter에서 name이 대기인원수인 totalUse를 +1하여 수정(즉, 총대기사용수+1)
               db.collection('counter').updateOne({name: '대기인원수'}, { $inc: {totalUse:1} }, function(에러2, 결과) {
                 if(에러2){return console.log(에러2)}
     
-                console.log('사용했기 때문에 true로 바뀌고 사용회원관리')
-                console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>')
+                console.log('/branchinfo.post >> 웨이팅 사용(isUseWait is true) 후 사용한 회원 관리(db.counter 수정) 성공')
                 res.redirect('/')
-                //res.send("타이머 실행 완료--------------------------------")
               })
             })
           }
@@ -1067,17 +1136,34 @@ app.get('/branchinfoA2', function (req, res) {
 
 //branchinfo 버튼 클릭 확인 - 원본
 app.post('/btncheck', function(req, res) {
-  console.log("branchinfo 버튼 클릭 -> 타이머 실행")
+  console.log("/btncheck.post >> branchinfo 버튼 클릭 > 타이머 실행")
   StartTimer(); 
 })
 
 //branchinfoA1 버튼 클릭 확인
 app.post('/btncheckA1', function(req, res) {
-  console.log("branchinfoA1 버튼 클릭 -> 타이머1 실행")
+  console.log("/btncheckA1.post >> branchinfoA1 버튼 클릭 > 타이머1 실행")
+
+  //타이머 시작(server) - browser의 타이머1에 시간 전달
   StartTimerA1(); 
+  
+  //db.branchUsage에서 branchName이 A인 isUseWmac을 true로 변경 => 사용중임
+  db.collection('branchUsage').updateOne({branchName : 'A'}, {$set : {isUseWmac1:true} }, function(에러, 결과){
+    if(에러){return console.log(에러)}
+    console.log('/btncheckA1.post >> db.branchUsage - A지점의 Wmac1이 true로 수정(즉, A지점 1번 세탁기 사용중)')
+  })
+
 })
 //branchinfoA2 버튼 클릭 확인
 app.post('/btncheckA2', function(req, res) {
-  console.log("branchinfoA2 버튼 클릭 -> 타이머2 실행")
+  console.log("/btncheckA2.post >> branchinfoA2 버튼 클릭 > 타이머2 실행")
+
+  //타이머 시작(server) - browser의 타이머2에 시간 전달
   StartTimerA2(); 
+
+  //db.branchUsage에서 branchName이 A인 isUseWmac2를 true로 변경 => 사용중임
+  db.collection('branchUsage').updateOne({branchName : 'A'}, {$set : {isUseWmac2:true} }, function(에러, 결과){
+    if(에러){return console.log(에러)}
+    console.log('/btncheckA2.post >> db.branchUsage - A지점의 Wmac2가 true로 수정(즉, A지점 2번 세탁기 사용중)')
+  })
 })

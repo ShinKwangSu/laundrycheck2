@@ -7,14 +7,10 @@ ex) macStatusA(A지점), macStatusB(B지점),...
 
 2) 지점별 현황에 대한 기기상세(branchinfo) 페이지 구현
 ex) branchinfoA1(A지점 wmac1), branchinfoA2(A지점 wmac2),...
-     branchinfoB1(B지점 wmac1), branchinfoB2(B지점 wmac2),...
+    branchinfoB1(B지점 wmac1), branchinfoB2(B지점 wmac2),...
 ----------------------------------------------------------------------------------
 2. 웨이팅 사용 조건 세부화 코드 추가
-- 모든 기기가 사용중인지 아닌지 구분하는 코드
 - 'branchinfo에서 비밀번호 입력 후 일치' > 시작버튼 클릭하는 코드
-- '모든 기기가 사용중인 경우' 웨이팅 사용(mypage에 있음)하는 코드
-  > macstatus의 타이머 실행
-  > 웨이팅 사용 코드 실행(총웨이팅인원-1, isUseWait true로 변경) 
 ----------------------------------------------------------------------------------
 3. 부여된 웨이팅 순서대로 사용 가능한 코드 추가
 - 웨이팅 순서가 아닌 경우 웨이팅 사용 불가
@@ -304,9 +300,94 @@ https://webisfree.com/2015-10-14/ajax%EB%A5%BC-%EC%82%AC%EC%9A%A9%ED%95%B4-%EC%8
 - macstatus.css 수정
   > span 말고 input(text type css에서 정렬하는 방법) 정렬하기
 
-3. 11/15 1번 만들어보기
+3. 11/15 1-1번 만들어보기
 1) 모든 기기가 사용중인지 아닌지 구분하는 코드
+- 기기가 사용중이라면.. > 타이머가 실행됨.. > db에 기기마다 타이머 실행여부 저장
    > /btncheck에서 타이머 실행 후, db에서 isUseW1(wmac1의 사용여부) true로 update 
    > isUseW1이 false로 변경되는건.... 타이머가 끝난 경우....!... => 이게 좀 애매함 => 타이머가 삭제될 때?
 
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+11/17(목)>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+1. 11/15 3번 해결 생각해보기 => 주말에 2번으로 수정해보기
+1) 두 버튼 다 같은 경로(macstatusA)니까 뒤에 url query string, url parameter 등을 다르게 바꿔보기
+2) db에서 유저id로 웨이팅 여부를 검색할 때 "/infoA1, /infoA2로 redirect 하는 부분"이 현재 서버에 있는데 "삭제"
+   1) 유저id로 웨이팅 여부를 검색하여 flag값만 보냄
+   2) 브라우저(macstatusA)에서 ajax의 success : function(data){} 안에서 flag 값을 받음
+   3) 유저가 웨이팅을 함 + 버튼1을 누름 -> infoA1으로 window.location.href="/infoA1"로 페이지 이동
+- ajax가 버튼마다 다르니 infoA1과 infoA2 각각 설정 가능할 듯
+
+2. 11/16 3번(11/15 1-1번) 이어서..
+- 기기 사용중 > 타이머 실행 > db에 기기마다 사용여부 저장 
+1) db에 컬렉션 및 자료 생성
+- branchUsage 컬렉션 추가 > branchName : A, isUseWmac1 : false, isUseWmac2 : false로 자료 추가
+
+2) 기기 사용여부 판별
+- 기기 사용중
+  > /branchinfo에서 버튼 클릭 > /btnCheck에서 타이머 실행 + db.branchUsage에서 branchName이 A인 isUseWmac을 true로 변경
+  ex) /branchinfoA1에서 버튼 클릭 > /btnCheckA1에서 타이머 실행 + db에서 branchName이 A인 isUseWmac1을 true로 변경
+========================================================================================================
+<<변경 : updateOne>>
+db.collection('counter').updateOne( {요런 이름의 자료를} , {이렇게 수정해주세요} , function(에러, 결과){
+  console.log('수정완료')
+})
++) { $set : { totalPost : 100 } } 값변경(100으로 변경), { $inc : { totalPost : 5 } } 값증가(5만큼더함)
+--------------------------------------------------------------------------------------------------------
+db.collection('branchUsage').updateOne({branchName : 'A'}, {$set : {isUseWmac1:true} }, function(에러, 결과){
+  if(에러){return console.log(에러)}
+  console.log('db.branchUsage - A지점의 Wmac1이 true로 수정됨')
+})
+========================================================================================================
+- 기기 사용끝(사용중X)
+  > 서버의 타이머 시간을 받아오기 때문에 서버의 타이머 종료 후 db에서 isUseWmac을 false로 변경
+  ex) isUseWmac1의 사용이 끝나면 서버의 타이머가 삭제되기 때문에 이때 isUseWmac1을 false로 변경
+
+3. 11/15 1-2번
+db.branchUsage에서 branchName이 A인 것을 검색해서 isUseWmac1, isUseWmac2가 true라면 모든 기기가 사용중이라고 판별
+- waitcheck를 waitfail.ejs로 변경해서 모든 기기가 사용중이지 않으면 여기로 이동
+========================================================================================================
+<<검색 : find, findOne>>
+- db.collection('post').find().toArray() : post 콜렉션에 저장된 모든 데이터를 Array 자료형으로 가져와주세요 => [자료1, 자료2 ...]
+- db.colleciton('post').findOne() : post 콜렉션에 저장된 데이터 하나를 가져와주세요
+--------------------------------------------------------------------------------------------------------
+db.collection('branchUsage').findOne({branchName : 'A', function(에러, 결과) {
+  if (에러) return done(에러)
+
+  if(결과 != null) {
+    if(결과.isUseWmac1 == true && 결과.isUseWmac2 == true) {
+      console.log('db.branchUsage - A지점의 Wmac1, Wmac2는 true 임')
+      //웨이팅 신청 부분을 함수로 만들어 여기서 호출
+    }
+    else {
+      res.render('waitfail.ejs')
+      console.log('db.branchUsage - A지점의 Wmac1, Wmac2는 true가 아님')
+      console.log('db.branchUsage - A지점의 Wmac1 >>> ' + 결과.isUseWmac1)
+      console.log('db.branchUsage - A지점의 Wmac2 >>> ' + 결과.isUseWmac2)
+    }   
+  }
+  else {
+    console.log('db.branchUsage - A지점의 조회 결과가 null')
+  }
+})
+========================================================================================================
+
+4. 2번의 문제점... 오프라인의 사용자도 고려해야 함..
+- 모든 기기가 작동중인 경우에만 웨이팅 신청이 가능하다면 그 전에 오프라인에서 세탁기를 누군가 사용해야 함
+= 웨이팅 신청을 안해도 macstatus의 기기를 누를 수 있어야 한다.. + 로그인도 안해도 된다... => 이 부분 같이 얘기해보기
+좀 복잡할듯?
+
+5. 기능 리스트 3번 - 부여된 웨이팅 순서대로 사용 가능한 코드 구상
+1) db.waitinfo의 리스트에서 기기의 사용이 끝나는대로 기기와 유저 연결
+1-1) 모든 기기가 사용중이지 않은 경우
+- db.branchUsage의 name이 A인 데이터의 기기 중 사용 여부가 false인 기기 찾기
+- db.waitinfo의 userid가 로그인한 유저의 id인 데이터의 wmac을 위의 기기번호(false인 기기번호)로 수정
+ex) A지점의 wmac1과 wmac2 중 wmac2가 false라면, waitinfo의 유저의 wmac을 0에서 2로 수정
+1-2) 모든 기기가 사용중인 경우
+- 기기의 타이머가 1분 기준이면 30초 남았을 때 wmac 지정
+ex) A지점의 wmac1,2가 사용중인데 wmac2가 30초 남았으면 true여도 wmac을 0에서 2로 수정
+
+2) 웨이팅 순서 구분
+- 웨이팅 순서가 아닌 경우 웨이팅 사용 불가  ex) 웨이팅 순서가 아닌 경우 /bwaituse(웨이팅 사용 전)로 이동
+- 웨이팅 순서가 맞는 경우 웨이팅 사용 가능  ex) 웨이팅 순서가 맞는 경우 /branchinfo로 이동
+- waitinfo의 리스트 중 false인 것을 찾아 myNumber 값이 가장 작은 것(가장 앞의 것)부터 사용할 수 있도록..?
 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>

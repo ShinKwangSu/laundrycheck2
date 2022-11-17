@@ -44,6 +44,10 @@ h2 {
 	margin-bottom: 20px;
 }
 
+#Timer1, #Timer2, #Timer3 {
+	text-align: center;
+}
+
 button#wmac1, button#wmac2, button#wmac3 {
 	transform: translate(10%, 5%);
 }
