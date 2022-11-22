@@ -412,19 +412,65 @@ ex) A지점의 wmac1과 wmac2 중 wmac2가 false라면, waitinfo의 유저의 wm
 ex) A지점의 wmac1,2가 사용중인데 wmac2가 30초 남았으면 true여도 wmac을 0에서 2로 수정
 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
-11/20-21(일-월)>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+11/20-22(일-화)>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 1. 기능 리스트 3번 이어서.. => branchinfo.post에서 웨이팅 사용
 1) 기기번호와 유저 연결
-1-1) 모든 기기가 사용중이지 않은 경우 -> waitReq()에 추가 
+1-1) 모든 기기가 사용중이지 않은 경우 => wait.post에 waitReq()에 추가 
 - db.branchUsage의 name이 A인 데이터의 기기 중 사용 여부가 false인 기기 찾기
 - db.waitinfo의 userid가 로그인한 유저의 id인 데이터의 wmac을 위의 기기번호(false인 기기번호)로 수정
 ex) A지점의 wmac1과 wmac2 중 wmac2가 false라면, waitinfo의 유저의 wmac을 0에서 2로 수정
 
-1-2) 모든 기기가 사용중인 경우(모두 true) -> waitReq()에 numGiving()으로 추가
+1-2) 웨이팅 사용 시 isUseWait이 false이고, wmac의 번호에 따라 macstatus에서 버튼 선택이 맞는 경우
+=> branchinfo.post, macstatusA1.post에 추가
+ex) isUseWait이 false이고, wmac이 1일 때 macstatus에서 세탁기1 버튼을 클릭해야 함
+- wmac과 macstatusA에서 선택한 버튼이 같은 경우에만 'branchinfo로 이동 + WaitUse()로 웨이팅 사용'
+- 같지 않으면 /bwaituse로 이동
+
+1-3) 오류발생 - 흐름 오류 발생 => branchinfoA1.ejs와 branchinfoA2.ejs에 추가
+<<흐름>>--------------------------------------------------------------------
+macstatusA.get -> 세탁기1버튼클릭 -> macstatusA1.post로 /branchinfoA1 이동
+-> branchinfoA1.get -> 시작버튼클릭
+-> branchinfo.post에서 branchinfo에서 선택한 버튼과 waitinfo에서 찾은 wmac이 같은 경우만 웨이팅 사용
+    + btnCheckA1.post에서 server의 Timer1() 실행 및 wmac1의 사용여부를 true로 변경 
+
+macstatusA의 ajax를 branchinfoA1과 branchinfoA2로 바꿈
+즉, 시작버튼 클릭 시 branchinfo.post에서 branchinfo에서 선택한 버튼과 db의 wmac 비교하여 웨이팅 사용
+		  + btnCheck.post에서 server의 Timer1() 실행 및 wmac1의 사용여부를 true로 변경 
+---------------------------------------------------------------------------
+- branchinfoA1.ejs와 branchinfoA2.ejs에서 form의 post를 /btncheckA1.post로 수정
+- branchinfoA1.ejs와 branchinfoA2.ejs에서 ajax를 /branchinfo.post만 async : false(동기)로 추가
+
+
+1-4) 모든 기기가 사용중인 경우(모두 true) 웨이팅 신청 가능으로 WaitReq() 호출
+     + 기기의 타이머가 1분 기준이면 30초 이하로 남았을 때 wmac 지정 => numGiving()으로 추가
 - 기기의 타이머가 1분 기준이면 30초 이하로 남았을 때 wmac 지정
 ex) A지점의 wmac1,2가 사용중인데 wmac2가 30초 남았으면 true여도 wmac을 0에서 2로 수정
++++) 유저가 이용할 차례일 때 (waitinfo에서 false인 첫번 째 요소의 id가 로그인한 유저의 id일 때)
 
--> 웨이팅 확인하는 페이지에 방문했을 때,
-if(waitinfo의 wmac이 0일 경우) { numGiving(); } => waitcheck.get의 재사용에 추가
--> wmac이 0인 경우에 웨이팅 사용하려고 하면 웨이팅 확인 페이지로 넘기기
+1-5) 웨이팅 확인하는 페이지에 방문했을 때 => waitcheck.get에 추가
+- if(waitinfo의 wmac이 0일 경우 && 유저가 이용할 차례일 때) { numGiving(); }
+-> wmac이 0인 경우에 사용중이지 않거나(false이거나) 타이머가 30초 이내로 남았다면 numGiving()으로
+   wmac 부여 
+- if(waitinfo의 wmac이 0일 경우 && 유저가 이용할 차례일 때) { res.redirect('/waitcheck') }
+-> numGiving()으로 wmac이 부여되지 않아 아직 wmac이 0인 경우에 웨이팅 사용하려고 하면
+   웨이팅 확인 페이지(/waitcheck)로 넘기기
+
+
+2) /bwaituse UI 수정
+
+3) wmac이 0인 채로 waitcheck하면 오류 발생 => 해결
+- 타이머가 30초 이하일 때 실행하는 코드인 numGiving()가 안먹힘
+- 타이머 30초 이전은 상관 없음 30초보다 낮으면 문제 발생
+- numGiving()을 풀어쓰는 것으로 해결
+
+-----------------------------------------------------------------여기까지
+
+4) 처음 사용하는 사람의 wmac 배정 방법 어떻게? => wait.post의 웨이팅 신청하는 WaitReq()에 추가
+- 모든 기기가 사용중이지 않다면(false) wmac을 1로 지정
+if(결과1.isUseWmac1 == false && 결과.isUseWmac2 == false) {
+  유저와연결할기기번호 = 1;
+}
+
+5) 모든 기기가 사용중일 때만 웨이팅 신청 가능한데 그 이전엔 어떻게?
+
 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>

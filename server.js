@@ -36,8 +36,8 @@ MongoClient.connect(process.env.DB_URL, { useUnifiedTopology: true }, function(e
 
   db = client.db('laundrycheck2')
 
-  //app.listen(process.env.PORT, function() {   //express(http를 쉽게 사용하기 위한 도구)로 서버 띄움
-  http.listen(process.env.PORT, function() {  //http(nodejs 기본 라이브러리) + socket.io로 서버 띄움
+  app.listen(process.env.PORT, function() {   //express(http를 쉽게 사용하기 위한 도구)로 서버 띄움
+  //http.listen(process.env.PORT, function() {  //http(nodejs 기본 라이브러리) + socket.io로 서버 띄움
     console.log('listening on 9999')
   })
 })
@@ -203,7 +203,7 @@ function isLogin(req, res, next) {
 
 
 //4. 메인페이지(express)
-/*app.get('/', function(req, res) {
+app.get('/', function(req, res) {
   let flashmsg = req.flash()
   let feedback = flashmsg.success
 
@@ -215,10 +215,10 @@ function isLogin(req, res, next) {
       res.render('index.ejs', {session: "false", successRes: feedback, welcomeUser: req.user})
     }
   }
-})*/
+})
 
 //4. 메인페이지(socket)
-app.get('/', function (req, res) {
+/* app.get('/', function (req, res) {
   let flashmsg = req.flash()
   let feedback = flashmsg.success
 
@@ -230,7 +230,7 @@ app.get('/', function (req, res) {
       res.render('socket.ejs', { session: "false", successRes: feedback, welcomeUser: req.user })
     }
   }
-});
+}); */
 
 
 // 카운트다운 타이머>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
@@ -524,12 +524,14 @@ app.post('/macstatusA1', function(req, res) {
 
       var 찾았니
       var 찾은고유번호
+      var 찾은기기번호
       for (let i = 0; i < 결과2.length; i++) {
         if (결과2[i].isUseWait == true) {
         찾았니 = "못찾음"         //로그인한 유저가 waitinfo에 없거나 이전에 사용 => 웨이팅 신청 가능
         }
         else {
           찾은고유번호 = 결과2[i].myNumber
+          찾은기기번호 = 결과2[i].wmac
           찾았니 = "찾음"         //로그인한 유저가 waitinfo에 있음 => 웨이팅 신청 불가
         }
       }
@@ -539,7 +541,6 @@ app.post('/macstatusA1', function(req, res) {
         console.log('/macstatusA1.post >> 1회 이상 - 현재 웨이팅 신청 가능')
       }
       else if(찾았니 == "찾음"){
-        //웨이팅 순서에 따른 페이지 이동
         // res.redirect('/branchinfoA1');
         // console.log('/macstatusA1.post >> 1회 이상 - 현재 웨이팅 신청 불가(되어있음)')
 
@@ -595,11 +596,15 @@ app.post('/macstatusA2', function(req, res) {
       console.log("/macstatusA2.post >> 1회 이상 - " + req.user.id + "의 웨이팅신청수(arr.length) : " + 유저의웨이팅신청수);
 
       var 찾았니
+      var 찾은고유번호
+      var 찾은기기번호
       for (let i = 0; i < 결과2.length; i++) {
         if (결과2[i].isUseWait == true) {
         찾았니 = "못찾음"         //로그인한 유저가 waitinfo에 없거나 이전에 사용 => 웨이팅 신청 가능
         }
         else {
+          찾은고유번호 = 결과2[i].myNumber
+          찾은기기번호 = 결과2[i].wmac
           찾았니 = "찾음"         //로그인한 유저가 waitinfo에 있음 => 웨이팅 신청 불가
         }
       }
@@ -609,7 +614,6 @@ app.post('/macstatusA2', function(req, res) {
         console.log('/macstatusA2.post >> 1회 이상 - 현재 웨이팅 신청 가능')
       }
       else if(찾았니 == "찾음"){
-        //웨이팅 순서에 따른 페이지 이동
         // res.redirect('/branchinfoA2');
         // console.log('/macstatusA2.post >> 1회 이상 - 현재 웨이팅 신청 불가(되어있음)')
 
@@ -746,11 +750,11 @@ app.post('/wait', isLogin, function(req, res){
   db.collection('branchUsage').findOne({branchName: 'A'}, function(에러, 결과){
     if (에러) return done(에러)
   
-    if(결과 != null) {
+    if(결과 != null) { //모든 기기가 사용중인 경우(모두 true)
       if(결과.isUseWmac1 == true && 결과.isUseWmac2 == true) {
         console.log('/wait.post >> db.branchUsage - A지점의 모든 기기가 사용중')
 
-        //웨이팅 신청 함수 호출
+        //웨이팅 신청가능으로 WaitReq() 호출
         WaitReq();
       }
       else {
@@ -776,43 +780,22 @@ app.post('/wait', isLogin, function(req, res){
       db.collection('waitinfo').find({userid : req.user.id}).toArray(function(에러, 결과2) {
         if(에러) return done(에러)
 
-        //사용중이지 않은 wmac(기기번호)과 연결----------------------------
-        // var 유저와연결할기기번호
-        // db.collection('branchUsage').findOne({name: 'A'}, function(에러, 결과){
-        //   //1) 모든 기기가 사용중이지 않은 경우
-        //   if(결과.isUseWmac1 == false && 결과.isUseWmac2 == true) { //wamc1은 사용중 아님, wmac2는 사용중
-        //     유저와연결할기기번호 = 1;
-        //   }
-        //   if(결과.isUseWmac1 == true && 결과.isUseWmac2 == false) { //wmac1만 사용중, wmac2는 사용중 아님
-        //     유저와연결할기기번호 = 2;
-        //   }
-        //   //2) 모든 기기가 사용중인 경우(모두 true)
-        //   if(결과1.isUseWmac == true && 결과.isUseWmac2 == true) {
-        //     유저와연결할기기번호 = 0;
-        //   }
-        // })
-
-        //기기의 타이머가 1분 기준이면 30초 남았을 때 지정된 wmac으로 수정하는 함수
-        // function numGiving() { 
-        //   if(min1 == 0 && (sec2 > 0 && sec2 <= 30)) { //Timer1의 시간이 30초 남았을 때 = wamc1이 30초 남았을 때
-        //     //wmac1을 1로 update하는 부분
-        //     db.collection('waitinfo').updateOne({userid : req.user.id}, {$set: {wamc:1} }, function(에러, 결과){
-        //       console.log("/wait.post >> Timer1이 30초 이하로 남아 wmac을 0에서 1로 수정")
-        //     })
-        //   }
-        //   else if(min2 == 0 && (sec2 > 0 && sec2 <= 30)) { //Timer2의 시간이 30초 남았을 때 = wamc2이 30초 남았을 때
-        //     //wmac2을 2로 update하는 부분
-        //     db.collection('waitinfo').updateOne({userid : req.user.id}, {$set: {wamc:2} }, function(에러, 결과){
-        //       console.log("/wait.post >> Timer2이 30초 이하로 남아 wmac을 0에서 2로 수정")
-        //     })
-        //   }
-        //   else {
-        //     console.log("/wait.post >> numGiving() 오류")
-        //     console.log("min1 : " + min1 + ", sec1 : " + sec1)
-        //     console.log("min2 : " + min2 + ", sec2 : " + sec2)
-        //   }
-        // }
-        //---------------------------------------------------------------
+        //사용중이지 않은 wmac(기기번호)과 연결---------------------
+        var 유저와연결할기기번호
+        db.collection('branchUsage').findOne({name: 'A'}, function(에러, 결과){
+          //1) 모든 기기가 사용중이지 않은 경우
+          if(결과.isUseWmac1 == false && 결과.isUseWmac2 == true) { //wamc1은 사용중 아님, wmac2는 사용중
+            유저와연결할기기번호 = 1;
+          }
+          if(결과.isUseWmac1 == true && 결과.isUseWmac2 == false) { //wmac1만 사용중, wmac2는 사용중 아님
+            유저와연결할기기번호 = 2;
+          }
+          //2) 모든 기기가 사용중인 경우(모두 true)
+          if(결과1.isUseWmac1 == true && 결과.isUseWmac2 == true) {
+            유저와연결할기기번호 = 0;
+          }
+        })
+        //--------------------------------------------------------
 
         // ------------------- 웨이팅 등록 최초 1회 ---------------
         if(결과2.length == 0) { //신청 이력이 없음
@@ -881,7 +864,6 @@ app.post('/wait', isLogin, function(req, res){
       })
     })
   }
-
 })
 
 
@@ -926,18 +908,38 @@ app.get('/waitcheck', isLogin, function(req, res) {
     var 유저의웨이팅신청수 = 결과2.length
     console.log("/waitcheck.get >> 1회 이상 - " + req.user.id + "의 웨이팅신청수(arr.length) : " + 유저의웨이팅신청수);
 
-    // if(결과2.wmac == 0){ //wmac이 0인 경우(신청 당시 모든 기기가 사용중이였음)
-    //   console.log('/waitcheck.get >> 1회 이상 - wmac이 0으로, numGiving() 실행')
-    //   numGiving(); //기기의 타이머가 1분 기준이면 30초 이하로 남았을 때 지정된 wmac으로 수정
-    // }
-
     var 찾았니
+    var 찾은기기번호
     for (let i = 0; i < 결과2.length; i++) {
       if (결과2[i].isUseWait == true) {
         찾았니 = "못찾음"         //로그인한 유저가 waitinfo에 없거나 이전에 사용 => 웨이팅 신청 가능
       }
       else {
+        찾은기기번호 = 결과2[i].wmac
         찾았니 = "찾음"          //로그인한 유저가 waitinfo에 있음 => 웨이팅 신청 불가
+      }
+    }
+
+    if(찾은기기번호 == 0){ //wmac이 0인 경우(신청 당시 모든 기기가 사용중이였음)
+      console.log('/waitcheck.get >> 1회 이상 - wmac이 0으로, numGiving() 실행')
+
+      //기기의 타이머가 1분 기준이면 30초 이하로 남았을 때 지정된 wmac으로 수정
+      if(min1 == 0 && sec1 <= 30) { //Timer1의 시간이 30초 남았을 때 = wamc1이 30초 남았을 때
+        //wmac1을 1로 update하는 부분
+        db.collection('waitinfo').updateOne({userid : req.user.id}, {$set: {wmac:1} }, function(에러, 결과){
+          console.log("/wait.post >> Timer1이 30초 이하로 남아 wmac을 0에서 1로 수정")
+        })
+      }
+      else if(min2 == 0 && sec2 <= 30) { //Timer2의 시간이 30초 남았을 때 = wamc2이 30초 남았을 때
+        //wmac2을 2로 update하는 부분
+        db.collection('waitinfo').updateOne({userid : req.user.id}, {$set: {wmac:2} }, function(에러, 결과){
+          console.log("/wait.post >> Timer2이 30초 이하로 남아 wmac을 0에서 2로 수정")
+        })
+      }
+      else {
+        console.log("/wait.post >> numGiving() 오류")
+        console.log("min1 : " + min1 + ", sec1 : " + sec1)
+        console.log("min2 : " + min2 + ", sec2 : " + sec2)
       }
     }
 
@@ -946,9 +948,13 @@ app.get('/waitcheck', isLogin, function(req, res) {
       console.log('/waitcheck.get >> 1회 이상 - 웨이팅 사용 후 확인')
     }
     else if(찾았니 == "찾음"){
-      // if(결과2.wmac == 0) {
+      // if(찾은기기번호 == 0) {
       //   res.redirect('/waitcheck')
       //   console.log('/waitcheck.get >> 1회 이상 - wmac이 0으로 지정되어 있음')
+      // }
+      // else{
+      //   res.redirect('/bwaituse')
+      //   console.log('/waitcheck.get >> 1회 이상 - 웨이팅 사용 전 확인')
       // }
       
       res.redirect('/bwaituse')
@@ -970,31 +976,37 @@ app.get('/bwaituse', isLogin, function(req, res) {
     console.log("/bwaituse.get >> " + req.user.id + "의 웨이팅신청수 : " + 결과2.length);
 
     var 찾았니
+    var 찾은고유번호
+    var 찾은기기번호
     for (let i = 0; i < 결과2.length; i++) {
       if (결과2[i].isUseWait == true) {
         찾았니 = "못찾음"         //로그인한 유저가 waitinfo에 없거나 이전에 사용 => 웨이팅 신청 가능
       }
       else {
+        찾은고유번호 = 결과2[i].myNumber
+        찾은기기번호 = 결과2[i].wmac
         찾았니 = "찾음"         //로그인한 유저가 waitinfo에 있음 => 웨이팅 신청 불가
       }
     }
 
     if (찾았니 == "찾음") {
-      var myNumber = 결과2[결과2.length - 1].myNumber
-      console.log("/bwaituse.get >> 본인웨이팅번호 : " + myNumber)
+      // var myNumber = 결과2[결과2.length - 1].myNumber
+      // console.log("/bwaituse.get >> 본인웨이팅번호 : " + myNumber)
 
       //db.counter에서 name이 대기인원수인 데이터 찾기
       db.collection('counter').findOne({name: '대기인원수'}, function(에러, 결과3){
         var totalWait = 결과3.totalWait
         var totalUse = 결과3.totalUse
-        var left = myNumber - totalUse - 1
+        //var left = myNumber - totalUse - 1
+        var left = 찾은고유번호 - totalUse - 1
 
         console.log("/bwaituse.get >> 총대기인원수 : " + totalWait)
         console.log("/bwaituse.get >> 총대기사용수 : " + totalUse)
         console.log("/bwaituse.get >> 앞에남은인원수 : " + left)
 
         //찾은 데이터를 bwaituse.ejs 안에 넣기(req.user를 사용자라는 이름으로 보내기)
-        res.render('bwaituse.ejs', {사용자 : req.user, 본인웨이팅번호 : myNumber, 대기사용수 : totalUse})
+        res.render('bwaituse.ejs', {사용자 : req.user, 본인웨이팅번호 : 찾은고유번호, 
+                                    본인기기번호 : 찾은기기번호, 대기사용수 : totalUse})
       })
     }
     else if(찾았니 == "못찾음"){
@@ -1237,12 +1249,15 @@ app.post('/branchinfo', function(req, res) {
 
     var 찾았니
     var 찾은고유번호
+    var 선택한버튼
+    var 찾은기기번호
     for (let i = 0; i < 결과2.length; i++) {
       if (결과2[i].isUseWait == true) {
         찾았니 = "못찾음"         //로그인한 유저가 waitinfo에 없거나 이전에 사용 => 웨이팅 신청 가능
       }
       else {
         찾은고유번호 = 결과2[i].myNumber
+        찾은기기번호 = 결과2[i].wmac
         찾았니 = "찾음"           //로그인한 유저가 waitinfo에 있음 => 웨이팅 신청 불가
       }
     }
@@ -1263,8 +1278,28 @@ app.post('/branchinfo', function(req, res) {
           console.log("/branchinfo.post >> waitinfo개수 : " + waitinfo개수)
           console.log("/branchinfo.post >> 현재순서고유번호 : " + 현재순서고유번호 + ", 찾은고유번호 : " + 찾은고유번호)
 
-          // 2) 웨이팅 사용 => 웨이팅 사용 코드
-          WaitUse()
+          //각 branchinfo에서 선택한 버튼과 waitinfo에서 찾은 wmac이 같은 경우만 웨이팅 사용(waitUse()호출)
+          if(req.body.macNumber == "A1"){       //branchinfoA1에서 클릭한 시작버튼(wmac1)
+            선택한버튼 = 1
+            console.log("/branchinfo.post >> macstatusA에서 선택한 버튼 : " + 선택한버튼)
+          }
+          else if(req.body.macNumber == "A2"){  //branchinfoA2에서 클릭한 시작버튼(wmac2)
+            선택한버튼 = 2
+            console.log("/branchinfo.post >> macstatusA에서 선택한 버튼 : " + 선택한버튼)
+          }
+
+          console.log("/branchinfo.post >> waitinfo에서 찾은 wmac 기기 번호 : " + 찾은기기번호)
+          
+          if(찾은기기번호 == 선택한버튼){
+            console.log("/branchinfo.post >> 찾은기기번호 == 선택한버튼")
+            // 2) 웨이팅 사용 => 웨이팅 사용 코드
+            WaitUse()
+          }
+          else { 
+            console.log("/branchinfo.post >> 찾은기기번호 != 선택한버튼")
+            res.redirect('/bwaituse')
+          }
+
         }
       })
 
@@ -1292,7 +1327,8 @@ app.post('/branchinfo', function(req, res) {
                   if(에러2){return console.log(에러2)}
 
                   console.log('/branchinfo.post >> 웨이팅 사용(isUseWait is true) 후 사용한 회원 관리(db.counter 수정) 성공')
-                  res.redirect('/')
+                  res.redirect('/')   //>>>>>>>>>>>>>>> redirect가 안먹혀서 /btncheckA1.post 시 redirect 추가
+
                 })
               })
             }
@@ -1333,6 +1369,8 @@ app.post('/btncheck', function(req, res) {
 
 //branchinfoA1 버튼 클릭 확인 - A지점 wmac1
 app.post('/btncheckA1', function(req, res) {
+  res.redirect('/')
+
   console.log("/btncheckA1.post >> branchinfoA1 버튼 클릭 > 타이머1 실행")
 
   //타이머 시작(server) - browser의 타이머1에 시간 전달
@@ -1347,6 +1385,8 @@ app.post('/btncheckA1', function(req, res) {
 })
 //branchinfoA2 버튼 클릭 확인 - A지점 wmac2
 app.post('/btncheckA2', function(req, res) {
+  res.redirect('/')
+
   console.log("/btncheckA2.post >> branchinfoA2 버튼 클릭 > 타이머2 실행")
 
   //타이머 시작(server) - browser의 타이머2에 시간 전달

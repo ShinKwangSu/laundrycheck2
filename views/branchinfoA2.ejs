@@ -23,7 +23,7 @@
 
     <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
 
-    <form action="/branchinfo" method="POST">   <!-- branchinfo의 post 요청 실행-->
+    <form action="/btncheckA2" method="POST">   <!-- branchinfo.post에서 btncheckA2.post로 수정 -->
       <div style="background-color:lightblue; padding:30px;">
         <div class="text-center">
           <p style="color:red; margin-bottom: 10px;"> 웨이팅 사용 시 시작버튼을 눌러주세요. </p>
@@ -35,10 +35,12 @@
 
 
     <script>
-      $('#startBtn').click(function() {   //startBtn을 click했을 때
-        $.ajax({  // branchinfo로 post요청 시 해당 data도 같이 보냄
+      $('#startBtn').click(function() {   //wmac1을 click했을 때
+        $.ajax({ 
           method : 'POST',
-          url : '/btncheckA2',
+          url : '/branchinfo',
+          async : false,
+          data : {macNumber:"A2"}
         }).done(function(결과){
           //AJAX 성공시 실행할 코드는 여기
           console("ajax 성공>> " + " 결과 : " + 결과);
@@ -47,6 +49,20 @@
           console("ajax 실패>> " + " 에러 : " + 에러);
         });
       })
+
+      // $('#startBtn').click(function() {   //startBtn을 click했을 때
+      //   $.ajax({  // branchinfo로 post요청 시 해당 data도 같이 보냄
+      //     method : 'POST',
+      //     url : '/btncheckA2',
+      //     async : false
+      //   }).done(function(결과){
+      //     //AJAX 성공시 실행할 코드는 여기
+      //     console("ajax 성공>> " + " 결과 : " + 결과);
+      //   }).fail(function(에러){
+      //     //실패시 실행할 코드는 여기
+      //     console("ajax 실패>> " + " 에러 : " + 에러);
+      //   });
+      // })
     </script>
 
 
