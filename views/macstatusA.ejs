@@ -114,6 +114,7 @@
       let time1 = "<%= 시간1 %>";   
       let min1 = "<%= 분1 %>";
       let sec1 = "<%= 초1 %>";
+      let btnClick1 = "<%= 클릭여부1 %>"; 
 
       Timer1.value = min1 + " : " + '00'; 
       console.log("time1 : " + time1)
@@ -121,7 +122,7 @@
       console.log("sec1 : " + sec1)
 
       function TIMER1() {
-        PLAYTIME = setInterval(function () {
+        PLAYTIME1 = setInterval(function () {
           time1 = time1 - 1000;       //1초씩 감소
           min1 = time1 / (60 * 1000);   //초를 분으로 나눔
 
@@ -140,15 +141,22 @@
         }, 1000)  //1초마다
       }
 
-      //------------------------------------------------
-      let btnClick1 = "<%= 클릭여부1 %>";   
+      //------------------------------------------------  
+      console.log("btnClick1 is 1 ?? > " + btnClick1);
+
       if(btnClick1 == 1) { 
         TIMER1(); 
-        setTimeout(function () {
-          clearInterval(PLAYTIME);
-          console.log("타이머1 삭제");
-        }, time1);   //3분(180,000)되면 타이머 삭제
         console.log("btnClick1 is 1 AND start TIMER1()");
+
+        setTimeout(function () {
+          clearInterval(PLAYTIME1);
+          btnClick1 = 0;
+
+          console.log("타이머1 삭제");
+          console.log("btnClick1 is 0?? : " + btnClick1);
+          console.log("btnClick1 is 0 AND end TIMER1()");
+
+        }, time1);   //3분(180,000)되면 타이머 삭제
       }
       else {
         console.log("btnClick1 is not 1, it is > " + btnClick1);
@@ -162,6 +170,7 @@
       let time2 = "<%= 시간2 %>";   
       let min2 = "<%= 분2 %>";
       let sec2 = "<%= 초2 %>";
+      let btnClick2 = "<%= 클릭여부2 %>"; 
 
       Timer2.value = min2 + " : " + '00'; 
       console.log("time2 : " + time2)
@@ -169,7 +178,7 @@
       console.log("sec2 : " + sec2)
 
       function TIMER2() {
-        PLAYTIME = setInterval(function () {
+        PLAYTIME2 = setInterval(function () {
           time2 = time2 - 1000;       //1초씩 감소
           min2 = time2 / (60 * 1000);   //초를 분으로 나눔
 
@@ -189,14 +198,20 @@
       }
 
       //------------------------------------------------
-      let btnClick2 = "<%= 클릭여부2 %>";   
+      console.log("btnClick2 is 1 ?? > " + btnClick2);
+
       if(btnClick2 == 1) { 
         TIMER2(); 
-        setTimeout(function () {
-          clearInterval(PLAYTIME);
-          console.log("타이머2 삭제");
-        }, time2);   //3분(180,000)되면 타이머 삭제
         console.log("btnClick2 is 1 AND start TIMER2()");
+
+        setTimeout(function () {
+          clearInterval(PLAYTIME2);
+          btnClick2 = 0;
+
+          console.log("타이머2 삭제");
+          console.log("btnClick2 is 0?? : " + btnClick2);
+          console.log("btnClick2 is 0 AND end TIMER2()");
+        }, time2);   //3분(180,000)되면 타이머 삭제
       }
       else {
         console.log("btnClick2 is not 1, it is > " + btnClick2);
