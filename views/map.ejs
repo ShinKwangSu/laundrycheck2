@@ -157,36 +157,36 @@
       var markerImage = new kakao.maps.MarkerImage(imageSrc, imageSize)
 
 
-      var flag = false
+      var flag = 0
+      var myLocCenter = 0
       //접속 위치 가져오기 성공
       function locationLoadSuccess(pos){
         // 현재 위치 받아오기
         var currentPos = new kakao.maps.LatLng(pos.coords.latitude, pos.coords.longitude);
         
         // 지도 이동(기존 위치와 가깝다면 부드럽게 이동)
-        map.panTo(currentPos);
+        if (myLocCenter == 0) {
+          map.panTo(currentPos);
+          myLocCenter = 1
+        }
+        
 
         // 마커 생성
-        var marker = new kakao.maps.Marker({
+        var myMarker = new kakao.maps.Marker({
           position: currentPos,
           image: markerImage
         });
 
         // 기존에 마커가 있다면 제거
-        if (flag) {
-          marker.setMap(null);
+        if (flag == 1) {
+          myMarker.setMap(null);
         } else {
-          flag = true
+          flag = 1
         }
-
-        marker.setMap(map);
+        if (flag == 1) {
+          myMarker.setMap(map);
+        }
         
-
-        //-----------------
-        // if (navigator.geolocation) {
-        //   navigator.geolocation.watchPosition(locationLoadSuccess,locationLoadError)
-        // }
-        //-----------------
       };
 
       //접속 위치 가져오기 실패

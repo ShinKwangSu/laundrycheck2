@@ -523,7 +523,7 @@ app.post('/macstatusA1', function(req, res) {
         res.redirect('/branchinfoA1');
         console.log('/macstatusA1.post >> 모든 기기가 사용중이지 않아 그냥 기기 사용 가능(모든 기기 false)')
       }
-      //모든 기기가 사용중일 때는 웨이팅 신청 가능하도록..
+      //모든 기기가 사용중일 때는 웨이팅 신청 가능하도록....
       else{
         // ------------------- 웨이팅 등록 최초 1회 -------------------
         //db.waitinfo에서 userid가 로그인한 유저의 id인 데이터를 조회
