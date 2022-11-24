@@ -159,6 +159,7 @@
 
       var flag = 0
       var myLocCenter = 0
+      var myMarkers = []
       //접속 위치 가져오기 성공
       function locationLoadSuccess(pos){
         // 현재 위치 받아오기
@@ -179,13 +180,15 @@
 
         // 기존에 마커가 있다면 제거
         if (flag == 1) {
-          myMarker.setMap(null);
+          myMarkers.setMap(null);
         } else {
           flag = 1
         }
         if (flag == 1) {
           myMarker.setMap(map);
         }
+
+        myMarkers = myMarker
         
       };
 
