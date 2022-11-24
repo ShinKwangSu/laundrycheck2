@@ -16,59 +16,141 @@
 
     <link rel="icon" href="/public/favicon.ico" />
     <title>현황 확인</title>
+
   </head>
   <body style="overflow-x: hidden;">
 
     <%- include('nav.html') %>
 
-    <div class="imgarea">
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
 
-      <div class="washarea">
-        <h2>세탁기</h2>
-        <span>00:00</span>
-        <div class="washmac">
-          <img src="/public/image/wash-machine.png" alt="" width="100" height="100">
+    <form action="/macstatus" method="POST">
+      <div class="imgarea">
+
+        <div class="washarea">
+          <h2>세탁기</h2>
+          <!-- <span><%= 분 %>:<%= 초 %></span> -->
+          <!-- <span id="Timer"></span> -->
+          <input id="Timer" type="text" value="1 : 00" readonly/>
+          <div class="washmac">
+            <img src="/public/image/wash-machine.png" alt="" width="100" height="100">
+            <button class="btn btn-primary" id="wmac1" type="submit">1번 세탁기</button>
+          </div>
+          <span>00:00</span>
+          <div class="washmac">
+            <img src="/public/image/wash-machine.png" alt="" width="100" height="100">
+          </div>
+          <span>00:00</span>
+          <div class="washmac">
+            <img src="/public/image/wash-machine.png" alt="" width="100" height="100">
+          </div>
         </div>
-        <span>00:00</span>
-        <div class="washmac">
-          <img src="/public/image/wash-machine.png" alt="" width="100" height="100">
+  
+        <div class="dryarea">
+          <h2>건조기</h2>
+          <span>00:00</span>
+          <div class="drymac">
+            <img src="/public/image/dry-machine.png" alt="" width="120" height="100">
+          </div>
+          <span>00:00</span>
+          <div class="drymac">
+            <img src="/public/image/dry-machine.png" alt="" width="120" height="100">
+          </div>
+          <span>00:00</span>
+          <div class="drymac">
+            <img src="/public/image/dry-machine.png" alt="" width="120" height="100">
+          </div>
         </div>
-        <span>00:00</span>
-        <div class="washmac">
-          <img src="/public/image/wash-machine.png" alt="" width="100" height="100">
-        </div>
+  
+        <button type="button" class="btn btn-primary gowait"><a href="/wait">웨이팅 하러 가기</a></button>
+  
       </div>
-      <div class="dryarea">
-        <h2>건조기</h2>
-        <span>00:00</span>
-        <div class="drymac">
-          <img src="/public/image/dry-machine.png" alt="" width="120" height="100">
-        </div>
-        <span>00:00</span>
-        <div class="drymac">
-          <img src="/public/image/dry-machine.png" alt="" width="120" height="100">
-        </div>
-        <span>00:00</span>
-        <div class="drymac">
-          <img src="/public/image/dry-machine.png" alt="" width="120" height="100">
-        </div>
-      </div>
+    </form>
 
-      <button type="button" class="btn btn-primary gowait"><a href="/wait">웨이팅 하러 가기</a></button>
 
-    </div>
-    
+    <script>
+    const Timer=document.getElementById('Timer');
+    let time = "<%= 시간 %>";    
+    let min = "<%= 분 %>";
+    let sec = "<%= 초 %>";
+
+    Timer.value=min+" : "+'00'; 
+    console.log("time : " + time)
+    console.log("min : " + min)
+    console.log("sec : " + sec)
+
+    function TIMER() {
+      PLAYTIME = setInterval(function () {
+        time = time - 1000;       //1초씩 감소
+        min = time / (60 * 1000);   //초를 분으로 나눔
+          
+        if (sec > 0) {   //sec=60 에서 1씩 빼서 출력
+          sec = sec - 1;
+          Timer.value = Math.floor(min) + ':' + sec;   //실수로 계산 > 소숫점 아래를 버리고 출력
+          console.log("타이머 : " + Timer.value);
+          // 수정==================================
+          // min = Math.floor(min);
+          // sec = sec - 1;
+          // 1)------------------------------------
+          // console.log("타이머(??:??) " + min + ":" + sec);
+          // 2)------------------------------------
+          // Timer1 = min + " : " + sec;
+          // console.log("타이머(?:?) " + Timer1);
+        }
+        if (sec == 0) {
+          //sec(60) 기준으로 0에서 -1하면 -59 출력
+          //따라서 0이면 sec을 60으로 변경하고, value는 0으로 출력
+          sec = 60;
+          Timer.value = Math.floor(min) + ':' + '00'
+          console.log("타이머 : " + Timer.value);
+
+          // 수정==================================
+          // min = Math.floor(min);
+          // sec = 60;
+          // 1)------------------------------------
+          // console.log("타이머(??:??) " + min + ":" + sec);
+          // 2)------------------------------------
+          // Timer1 = min + " : " + "00";
+          // console.log("타이머(?:00) " + Timer1);
+        }
+      }, 1000)  //1초마다
+    }
+
+    //------------------------------------------------
+    let btnClick = "<%= 클릭여부 %>";   
+    if(btnClick == 1) { 
+      TIMER(); 
+      setTimeout(function () {
+      clearInterval(PLAYTIME);
+      console.log("타이머 삭제");
+      }, time);   //3분(180,000)되면 타이머 삭제
+      
+      console.log("btnClick is true AND start TIMER()");
+    }
+    else {
+      console.log("btnClick is > " + btnClick);
+    }
+    //--------------------------------------------------
+      
+    //TIMER();
+    // setTimeout(function () {
+    //   clearInterval(PLAYTIME);
+    //   console.log("타이머 삭제");
+    // }, 60000);   //3분(180,000)되면 타이머 삭제
+    </script>
+
+
     <script>
       let loginBtnEl = document.querySelector('.login-btn')
       let signupBtnEl = document.querySelector('.signup-btn')
       const session = "<%= session %>";
-      if (session === "false") {
+      if (session === "false") {  //로그인O
         loginBtnEl.textContent = "로그아웃";
         loginBtnEl.href = "/logout";
         signupBtnEl.textContent = "마이페이지";
         signupBtnEl.href = "/mypage";
       }
-      else {
+      else {                      //로그인X
         loginBtnEl.textContent = "로그인";
         loginBtnEl.href = "/login";
         signupBtnEl.textContent = "회원가입";

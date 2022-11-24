@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reset-css@5.0.1/reset.min.css" />
+
+    <link rel="stylesheet" href="../public/css/nav.css">
+    <link rel="stylesheet" href="../public/css/macstatus.css">
+
+    <link rel="icon" href="/public/favicon.ico" />
+    <title>현황 확인(A지점)</title>
+
+  </head>
+  <body style="overflow-x: hidden;">
+
+    <%- include('nav.html') %>
+
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+
+    <div class="imgarea">
+
+      <div class="washarea">
+        <h2>세탁기</h2>
+        <form action="/macstatusA1/" method="POST">
+          <div class="washmac">
+            <input id="Timer1" type="text" style="border:none; width:100px" value="" readonly/>
+            <img src="/public/image/wash-machine.png" alt="" width="100" height="100">
+            <button class="btn btn-primary" id="wmac1" type="submit">세탁기1</button>
+          </div>
+        </form>
+        <form action="/macstatusA2" method="POST">
+          <div class="washmac">
+            <input id="Timer2" type="text" style="border:none; width:100px" value="" readonly/>
+            <img src="/public/image/wash-machine.png" alt="" width="100" height="100">
+            <button class="btn btn-primary" id="wmac2" type="submit">세탁기2</button>
+          </div>
+        </form>
+        <form action="/macstatusA" method="POST">
+          <div class="washmac">
+            <input id="Timer3" type="text" style="border:none; width:100px" value="00 : 00" readonly/>
+            <img src="/public/image/wash-machine.png" alt="" width="100" height="100">
+            <button class="btn btn-primary" id="wmac3" type="submit" disabled>세탁기3</button>
+          </div>
+        </form>
+      </div>
+
+      <div class="dryarea">
+        <h2>건조기</h2>
+        <span>00:00</span>
+        <div class="drymac">
+          <img src="/public/image/dry-machine.png" alt="" width="120" height="100">
+          <button class="btn btn-primary" id="lmac1" type="submit" disabled>건조기1</button>
+        </div>
+        <span>00:00</span>
+        <div class="drymac">
+          <img src="/public/image/dry-machine.png" alt="" width="120" height="100">
+          <button class="btn btn-primary" id="lmac2" type="submit" disabled>건조기2</button>
+        </div>
+        <span>00:00</span>
+        <div class="drymac">
+          <img src="/public/image/dry-machine.png" alt="" width="120" height="100">
+          <button class="btn btn-primary" id="lmac3" type="submit" disabled>건조기3</button>
+        </div>
+      </div>
+
+      <button type="button" class="btn btn-primary gowait"><a href="/wait">웨이팅 하러 가기</a></button>
+
+    </div>
+
+  
+    <script>
+      // $('#wmac1').click(function() {   //wmac1을 click했을 때
+      //   $.ajax({ 
+      //     method : 'POST',
+      //     url : '/branchinfo',
+      //     async : false,
+      //     data : {macNumber:"A1"}
+      //   }).done(function(결과){
+      //     //AJAX 성공시 실행할 코드는 여기
+      //     console("ajax 성공>> " + " 결과 : " + 결과);
+      //   }).fail(function(에러){
+      //     //실패시 실행할 코드는 여기
+      //     console("ajax 실패>> " + " 에러 : " + 에러);
+      //   });
+      // })
+
+      // $('#wmac2').click(function() {   //wmac1을 click했을 때
+      //   $.ajax({  
+      //     method : 'POST',
+      //     url : '/branchinfo',
+      //     async : false,
+      //     data : {macNumber:"A2"}
+      //   }).done(function(결과){
+      //     //AJAX 성공시 실행할 코드는 여기
+      //     console("ajax 성공>> " + " 결과 : " + 결과);
+      //   }).fail(function(에러){
+      //     //실패시 실행할 코드는 여기
+      //     console("ajax 실패>> " + " 에러 : " + 에러);
+      //   });
+      // })
+    </script>
+
+
+    <script>
+      //wmac1의 타이머1
+      const Timer1 = document.getElementById('Timer1');
+      let time1 = "<%= 시간1 %>";   
+      let min1 = "<%= 분1 %>";
+      let sec1 = "<%= 초1 %>";
+
+      Timer1.value = min1 + " : " + '00'; 
+      console.log("time1 : " + time1)
+      console.log("min1 : " + min1)
+      console.log("sec1 : " + sec1)
+
+      function TIMER1() {
+        PLAYTIME = setInterval(function () {
+          time1 = time1 - 1000;       //1초씩 감소
+          min1 = time1 / (60 * 1000);   //초를 분으로 나눔
+
+          if (sec1 > 0) {   //sec=60 에서 1씩 빼서 출력
+            sec1 = sec1 - 1;
+            Timer1.value = Math.floor(min1) + ':' + sec1;   //실수로 계산 > 소숫점 아래를 버리고 출력
+            console.log("타이머1 : " + Timer1.value);
+          }
+          if (sec1 == 0) {
+            //sec(60) 기준으로 0에서 -1하면 -59 출력
+            //따라서 0이면 sec을 60으로 변경하고, value는 0으로 출력
+            sec1 = 60;
+            Timer1.value = Math.floor(min1) + ':' + '00'
+            console.log("타이머1 : " + Timer1.value);
+          }
+        }, 1000)  //1초마다
+      }
+
+      //------------------------------------------------
+      let btnClick1 = "<%= 클릭여부1 %>";   
+      if(btnClick1 == 1) { 
+        TIMER1(); 
+        setTimeout(function () {
+          clearInterval(PLAYTIME);
+          console.log("타이머1 삭제");
+        }, time1);   //3분(180,000)되면 타이머 삭제
+        console.log("btnClick1 is 1 AND start TIMER1()");
+      }
+      else {
+        console.log("btnClick1 is not 1, it is > " + btnClick1);
+      }
+    </script>
+
+
+    <script>
+      //wmac2의 타이머2
+      const Timer2 = document.getElementById('Timer2');
+      let time2 = "<%= 시간2 %>";   
+      let min2 = "<%= 분2 %>";
+      let sec2 = "<%= 초2 %>";
+
+      Timer2.value = min2 + " : " + '00'; 
+      console.log("time2 : " + time2)
+      console.log("min2 : " + min2)
+      console.log("sec2 : " + sec2)
+
+      function TIMER2() {
+        PLAYTIME = setInterval(function () {
+          time2 = time2 - 1000;       //1초씩 감소
+          min2 = time2 / (60 * 1000);   //초를 분으로 나눔
+
+          if (sec2 > 0) {   //sec=60 에서 1씩 빼서 출력
+            sec2 = sec2 - 1;
+            Timer2.value = Math.floor(min2) + ':' + sec2;   //실수로 계산 > 소숫점 아래를 버리고 출력
+            console.log("타이머2 : " + Timer2.value);
+          }
+          if (sec2 == 0) {
+            //sec(60) 기준으로 0에서 -1하면 -59 출력
+            //따라서 0이면 sec을 60으로 변경하고, value는 0으로 출력
+            sec2 = 60;
+            Timer2.value = Math.floor(min2) + ':' + '00'
+            console.log("타이머2 : " + Timer2.value);
+          }
+        }, 1000)  //1초마다
+      }
+
+      //------------------------------------------------
+      let btnClick2 = "<%= 클릭여부2 %>";   
+      if(btnClick2 == 1) { 
+        TIMER2(); 
+        setTimeout(function () {
+          clearInterval(PLAYTIME);
+          console.log("타이머2 삭제");
+        }, time2);   //3분(180,000)되면 타이머 삭제
+        console.log("btnClick2 is 1 AND start TIMER2()");
+      }
+      else {
+        console.log("btnClick2 is not 1, it is > " + btnClick2);
+      }
+    </script>
+
+
+    <!-- Optional JavaScript; choose one of the two! -->
+
+    <!-- Option 1: Bootstrap Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+
+    <!-- Option 2: Separate Popper and Bootstrap JS -->
+    <!--
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js" integrity="sha384-7+zCNj/IqJ95wo16oMtfsKbZ9ccEh31eOz1HGyDuCQ6wgnyJNSYdrPa03rtR1zdB" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js" integrity="sha384-QJHtvGhmr9XOIpI6YVutG+2QOK9T+ZnN4kzFN1RtK3zEFEIsxhlmWl5/YESvpZ13" crossorigin="anonymous"></script>
+    -->
+  </body>
+</html>

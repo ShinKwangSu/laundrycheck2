@@ -1,0 +1,484 @@
+만들어야 하는 기능>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+1. 지점별 페이지 구현 (macStatus 및 branchinfo)
+1) 지점별 현황(macStatus) 페이지 구현
+ex) macStatusA(A지점), macStatusB(B지점),...
+- 쿼리스트링 ? 특정이름 붙이기 	ex) ?mname=변수명 -> map.ejs
+- 변수를 a,b,c 설정 -> server.js의 get요청에서 /부분에 변수사용
+
+2) 지점별 현황에 대한 기기상세(branchinfo) 페이지 구현
+ex) branchinfoA1(A지점 wmac1), branchinfoA2(A지점 wmac2),...
+    branchinfoB1(B지점 wmac1), branchinfoB2(B지점 wmac2),...
+----------------------------------------------------------------------------------
+2. 웨이팅 사용 조건 세부화 코드 추가
+- 'branchinfo에서 비밀번호 입력 후 일치' > 시작버튼 클릭하는 코드
+----------------------------------------------------------------------------------
+3. 부여된 웨이팅 순서대로 사용 가능한 코드 추가
+- 웨이팅 순서가 아닌 경우 웨이팅 사용 불가
+- 웨이팅 순서가 맞는 경우 웨이팅 사용 가능
+ex1) 웨이팅 순서가 맞는 경우만 웨이팅 사용 버튼 활성화
+ex2) 웨이팅 순서가 아닌 경우 /bwaituse(웨이팅 사용 전)로 이동
+> 자신의 차례 : branchinfo로 이동 / 자신의 차례X : bwaituse로 이동 추가
+----------------------------------------------------------------------------------
+4. mypage에 넣을 내용 구상
+----------------------------------------------------------------------------------
+5. 웨이팅 알람 기능 및 잔여시간 알람 기능
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+10/25(화)>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+1. info 브랜치 생성
+2. branchinfo 페이지 생성 =====================================================> 디자인 수정
+3. index.ejs에서 현황 확인 > 지점 찾기로 수정
+
+4. macstatus에서 branchinfo로 redirect 연결
+1) macstatus에서 웨이팅 신청여부에 따라 웨이팅 신청버튼과 세탁기 img 활성화 여부 => 실패
+  > 신청X, 웨이팅 하러가기 버튼 활성화 + 세탁기 이미지 버튼 비활성화
+  > 신청O, 웨이팅 하러가기 버튼 비활성화 + 세탁기 이미지 버튼 활성화
+- 세탁기 img와 div에 disabled 사용 불가
+
+2) macstatus에서 '세탁기 img 클릭 시' /branchinfo로 이동========================> 실패
+- 세탁기 img와 그를 감싸는 div를 이용해 클릭 시 redirect는 가능함(but 조건에 따라 이동해야 함)
+   (onclick="javascript:location.href='/branchinfo';" 사용함)
+- img와 div의 class로 querySelector를 통해 href 사용했지만 정상적으로 실행되지 않음
+
+3) macstatus에서 '세탁기 img 하단에 버튼 추가하여 해당 버튼 클릭 시 branchinfo로 post 요청' => 성공
+- 현재 웨이팅 신청X이면 awaituse로 이동, 현재 웨이팅 신청O이면 branchinfo로 이동
+  +) 신청O일 때 순서를 구분 > 자신의 차례 : branchinfo로 이동 / 자신의 차례X : bwaituse로 이동
+     =====> 코드 수정
+
+4-1)-------------------------------------------------------------------------------------------
+- session: "false" 일 때 로그인O (웨이팅 신청은 로그인 한 경우만 가능)
+- waitinfo에서 웨이팅 신청 여부를 가져와서 render 시 session과 같이 전송
+- 받아온 웨이팅 신청 여부를 ejs에서 사용
+  > 웨이팅 신청 여부 false이면, 웨이팅 신청X, 세탁기 이미지 버튼 활성화
+  > 웨이팅 신청 여부 true이면, 웨이팅 신청O, 세탁기 이미지 버튼 비활성화
+++) wmac도 받아와서 render 후, 해당 번호에 맞는 세탁기 img 비활성화하기
+------------------------------------------------------------------------------------------------
+
+5. branchinfo 타이머
+- setInterval : 일정 시간 (millisecond) 마다 반복하여 함수 실행
+- clearInterval : 일정 시간 마다 반복되는 setInterval 실행 종료
+- setTimeout : 만료된 후 함수나 지정한 코드 조각을 실행하는 타이머 설정
+
+https://twinklehwa.tistory.com/426 - 3분 카운트다운 ==> 참고
+https://wonpaper.tistory.com/319 - 1초마다 자동갱신되는 타이머
+https://goodmemory.tistory.com/116 - 10초 카운트 다운 + stop
+
+---> ajax가 제대로 실행되고 있는지 모르겠음
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+10/26(수)>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+1. branchinfo 타이머 코드 수정
+2. branchinfo Post요청에 대한 Ajax 수정중..
+- ajax 없이 실행은 되지만 브라우저 창에 새로고침 계속 돌아가고 redirect 결과 반환이 늦음
+- 타이머 새로고침 시 초기화됨
+-> /idcheck처럼 /timer 따로 만들고 ajax를 통해서 db로 저장?
+
+https://blog.naver.com/PostView.nhn?blogId=ka28&logNo=222038499551 - Ajax get/post
+https://sir.kr/qa/116308 - 타이머 새로고침 초기화 해결방안
+- 불특정 접속자마다 다른 실시간 초기화를 원하는 경우 : 쿠키나 세션 사용
+- 옥션타이머와 같이 동일한 카운터를 원하는 경우 : ajax를 통해 db로 저장
+https://webisfree.com/2015-10-14/ajax%EB%A5%BC-%EC%82%AC%EC%9A%A9%ED%95%B4-%EC%84%9C%EB%B2%84%EC%97%90-%EB%8D%B0%EC%9D%B4%ED%84%B0-%EC%A0%80%EC%9E%A5%ED%95%98%EB%8A%94-%EB%B0%A9%EB%B2%95
+- Ajax를 사용해 서버에 데이터 저장하는 방법
+
+3. 웹소켓 공부..
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+10/27(목)>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+1. 웹소켓 공부..
+2. socket.io 라이브러리 설치 -> npm install socket.io
+- socket.ejs 생성 후 index.ejs 대신에 사용(home이 socket.ejs임)
+- macstatus.ejs) socket.io 설치 script + 서버와 실시간 소통채널 개설 script 추가
+
+- 아래 코드는 페이지 로드 시 한번 쭉 실행됨 -> ejs
+<script>
+      var socket = io();  //유저가 웹소켓에 접속
+</script>
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+10/31(월)>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+1. branchinfo에서 버튼 클릭 > macstatus에서 타이머 실행
+- branchinfo 버튼 클릭 시 server.js로 버튼 클릭 여부 전달 -> 웹소켓 사용? (서버에세 웹소켓으로 실시간 메세지 보냄)
+  > server.js에서 버튼 클릭 여부에 따라 ture(클릭O)이면..
+    > branchinfo에 있는 유저는 웨이팅 사용했으니 /socket으로 이동
+    > server.js에서는 타이머 실행... 그 값을 macstatus.ejs로 render --> ajax 사용?
+
+- 타이머 코드 : branchinfo에서 server.js로 이동
+- 타이머 코드 실행한 Timer1을 macStatus get할 때 render{타이머}해서 출력 --> 추후 ajax 사용으로 새로고침
+
+2. 웹소켓
+1) socket.io 라이브러리 설치
+2) server.js에서
+- socket.io에 대한 const 부분 추가
+- 서버 띄우는 코드에서 app.listen -> http.listen으로 수정
+- index.ejs 대신 socket.ejs 사용
+- 웹소켓 접속 시 서버가 실행하는 부분 추가
+  io.on('connection', function(){
+    console.log('웹소켓 연결로 유저 접속됨');
+  });
+3) socket.ejs
+- index.ejs 복붙
+4) macstatus.ejs
+- 유저에 웹소켓 접속하는 부분 추가
+  <script>
+    var socket = io();  
+  </script>
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+11/02(수)>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+1. 10/31(월) 1번 부분
+- branchinfo에서 버튼 클릭 시 server.js의 타이머 실행
+  <<완료>>
+  - server.js에서 타이머 실행
+  - branchinfo 버튼 클릭 시 server.js의 타이머 실행
+
+  <<수정할 것>>
+  - branchinfo에서 버튼 클릭 시 post요청 원활하게 실행하기 => 해결 render 연결이 잘 안되어 있었음
+  - branchinfo에서 버튼 클릭 시 ajax의 성공/실패가 실행이 안됨 => 해결 상관없음
+    > 데이터는 넘어감, done()과 fail()이 실행안됨
+  - server.js에서 실행된 타이머를 macstatus에 출력하기
+    > 타이머 값이 ajax가 되지 않아 타이머의 처음 값만 render된 상태
+    > server.js에서 타이머는 돌아가고 있음
+
+2. branchinfo 버튼 클릭 시 server.js의 타이머 실행
+- branchinfo 버튼 클릭을 ajax로 서버에 요청
+  > 클릭하면 바로 post 요청이니 클릭여부 확인 필요 없음
+- /btncheck로 post 요청해서 StartTimer() 호출해서 타이머 실행
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+11/03(목)>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+1. 11/02(수) 1번 <<수정 부분>>
+- server.js에서 실행된 타이머를 macstatus에 출력하기
+  > 타이머 값이 ajax가 되지 않아 타이머의 처음 값만 render된 상태
+  > server.js에서 타이머는 돌아가고 있음
+  +) 웹소켓 사용해도 ajax랑 결과는 동일함 -> ajax와 웹소켓 중 선택하는 것임
+
+2. vhost 사용 => 실행 오류
+: 도메인별로 다른 express 사용해서 서버 띄우기
+- 모듈 설치 : npm install --save express vhost
+
+3. 웨이팅 사용 조건 세부화 코드 구상
+- 모든 기기가 사용중인지 아닌지 구분하는 코드
+  >/btncheck에서 타이머 실행 후, db에서 isUseW1(wmac1의 사용여부) true로 update 
+  >isUseW1이 false로 변경되는건.... 타이머가 끝난 경우....!... => 이게 좀 애매함
+
+- '모든 기기가 사용중인 경우' 웨이팅 사용(mypage에 있음)하는 코드
+  > macstatus의 타이머 실행
+  > 웨이팅 사용 코드 실행(총웨이팅인원-1, isUseWait true로 변경) 
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+11/04(금)>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+1. 11/03(목) 1번 <<수정 부분>>
+* server.js에서 실행된 타이머를 macstatus에 출력하기
+- 문제점 및 진행현황
+  > 타이머 값이 ajax가 되지 않아 타이머의 처음 값만 render된 상태
+  > server.js에서 타이머는 돌아가고 있음
+
+- 해결하기 위해 수정중..
+  1) server와 browser 모두 타이머 코드 사용 -> 자원 절약을 위해 아래 참고
+  2) server에서 시간만 render해주고 browser에서 해당 시간 받아서 타이머 코드에 사용
+     > server에서 /macstatus로 get요청할 때 서버시간 render
+     > /macstatus로 get요청할 때마다 서버시간 받아온 결과를 1초에 1씩 감소
+  3) server에서 render한 데이터를 ejs의 <script> 내에서 사용할 때 아래처럼 쓰기
+     <script>
+        var aaa = "<%= AAA %>";
+     </script>
+
+- 여기까지 코드의 문제점
+  > macstatus get하면 바로 브라우저의 타이머 실행
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+11/05-6(토-일)>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+1. /macstatus로 get 요청 > server의 시간을 기준으로 /macstatus의 타이머 실행
+ > macstatus로 get 요청하면 브라우저의 타이머가 바로 실행됨
+ > branchinfo의 버튼 체크 여부에 따라 브라우저의 타이머를 실행해야 함
+
+- 해결방안
+1) branchinfo 버튼 클릭하면 /btnChek로 post 요청되니 /macstatus로도 여부를 전달
+   > branchinfo에서 버튼 클릭하면, /macstatus에 ajax로 get 요청하면 isClick : true 전달!!
+   > server.js에서 /macstatus에 get할 때 req.body.isClick를 btnClick에 담아 render할 때 클릭여부 : btnClick으로 보냄
+     해당 ajax가 실행되지 않는듯
+
+* ajax에서 done과 success의 차이 (https://string.tistory.com/128)
+- 성공 시 : success > complete > done > always
+- 실패 시 : error > complete > fail > always
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+11/7-8(월-화)>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+1. 11/5-6의 해결방안 1이 되지 않는 이유를 찾음
+- 이유 : post요청만 서버로 req.body 데이터를 보낼 수 있음
+
+2. 이에 따른 다른 해결방안 생각해보기
+1) /branchinfo에서 /btnCheck로 post ajax할 때 data 전송해서 사용해보기
+- server.js의 btncheck.post에서 해당 데이터를 받아지는지 확인
+- server.js에서 AAA()만들고 btncheck.post에서 AAA()호출하면 data를 사용해 return data하도록 만듬
+- server.js에서 /macstatus.get할 때 AAA()를 호출해서 return된 데이터 사용하도록 함
+
+2) server.js의 StartTimer() 실행 여부에 따른 변수를 받아와서 사용해보기 => 사용
+- 아래 흐름에 맞게 코드 변경
+  1) branchinfo.ejs에서 '시작버튼'을 누르면 server의 StartTimer() 실행(/btnCheck에서)
+  2) let isClick을 전역변수로 만들어서.. (StartTimer() 내부에 TIMER() 있음)
+     TIMER()가 실행되면 btnClick=1이 되고, TIMER()가 끝나면 btnClick=0이 됨
+  3) /macstatus get요청할 때 {클릭여부:btnClick}으로 render
+  4) macstatus.ejs에서 btnClick = "<%= 클릭여부 %>"로 받아옴
+  5) btnClick = 1일 때, 브라우저의 TIMER() 실행 및 삭제
+=> 유저1, 2명 접속했을 때 잘 돌아가는 것 확인
+=> n초 정도 차이나는 문제 있음
+
+3. 웨이팅 사용 조건 세부화 코드 구상
+- 모든 기기가 사용중인지 아닌지 구분하는 코드
+  > /btncheck에서 타이머 실행 후, db에서 isUseW1(wmac1의 사용여부) true로 update 
+  > isUseW1이 false로 변경되는건.... 타이머가 끝난 경우....!... => 이게 좀 애매함
+
+- '모든 기기가 사용중인 경우' 웨이팅 사용(mypage에 있음)'하는 코드
+  > macstatus의 타이머 실행
+  > 웨이팅 사용 코드 실행(총웨이팅인원-1, isUseWait true로 변경)
+
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+11/15(화)>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+1. 웨이팅 사용 조건 세부화 코드 구상
+- 모든 기기가 사용중인지 아닌지 구분하는 코드
+  > /btncheck에서 타이머 실행 후, db에서 isUseW1(wmac1의 사용여부) true로 update 
+  > isUseW1이 false로 변경되는건.... 타이머가 끝난 경우....!... => 이게 좀 애매함
+
+- '모든 기기가 사용중인 경우' 웨이팅 사용(mypage에 있음)'하는 코드
+  > macstatus의 타이머 실행
+  > 웨이팅 사용 코드 실행(총웨이팅인원-1, isUseWait true로 변경)
+
+2. 1번의 1번 하기 위해 A지점에 wmac1과 wmac2의 타이머 생성
+1) A지점의 wmac1과 wmac2 페이지 생성
+- macstatusA, branchinfoA1, branchinfoA2로 생성
+
+2) macstatusA에서 wmac1과 wmac2의 각 branchinfo(branchinfoA1, branchinfoA2)로 이동
+- macstatus.ejs에서 ajax post로 data 넘겨서 server에서 if문 이용해서 사용
+  > ajax로 data : {macNumber:"A1"}, data : {macNumber:"A2"} 넘김
+  > server에서 macNumber가 A1이면 branchinfoA1으로 이동, A2이면 branchinfoA2로 이동(macstatusA의 post요청 부분)
+
+3) wmac1과 wmac2의 각 branchinfo(branchinfoA1, branchinfoA2)에서 시작버튼 클릭 시,
+   branchinfo로 post요청해서 웨이팅 사용(페이지 이동 없기 때문에 공통으로 사용해보자)
+   각 btnCheck로 ajax post요청해서 각 StartTimer 실행 -> btnCheck에 따라 다른 타이머를 실행하기 위함
+- branchinfo의 StartBtn 클릭 시 btnCheck로 ajax post요청해서 StartTimer() 실행
+  > branchinfoA1의 StartBtn버튼 클릭 > StartTimerA1() 실행 > btnClick1 == 1
+  > branchinfoA2의 StartBtn버튼 클릭 > StartTimerA2() 실행 > btnClick2 == 1
+
+4) 각 StartTimer()의 각 time, min, sec을 macstatusA get요청 시 render하여 macstatusA에서 출력
+  > StartTimerA1() 실행 > time1, min1, sec1, btnClick1 사용 > macstatusA로 모두 render
+  > StartTimerA2() 실행 > time2, min2, sec2, btnClick2 사용 > macstatusA로 모두 render
+
+5) macstatus.ejs의 타이머 부분도 render 받은거에 맞게 수정해주기
+
+3. 2번처럼 수정한 결과..
+- macstatus의 ajax에 문제가 있는 것 같음
+  > macstatus의 post요청의 if문에서 문제 발생(macNumber 받아지는데 그에 따라 redirect 안됨)
+  > 오류 시 jquery 문제가 뜨기 때문
+- macstatus의 post요청의 if문 말고 macNumber 출력과 redirect만 각 사용해봄
+  > macNumber가 A1인 경우, branchinfoA1으로 redirect 잘 되고 타이머 문제 없음
+  > macNumber가 A2인 경우, branchinfoA2으로 redirect는 잘 되지만 타이머 문제 있음(타이머 출력X, 타이머 삭제됨) => 해결
+- macstatusA의 post요청이 두번 실행됨, db는 바뀌지 않고 redirect도 되지 않음
+
+4. 3번의 해결방안
+- ajax 사용시 서버에서 .redirect말고 프론트엔드에서 window.location.href="/" 실행해서 페이지이동
+  (window.location.href와 location.href는 같음, windows만 생략될 뿐)
+  > 안됨
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+11/16(수)>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+1. 11/15 3번 해결해보기 => 일단 야매로 해결
+1) 버튼마다 다른 form post요청으로 묶어보기 => 사용
+- macstatusA1, macstatusA2 post요청 추가(macstatusA를 복제함)
+- 버튼1 클릭 > macstatusA1으로 post요청 > branchinfoA1으로 redirect
+- 버튼2 클릭 > macstatusA2으로 post요청 > branchinfoA2으로 redirect
+2) async : false 를 ajax 요청보낼때 설정
+
+2. macstatusA 프론트 구조(?) 변경 => 추후 css로 정렬 맞추기 등 하기
+- macstatus.css 수정
+  > span 말고 input(text type css에서 정렬하는 방법) 정렬하기
+
+3. 11/15 1-1번 만들어보기
+1) 모든 기기가 사용중인지 아닌지 구분하는 코드
+- 기기가 사용중이라면.. > 타이머가 실행됨.. > db에 기기마다 타이머 실행여부 저장
+   > /btncheck에서 타이머 실행 후, db에서 isUseW1(wmac1의 사용여부) true로 update 
+   > isUseW1이 false로 변경되는건.... 타이머가 끝난 경우....!... => 이게 좀 애매함 => 타이머가 삭제될 때?
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+11/17(목)>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+1. 11/15 3번 해결 생각해보기 => 주말에 2번으로 수정해보기
+1) 두 버튼 다 같은 경로(macstatusA)니까 뒤에 url query string, url parameter 등을 다르게 바꿔보기
+2) db에서 유저id로 웨이팅 여부를 검색할 때 "/infoA1, /infoA2로 redirect 하는 부분"이 현재 서버에 있는데 "삭제"
+   1) 유저id로 웨이팅 여부를 검색하여 flag값만 보냄
+   2) 브라우저(macstatusA)에서 ajax의 success : function(data){} 안에서 flag 값을 받음
+   3) 유저가 웨이팅을 함 + 버튼1을 누름 -> infoA1으로 window.location.href="/infoA1"로 페이지 이동
+- ajax가 버튼마다 다르니 infoA1과 infoA2 각각 설정 가능할 듯
+
+2. 11/16 3번(11/15 1-1번) 이어서..
+- 기기 사용중 > 타이머 실행 > db에 기기마다 사용여부 저장 
+1) db에 컬렉션 및 자료 생성
+- branchUsage 컬렉션 추가 > branchName : A, isUseWmac1 : false, isUseWmac2 : false로 자료 추가
+
+2) 기기 사용여부 판별
+- 기기 사용중
+  > /branchinfo에서 버튼 클릭 > /btnCheck에서 타이머 실행 + db.branchUsage에서 branchName이 A인 isUseWmac을 true로 변경
+  ex) /branchinfoA1에서 버튼 클릭 > /btnCheckA1에서 타이머 실행 + db에서 branchName이 A인 isUseWmac1을 true로 변경
+========================================================================================================
+<<변경 : updateOne>>
+db.collection('counter').updateOne( {요런 이름의 자료를} , {이렇게 수정해주세요} , function(에러, 결과){
+  console.log('수정완료')
+})
++) { $set : { totalPost : 100 } } 값변경(100으로 변경), { $inc : { totalPost : 5 } } 값증가(5만큼더함)
+--------------------------------------------------------------------------------------------------------
+db.collection('branchUsage').updateOne({branchName : 'A'}, {$set : {isUseWmac1:true} }, function(에러, 결과){
+  if(에러){return console.log(에러)}
+  console.log('db.branchUsage - A지점의 Wmac1이 true로 수정됨')
+})
+========================================================================================================
+- 기기 사용끝(사용중X)
+  > 서버의 타이머 시간을 받아오기 때문에 서버의 타이머 종료 후 db에서 isUseWmac을 false로 변경
+  ex) isUseWmac1의 사용이 끝나면 서버의 타이머가 삭제되기 때문에 이때 isUseWmac1을 false로 변경
+
+3. 11/15 1-2번
+db.branchUsage에서 branchName이 A인 것을 검색해서 isUseWmac1, isUseWmac2가 true라면 모든 기기가 사용중이라고 판별
+- waitcheck를 waitfail.ejs로 변경해서 모든 기기가 사용중이지 않으면 여기로 이동
+========================================================================================================
+<<검색 : find, findOne>>
+- db.collection('post').find().toArray() : post 콜렉션에 저장된 모든 데이터를 Array 자료형으로 가져와주세요 => [자료1, 자료2 ...]
+- db.colleciton('post').findOne() : post 콜렉션에 저장된 데이터 하나를 가져와주세요
+--------------------------------------------------------------------------------------------------------
+db.collection('branchUsage').findOne({branchName : 'A', function(에러, 결과) {
+  if (에러) return done(에러)
+
+  if(결과 != null) {
+    if(결과.isUseWmac1 == true && 결과.isUseWmac2 == true) {
+      console.log('db.branchUsage - A지점의 Wmac1, Wmac2는 true 임')
+      //웨이팅 신청 부분을 함수로 만들어 여기서 호출
+    }
+    else {
+      res.render('waitfail.ejs')
+      console.log('db.branchUsage - A지점의 Wmac1, Wmac2는 true가 아님')
+      console.log('db.branchUsage - A지점의 Wmac1 >>> ' + 결과.isUseWmac1)
+      console.log('db.branchUsage - A지점의 Wmac2 >>> ' + 결과.isUseWmac2)
+    }   
+  }
+  else {
+    console.log('db.branchUsage - A지점의 조회 결과가 null')
+  }
+})
+========================================================================================================
+
+4. 2번의 문제점... 오프라인의 사용자도 고려해야 함..
+- 모든 기기가 작동중인 경우에만 웨이팅 신청이 가능하다면 그 전에 오프라인에서 세탁기를 누군가 사용해야 함
+= 웨이팅 신청을 안해도 macstatus의 기기를 누를 수 있어야 한다.. + 로그인도 안해도 된다... => 이 부분 같이 얘기해보기
+좀 복잡할듯?
+
+5. 기능 리스트 3번 - 부여된 웨이팅 순서대로 사용 가능한 코드 구상
+1) db.waitinfo의 리스트에서 기기의 사용이 끝나는대로 기기와 유저 연결
+1-1) 모든 기기가 사용중이지 않은 경우
+- db.branchUsage의 name이 A인 데이터의 기기 중 사용 여부가 false인 기기 찾기
+- db.waitinfo의 userid가 로그인한 유저의 id인 데이터의 wmac을 위의 기기번호(false인 기기번호)로 수정
+ex) A지점의 wmac1과 wmac2 중 wmac2가 false라면, waitinfo의 유저의 wmac을 0에서 2로 수정
+1-2) 모든 기기가 사용중인 경우
+- 기기의 타이머가 1분 기준이면 30초 남았을 때 wmac 지정
+ex) A지점의 wmac1,2가 사용중인데 wmac2가 30초 남았으면 true여도 wmac을 0에서 2로 수정
+
+2) 웨이팅 순서 구분
+- 웨이팅 순서가 아닌 경우 웨이팅 사용 불가  ex) 웨이팅 순서가 아닌 경우 /bwaituse(웨이팅 사용 전)로 이동
+- 웨이팅 순서가 맞는 경우 웨이팅 사용 가능  ex) 웨이팅 순서가 맞는 경우 /branchinfo로 이동
+- waitinfo의 리스트 중 false인 것을 찾아 myNumber 값이 가장 작은 것(가장 앞의 것)부터 사용할 수 있도록..?
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+11/18-19(금-토)>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+1. 기능 리스트 3번 - 부여된 웨이팅 순서대로 사용 가능한 코드 
+1) 웨이팅 순서 구분 => 해결
+   1-1) 대기자의 유무 상관없이 부여된 웨이팅 대기번호(myNumber)가 totalUse(사용인원) + 1인 사람이
+        웨이팅을 사용 => branchinfo.post에서 웨이팅 사용
+   1-2) 웨이팅 순서에 따른 페이지 이동 => macstatusA1.post와 macstatusA2.post에서 페이지 이동
+   - 웨이팅 순서가 아닌 경우 웨이팅 사용 불가  ex) 웨이팅 순서가 아닌 경우 /bwaituse(웨이팅 사용 전)로 이동
+   - 웨이팅 순서가 맞는 경우 웨이팅 사용 가능  ex) 웨이팅 순서가 맞는 경우 /branchinfo로 이동
+
+2) 기기번호와 유저 연결 구상
+2-1) 모든 기기가 사용중이지 않은 경우
+- db.branchUsage의 name이 A인 데이터의 기기 중 사용 여부가 false인 기기 찾기
+- db.waitinfo의 userid가 로그인한 유저의 id인 데이터의 wmac을 위의 기기번호(false인 기기번호)로 수정
+ex) A지점의 wmac1과 wmac2 중 wmac2가 false라면, waitinfo의 유저의 wmac을 0에서 2로 수정
+
+2-2) 모든 기기가 사용중인 경우
+- 기기의 타이머가 1분 기준이면 30초 남았을 때 wmac 지정
+ex) A지점의 wmac1,2가 사용중인데 wmac2가 30초 남았으면 true여도 wmac을 0에서 2로 수정
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+11/20-22(일-화)>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+1. 기능 리스트 3번 이어서.. => branchinfo.post에서 웨이팅 사용
+1) 기기번호와 유저 연결
+1-1) 모든 기기가 사용중이지 않은 경우 => wait.post에 waitReq()에 추가 
+- db.branchUsage의 name이 A인 데이터의 기기 중 사용 여부가 false인 기기 찾기
+- db.waitinfo의 userid가 로그인한 유저의 id인 데이터의 wmac을 위의 기기번호(false인 기기번호)로 수정
+ex) A지점의 wmac1과 wmac2 중 wmac2가 false라면, waitinfo의 유저의 wmac을 0에서 2로 수정
+
+1-2) 웨이팅 사용 시 isUseWait이 false이고, wmac의 번호에 따라 macstatus에서 버튼 선택이 맞는 경우
+=> branchinfo.post, macstatusA1.post에 추가
+ex) isUseWait이 false이고, wmac이 1일 때 macstatus에서 세탁기1 버튼을 클릭해야 함
+- wmac과 macstatusA에서 선택한 버튼이 같은 경우에만 'branchinfo로 이동 + WaitUse()로 웨이팅 사용'
+- 같지 않으면 /bwaituse로 이동
+
+1-3) 오류발생 - 흐름 오류 발생 => branchinfoA1.ejs와 branchinfoA2.ejs에 추가
+<<흐름>>--------------------------------------------------------------------
+macstatusA.get -> 세탁기1버튼클릭 -> macstatusA1.post로 /branchinfoA1 이동
+-> branchinfoA1.get -> 시작버튼클릭
+-> branchinfo.post에서 branchinfo에서 선택한 버튼과 waitinfo에서 찾은 wmac이 같은 경우만 웨이팅 사용
+    + btnCheckA1.post에서 server의 Timer1() 실행 및 wmac1의 사용여부를 true로 변경 
+
+macstatusA의 ajax를 branchinfoA1과 branchinfoA2로 바꿈
+즉, 시작버튼 클릭 시 branchinfo.post에서 branchinfo에서 선택한 버튼과 db의 wmac 비교하여 웨이팅 사용
+		  + btnCheck.post에서 server의 Timer1() 실행 및 wmac1의 사용여부를 true로 변경 
+---------------------------------------------------------------------------
+- branchinfoA1.ejs와 branchinfoA2.ejs에서 form의 post를 /btncheckA1.post로 수정
+- branchinfoA1.ejs와 branchinfoA2.ejs에서 ajax를 /branchinfo.post만 async : false(동기)로 추가
+
+
+1-4) 모든 기기가 사용중인 경우(모두 true) 웨이팅 신청 가능으로 WaitReq() 호출
+     + 기기의 타이머가 1분 기준이면 30초 이하로 남았을 때 wmac 지정 => numGiving()으로 추가
+- 기기의 타이머가 1분 기준이면 30초 이하로 남았을 때 wmac 지정
+ex) A지점의 wmac1,2가 사용중인데 wmac2가 30초 남았으면 true여도 wmac을 0에서 2로 수정
++++) 유저가 이용할 차례일 때 (waitinfo에서 false인 첫번 째 요소의 id가 로그인한 유저의 id일 때)
+
+1-5) 웨이팅 확인하는 페이지에 방문했을 때 => waitcheck.get에 추가
+- if(waitinfo의 wmac이 0일 경우 && 유저가 이용할 차례일 때) { numGiving(); }
+-> wmac이 0인 경우에 사용중이지 않거나(false이거나) 타이머가 30초 이내로 남았다면 numGiving()으로
+   wmac 부여 
+- if(waitinfo의 wmac이 0일 경우 && 유저가 이용할 차례일 때) { res.redirect('/waitcheck') }
+-> numGiving()으로 wmac이 부여되지 않아 아직 wmac이 0인 경우에 웨이팅 사용하려고 하면
+   웨이팅 확인 페이지(/waitcheck)로 넘기기
+
+
+2) /bwaituse UI 수정
+
+3) wmac이 0인 채로 waitcheck하면 오류 발생 => 해결
+- 타이머가 30초 이하일 때 실행하는 코드인 numGiving()가 안먹힘
+- 타이머 30초 이전은 상관 없음 30초보다 낮으면 문제 발생
+- numGiving()을 풀어쓰는 것으로 해결
+
+
+
+4) 처음 사용하는 사람의 wmac 배정 방법 어떻게? => wait.post의 웨이팅 신청하는 WaitReq()에 추가
+- 모든 기기가 사용중이지 않다면(false) wmac을 1로 지정
+if(결과1.isUseWmac1 == false && 결과.isUseWmac2 == false) {
+  유저와연결할기기번호 = 1;
+}
+
+5) 모든 기기가 사용중일 때만 웨이팅 신청 가능한데 그 이전엔 어떻게? => macstatusA1.post와 macstatusA2.post에 추가
+- 로그인한 유저만 사용한다는 가정 하에.....
+- 모든 기기가 사용중이지 않을 때는 웨이팅 신청 및 사용X
+- 따라서 모든 기기가 사용중이지 않을 때는 그냥 기기 사용 가능하도록....
+-> 기기 사용은 macstatusA에서 버튼 클릭 > branchinfo에서 시작버튼 클릭 > btnCheck
+
+- 수정 전 상황 : macstatusA에서 버튼 클릭하면 웨이팅 사용안했다고 뜸
+  > macstatusA.post하면 웨이팅 신청여부로 나뉘기 때문
+-> macstatusA에서 버튼 클릭 시 "모든 기기가 작동중이지 않다면"...!
+    branchinfo로 이동할 수 있도록....
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>

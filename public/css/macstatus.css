@@ -2,7 +2,7 @@
 .imgarea {
   width: 100%;
   height: 100vh;
-	position: relative;
+  position: relative;
 }
 
 .washarea {
@@ -41,13 +41,26 @@ h2 {
 	font-size: 24px;
 	font-weight: 700;
 	text-align: center;
-	margin-bottom: 50px;
+	margin-bottom: 20px;
 }
+
+#Timer1, #Timer2, #Timer3 {
+	text-align: center;
+}
+
+button#wmac1, button#wmac2, button#wmac3 {
+	transform: translate(10%, 5%);
+}
+button#lmac1, button#lmac2, button#lmac3 {
+	transform: translate(22%, 5%);
+}
+
 button.gowait {
 	position: absolute;
 	bottom: 20%;
 	left: 50%;
 	transform: translate(-50%, 20%);
+	
 }
 button.gowait a {
 	color: #fff;
