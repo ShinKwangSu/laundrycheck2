@@ -12,35 +12,32 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reset-css@5.0.1/reset.min.css" />
 
     <link rel="stylesheet" href="../public/css/nav.css">
-    <link rel="stylesheet" href="../public/css/wait.css">
     <link rel="stylesheet" href="../public/css/displaynone.css">
 
     <link rel="icon" href="/public/favicon.ico" />
-    <title>웨이팅 등록(A지점)</title>
+    <title>웨이팅 사용 전 확인 페이지(B지점)</title>
   </head>
   <body style="overflow-x: hidden;">
 
     <%- include('nav.html') %>
 
-    <h4>웨이팅 페이지(A지점)</h4>
+    <h4 class="ml-2 my-3 text-center">웨이팅 사용 전 확인 페이지(B지점)</h4>
 
-    <form action="/wait" method="POST">
-      <div class="btn-area">
-        <p>웨이팅 할 기기를 선택해주세요.</p>
-        <button class="btn btn-primary" type="submit">세탁기</button>
-        <button class="btn btn-primary" disabled>건조기</button>
+    <div style="background-color:lightblue; padding:30px;">
+      <div class="text-center">
+        <p style="color:red"> 본인의 웨이팅 번호가 다가오면 대기해주세요. </p>
         <br>
       </div>
-    </form>
 
-    <div class="count-area">
-      <div class="wash-count">
-        <p> &#60;세탁기 대기인원수&#62; </p>
-        <h4><%= counters.totalWait %> 명</h4>
-      </div>
-      <div class="dry-count">
-        <p> &#60;건조기 대기인원수&#62; </p>
-        <h4>0 명</h4>
+      <div class="text-center">
+        <h4> "<%= 사용자.id %>"님의 대기번호는 <%= 본인웨이팅번호 %>번으로 <br>
+          현재 앞에 <%= (본인웨이팅번호) - (대기사용수) - 1 %>명이 있습니다. <br><br>
+          웨이팅 사용 시 <br>해당 지점의 <%= 본인기기번호 %>번 기기를 사용해주세요.
+        </h4>
+        <br>
+        <p style="color:blue; margin-bottom: 10px;"> 만약 기기번호가 0번이면<br>아직 배정되지 않은 상태입니다.</p>
+        <p style="color:blue; margin-bottom: 10px;"> (앞에 0명 : 작동 종료 30초 전 배정) </p>
+        <p style="color:blue; margin-bottom: 10px;"> (앞에 n명 : 앞에 1명인 경우 배정) </p>
       </div>
     </div>
 

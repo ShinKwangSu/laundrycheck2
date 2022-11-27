@@ -28,7 +28,7 @@
 
       <div class="washarea">
         <h2>세탁기</h2>
-        <form action="/macstatusA1/" method="POST">
+        <form action="/macstatusA1" method="POST">
           <div class="washmac">
             <input id="Timer1" type="text" style="border:none; width:100px" value="" readonly/>
             <img src="/public/image/wash-machine.png" alt="" width="100" height="100">
@@ -44,7 +44,7 @@
         </form>
         <form action="/macstatusA" method="POST">
           <div class="washmac">
-            <input id="Timer3" type="text" style="border:none; width:100px" value="00 : 00" readonly/>
+            <input id="Timer5" type="text" style="border:none; width:100px" value="00 : 00" readonly/>
             <img src="/public/image/wash-machine.png" alt="" width="100" height="100">
             <button class="btn btn-primary" id="wmac3" type="submit" disabled>세탁기3</button>
           </div>
@@ -206,14 +206,14 @@
 
       if(btnClick2 == 1) { 
         TIMER2(); 
-        $('#wmac1').attr('disabled', 'disabled')
+        $('#wmac2').attr('disabled', 'disabled')
 
         console.log("btnClick2 is 1 AND start TIMER2()");
 
         setTimeout(function () {
           clearInterval(PLAYTIME2);
           btnClick2 = 0;
-          $('#wmac1').attr('disabled', '')
+          $('#wmac2').attr('disabled', '')
           window.location.reload()
 
           console.log("타이머2 삭제");

@@ -537,3 +537,9 @@ ddd - 모든 기기가 사용중이지 않을 때 첫 번째 사용자 -> wmac1 
 웨이팅 신청하고 사용하는 사람들 => 됨
 wmac과 버튼번호가 같은 경우 - 타이머 실행 및 db 수정됨 => 완료
 wmac과 버튼번호가 다른 경우 - bwaituse로 이동함 => 완료
+
+지점별 페이지 구현
+branchinfoB1,B2
+bwaituseB
+macStatusB
+wsitB 추가

@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reset-css@5.0.1/reset.min.css" />
+
+    <link rel="stylesheet" href="../public/css/nav.css">
+    <link rel="stylesheet" href="../public/css/macstatus.css">
+
+    <link rel="icon" href="/public/favicon.ico" />
+    <title>현황 확인(B지점)</title>
+
+  </head>
+  <body style="overflow-x: hidden;">
+
+    <%- include('nav.html') %>
+
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+
+    <div class="imgarea">
+
+      <div class="washarea">
+        <h2>세탁기</h2>
+        <form action="/macstatusB1" method="POST">
+          <div class="washmac">
+            <input id="Timer3" type="text" style="border:none; width:100px" value="" readonly/>
+            <img src="/public/image/wash-machine.png" alt="" width="100" height="100">
+            <button class="btn btn-primary" id="wmac1" type="submit">세탁기1</button>
+          </div>
+        </form>
+        <form action="/macstatusB2" method="POST">
+          <div class="washmac">
+            <input id="Timer4" type="text" style="border:none; width:100px" value="" readonly/>
+            <img src="/public/image/wash-machine.png" alt="" width="100" height="100">
+            <button class="btn btn-primary" id="wmac2" type="submit">세탁기2</button>
+          </div>
+        </form>
+        <form action="/macstatusA" method="POST">
+          <div class="washmac">
+            <input id="Timer6" type="text" style="border:none; width:100px" value="00 : 00" readonly/>
+            <img src="/public/image/wash-machine.png" alt="" width="100" height="100">
+            <button class="btn btn-primary" id="wmac3" type="submit" disabled>세탁기3</button>
+          </div>
+        </form>
+      </div>
+
+      <div class="dryarea">
+        <h2>건조기</h2>
+        <span>00:00</span>
+        <div class="drymac">
+          <img src="/public/image/dry-machine.png" alt="" width="120" height="100">
+          <button class="btn btn-primary" id="lmac1" type="submit" disabled>건조기1</button>
+        </div>
+        <span>00:00</span>
+        <div class="drymac">
+          <img src="/public/image/dry-machine.png" alt="" width="120" height="100">
+          <button class="btn btn-primary" id="lmac2" type="submit" disabled>건조기2</button>
+        </div>
+        <span>00:00</span>
+        <div class="drymac">
+          <img src="/public/image/dry-machine.png" alt="" width="120" height="100">
+          <button class="btn btn-primary" id="lmac3" type="submit" disabled>건조기3</button>
+        </div>
+      </div>
+
+      <button type="button" class="btn btn-primary gowait"><a href="/waitB">웨이팅 하러 가기</a></button>
+
+    </div>
+
+    <script>
+      //wmac1의 타이머3
+      const Timer3 = document.getElementById('Timer3');
+      let time3 = "<%= 시간3 %>";   
+      let min3 = "<%= 분3 %>";
+      let sec3 = "<%= 초3 %>";
+      let btnClick3 = "<%= 클릭여부3 %>"; 
+
+      Timer3.value = min3 + " : " + '00'; 
+      console.log("time3 : " + time3)
+      console.log("min3 : " + min3)
+      console.log("sec3 : " + sec3)
+
+      function TIMER3() {
+        PLAYTIME3 = setInterval(function () {
+          time3 = time3 - 1000;       //1초씩 감소
+          min3 = time3 / (60 * 1000);   //초를 분으로 나눔
+
+          if (sec3 > 0) {   //sec=60 에서 1씩 빼서 출력
+            sec3 = sec3 - 1;
+            Timer3.value = Math.floor(min3) + ':' + sec3;   //실수로 계산 > 소숫점 아래를 버리고 출력
+            console.log("타이머3 : " + Timer3.value);
+          }
+          if (sec3 == 0) {
+            //sec(60) 기준으로 0에서 -1하면 -59 출력
+            //따라서 0이면 sec을 60으로 변경하고, value는 0으로 출력
+            sec3 = 60;
+            Timer3.value = Math.floor(min3) + ':' + '00'
+            console.log("타이머3 : " + Timer3.value);
+          }
+        }, 1000)  //1초마다
+      }
+
+      //------------------------------------------------  
+      console.log("btnClick3 is 1 ?? > " + btnClick3);
+
+      if(btnClick3 == 1) { 
+        TIMER3(); 
+        $('#wmac1').attr('disabled', 'disabled')
+
+        console.log("btnClick3 is 1 AND start TIMER3()");
+
+        setTimeout(function () {
+          clearInterval(PLAYTIME3);
+          btnClick3 = 0;
+          $('#wmac1').attr('disabled', '')
+          window.location.reload()
+
+          console.log("타이머3 삭제");
+          console.log("btnClick3 is 0?? : " + btnClick3);
+          console.log("btnClick3 is 0 AND end TIMER3()");
+
+        }, time3);   //3분(180,000)되면 타이머 삭제
+      }
+      else {
+        console.log("btnClick3 is not 1, it is > " + btnClick3);
+      }
+    </script>
+
+
+    <script>
+      //wmac2의 타이머4
+      const Timer4 = document.getElementById('Timer4');
+      let time4 = "<%= 시간4 %>";   
+      let min4 = "<%= 분4 %>";
+      let sec4 = "<%= 초4 %>";
+      let btnClick4 = "<%= 클릭여부4 %>"; 
+
+      Timer4.value = min4 + " : " + '00'; 
+      console.log("time4 : " + time4)
+      console.log("min4 : " + min4)
+      console.log("sec4 : " + sec4)
+
+      function TIMER4() {
+        PLAYTIME4 = setInterval(function () {
+          time4 = time4 - 1000;       //1초씩 감소
+          min4 = time4 / (60 * 1000);   //초를 분으로 나눔
+
+          if (sec4 > 0) {   //sec=60 에서 1씩 빼서 출력
+            sec4 = sec4 - 1;
+            Timer4.value = Math.floor(min4) + ':' + sec4;   //실수로 계산 > 소숫점 아래를 버리고 출력
+            console.log("타이머4 : " + Timer4.value);
+          }
+          if (sec4 == 0) {
+            //sec(60) 기준으로 0에서 -1하면 -59 출력
+            //따라서 0이면 sec을 60으로 변경하고, value는 0으로 출력
+            sec4 = 60;
+            Timer4.value = Math.floor(min4) + ':' + '00'
+            console.log("타이머4 : " + Timer4.value);
+          }
+        }, 1000)  //1초마다
+      }
+
+      //------------------------------------------------
+      console.log("btnClick4 is 1 ?? > " + btnClick4);
+
+      if(btnClick4 == 1) { 
+        TIMER4(); 
+        $('#wmac2').attr('disabled', 'disabled')
+
+        console.log("btnClick4 is 1 AND start TIMER4()");
+
+        setTimeout(function () {
+          clearInterval(PLAYTIME4);
+          btnClick4 = 0;
+          $('#wmac2').attr('disabled', '')
+          window.location.reload()
+
+          console.log("타이머4 삭제");
+          console.log("btnClick4 is 0?? : " + btnClick4);
+          console.log("btnClick24 is 0 AND end TIMER4()");
+        }, time4);   //3분(180,000)되면 타이머 삭제
+      }
+      else {
+        console.log("btnClick4 is not 1, it is > " + btnClick4);
+      }
+    </script>
+
+
+    <!-- Optional JavaScript; choose one of the two! -->
+
+    <!-- Option 1: Bootstrap Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+
+    <!-- Option 2: Separate Popper and Bootstrap JS -->
+    <!--
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js" integrity="sha384-7+zCNj/IqJ95wo16oMtfsKbZ9ccEh31eOz1HGyDuCQ6wgnyJNSYdrPa03rtR1zdB" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js" integrity="sha384-QJHtvGhmr9XOIpI6YVutG+2QOK9T+ZnN4kzFN1RtK3zEFEIsxhlmWl5/YESvpZ13" crossorigin="anonymous"></script>
+    -->
+  </body>
+</html>
