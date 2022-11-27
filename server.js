@@ -241,9 +241,9 @@ let sec1, sec2;
 let btnClick1 = 0;    let btnClick2 = 0;    //branchinfo 버튼 클릭 여부
 
 function StartTimerA1() {
-  time1 = 120000;                   //setInterval(1000) = 1초인데, *3분(180초)하면 180,000
-  min1 = 1;
-  sec1 = 60;
+  time1 = 10000;                   //setInterval(1000) = 1초인데, *3분(180초)하면 180,000
+  min1 = 0;                    //1
+  sec1 = 10;                    //60
   function TIMER1() {
     PLAYTIME1 = setInterval(function () {
       btnClick1 = 1;               //branchinfo 버튼 클릭 여부(true)
@@ -294,13 +294,13 @@ function StartTimerA1() {
       console.log('StartTimerA1() >> db.branchUsage - A지점의 Wmac1이 false로 수정(즉, A지점 1번 세탁기 사용끝)')
     })
 
-  }, 120000);                      //3분(180,000)되면 타이머 삭제
+  }, 10000);                      //3분(180,000)되면 타이머 삭제
 }
 
 function StartTimerA2() {
-  time2 = 120000;                   //setInterval(1000) = 1초인데, *3분(180초)하면 180,000
-  min2 = 1;
-  sec2 = 60;
+  time2 = 10000;                   //setInterval(1000) = 1초인데, *3분(180초)하면 180,000
+  min2 = 0;
+  sec2 = 10;
   function TIMER2() {
     PLAYTIME2 = setInterval(function () {
       btnClick2 = 1;               //branchinfo 버튼 클릭 여부(true)
@@ -351,7 +351,7 @@ function StartTimerA2() {
       console.log('StartTimerA2() >> db.branchUsage - A지점의 Wmac2이 false로 수정(즉, A지점 2번 세탁기 사용끝)')
     })
 
-  }, 120000);                      //3분(180,000)되면 타이머 삭제
+  }, 10000);                      //3분(180,000)되면 타이머 삭제
 }
 // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
@@ -530,7 +530,7 @@ app.post('/macstatusA1', function(req, res) {
         console.log('/macstatusA1.post >> 모든 기기가 사용중이지 않아 그냥 기기 사용 가능(모든 기기 false)')
       }
       //모든 기기가 사용중일 때는 웨이팅 신청 가능하도록....
-      else{
+      else if(결과.isUseWmac1 == true && 결과.isUseWmac2 == true) { 
         // ------------------- 웨이팅 등록 최초 1회 -------------------
         //db.waitinfo에서 userid가 로그인한 유저의 id인 데이터를 조회
         db.collection('waitinfo').findOne({userid : req.user.id}, function(에러, 결과2) {
@@ -547,10 +547,10 @@ app.post('/macstatusA1', function(req, res) {
         //db.waitinfo에서 userid가 로그인한 유저의 id인 데이터를 조회
         db.collection('waitinfo').find({userid : req.user.id}).toArray(function(에러, 결과2) {
           if(에러) return done(에러)
-    
+          
           var 유저의웨이팅신청수 = 결과2.length
           console.log("/macstatusA1.post >> 1회 이상 - " + req.user.id + "의 웨이팅신청수(arr.length) : " + 유저의웨이팅신청수);
-    
+          
           var 찾았니
           var 찾은고유번호
           var 찾은기기번호
@@ -696,7 +696,7 @@ app.post('/macstatusA2', function(req, res) {
         console.log('/macstatusA2.post >> 모든 기기가 사용중이지 않아 그냥 기기 사용 가능(모든 기기 false)')
       }
       //모든 기기가 사용중일 때는 웨이팅 신청 가능하도록....
-      else{
+      else if(결과.isUseWmac1 == true && 결과.isUseWmac2 == true) { 
         // ------------------- 웨이팅 등록 최초 1회 -------------------
         //db.waitinfo에서 userid가 로그인한 유저의 id인 데이터를 조회
         db.collection('waitinfo').findOne({userid : req.user.id}, function(에러, 결과2) {
@@ -1137,6 +1137,22 @@ app.get('/branchinfo', function (req, res) {
 
 // 수정본 - 신청 시 부여된 myNumber 순서대로 웨이팅 사용 가능 (+추가예정 : 부여된 wmac로 웨이팅 사용 가능)
 app.post('/branchinfo', function(req, res) {
+  //웨이팅 신청 없이 사용하는 사람들
+  db.collection('waitinfo').find({userid : req.user.id}).toArray(function(에러, 결과2) {
+    var 찾은사용여부
+    for (let i = 0; i < 결과2.length; i++) {
+      찾은사용여부 = 결과2[i].isUseWait
+    }
+    console.log("/branchinfo.post >> 결과 >>")
+    console.log(결과2)
+
+    //웨이팅 신청없이 사용하는 경우
+    if(결과2.length == 0 || 찾은사용여부 == true) {
+      console.log("/branchinfo.post >> 웨이팅 신청 없이 사용하는 사람들")
+    }
+  })
+
+  //웨이팅 신청하고 사용하는 사람들
   // ------------------- 웨이팅 등록 최초 1회 -------------------
   //db.waitinfo에서 userid가 로그인한 유저의 id인 데이터를 조회
   db.collection('waitinfo').findOne({userid : req.user.id}, function(에러, 결과2) {
@@ -1210,7 +1226,6 @@ app.post('/branchinfo', function(req, res) {
           }
           else { 
             console.log("/branchinfo.post >> 찾은기기번호 != 선택한버튼")
-            //res.render('bwaituse.ejs')
             res.redirect('/bwaituse')
           }
 
@@ -1241,12 +1256,12 @@ app.post('/branchinfo', function(req, res) {
                   if(에러2){return console.log(에러2)}
 
                   console.log('/branchinfo.post >> 웨이팅 사용(isUseWait is true) 후 사용한 회원 관리(db.counter 수정) 성공')
-                  //return res.redirect('/')   //>>>>>>>>>>>>>>> redirect가 안먹혀서 /btncheckA1.post 시 redirect 추가
+                  res.redirect('/')   //>>>>>>>>>>>>>>> redirect가 안먹혀서 /btncheckA1.post 시 redirect 추가
 
                 })
               })
             }
-            else { res.redirect('/') }
+            //else { res.redirect('/') }
           })
         })
       }
@@ -1283,8 +1298,6 @@ app.post('/btncheck', function(req, res) {
 
 //branchinfoA1 버튼 클릭 확인 - A지점 wmac1
 app.post('/btncheckA1', function(req, res) {
-
-  res.redirect('/')
   console.log("/btncheckA1.post >> branchinfoA1 버튼 클릭")
 
   var 선택한버튼 = 1
@@ -1295,9 +1308,12 @@ app.post('/btncheckA1', function(req, res) {
       찾은기기번호 = 결과2[i].wmac
       찾은사용여부 = 결과2[i].isUseWait
     }
+    console.log("/btncheckA1.post >> 결과 >>")
+    console.log(결과2)
+    console.log("/btncheckA1.post >> 찾은사용여부 is true? : " + 찾은사용여부)
 
     //웨이팅 신청없이 사용하는 경우
-    if(결과2.length == null || 찾은사용여부 == true) {
+    if(결과2.length == 0 || 찾은사용여부 == true) {
       console.log("/btncheckA1.post >> 웨이팅 신청 없이 사용하는 사람들")
       console.log("/btncheckA1.post >> 타이머1 실행")
 
@@ -1309,10 +1325,12 @@ app.post('/btncheckA1', function(req, res) {
         if(에러){return console.log(에러)}
         console.log('/btncheckA1.post >> db.branchUsage - A지점의 Wmac1이 true로 수정(즉, A지점 1번 세탁기 사용중)')
       })
+
+      res.redirect('/')
     }
 
     //웨이팅 신청하고 사용하는 경우
-    if(찾은기기번호 == 선택한버튼){
+    else if(찾은기기번호 == 선택한버튼){
       console.log("/btncheckA1.post >> 찾은기기번호 == 선택한버튼")
       console.log("/btncheckA1.post >> 타이머1 실행")
 
@@ -1324,10 +1342,11 @@ app.post('/btncheckA1', function(req, res) {
         if(에러){return console.log(에러)}
         console.log('/btncheckA1.post >> db.branchUsage - A지점의 Wmac1이 true로 수정(즉, A지점 1번 세탁기 사용중)')
       })
+
+      res.redirect('/')
     }
-    else { 
+    else if(찾은기기번호 != 선택한버튼){ 
       console.log("/btncheckA1.post >> 찾은기기번호 != 선택한버튼")
-      //res.render('bwaituse.ejs')
       res.redirect('/bwaituse')
     }
 
@@ -1349,15 +1368,57 @@ app.post('/btncheckA1', function(req, res) {
 })
 //branchinfoA2 버튼 클릭 확인 - A지점 wmac2
 app.post('/btncheckA2', function(req, res) {
-  res.redirect('/')
-  console.log("/btncheckA2.post >> branchinfoA2 버튼 클릭 > 타이머2 실행")
+  console.log("/btncheckA2.post >> branchinfoA2 버튼 클릭")
 
-  //타이머 시작(server) - browser의 타이머2에 시간 전달
-  StartTimerA2(); 
+  var 선택한버튼 = 2
+  db.collection('waitinfo').find({userid : req.user.id}).toArray(function(에러, 결과2) {
+    var 찾은기기번호
+    var 찾은사용여부
+    for (let i = 0; i < 결과2.length; i++) {
+      찾은기기번호 = 결과2[i].wmac
+      찾은사용여부 = 결과2[i].isUseWait
+    }
+    console.log("/btncheckA1.post >> 결과 >>")
+    console.log(결과2)
+    console.log("/btncheckA1.post >> 찾은사용여부 is true? : " + 찾은사용여부)
 
-  //db.branchUsage에서 branchName이 A인 isUseWmac2를 true로 변경 => 사용중임
-  db.collection('branchUsage').updateOne({branchName : 'A'}, {$set : {isUseWmac2:true} }, function(에러, 결과){
-    if(에러){return console.log(에러)}
-    console.log('/btncheckA2.post >> db.branchUsage - A지점의 Wmac2가 true로 수정(즉, A지점 2번 세탁기 사용중)')
+    //웨이팅 신청없이 사용하는 경우
+    if(결과2.length == 0 || 찾은사용여부 == true) {
+      console.log("/btncheckA2.post >> 웨이팅 신청 없이 사용하는 사람들")
+      console.log("/btncheckA2.post >> 타이머2 실행")
+
+      //타이머 시작(server) - browser의 타이머2에 시간 전달
+      StartTimerA2();
+
+      //db.branchUsage에서 branchName이 A인 isUseWmac을 true로 변경 => 사용중임
+      db.collection('branchUsage').updateOne({branchName : 'A'}, {$set : {isUseWmac2:true} }, function(에러, 결과){
+        if(에러){return console.log(에러)}
+        console.log('/btncheckA2.post >> db.branchUsage - A지점의 Wmac2이 true로 수정(즉, A지점 2번 세탁기 사용중)')
+      })
+
+      res.redirect('/')
+    }
+
+    //웨이팅 신청하고 사용하는 경우
+    else if(찾은기기번호 == 선택한버튼){
+      console.log("/btncheckA2.post >> 찾은기기번호 == 선택한버튼")
+      console.log("/btncheckA2.post >> 타이머2 실행")
+
+      //타이머 시작(server) - browser의 타이머2에 시간 전달
+      StartTimerA2();
+
+      //db.branchUsage에서 branchName이 A인 isUseWmac을 true로 변경 => 사용중임
+      db.collection('branchUsage').updateOne({branchName : 'A'}, {$set : {isUseWmac2:true} }, function(에러, 결과){
+        if(에러){return console.log(에러)}
+        console.log('/btncheckA2.post >> db.branchUsage - A지점의 Wmac2이 true로 수정(즉, A지점 2번 세탁기 사용중)')
+      })
+
+      res.redirect('/')
+    }
+    else if(찾은기기번호 != 선택한버튼){ 
+      console.log("/btncheckA2.post >> 찾은기기번호 != 선택한버튼")
+      res.redirect('/bwaituse')
+    }
+
   })
 })

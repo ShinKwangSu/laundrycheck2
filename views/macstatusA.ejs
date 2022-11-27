@@ -146,11 +146,15 @@
 
       if(btnClick1 == 1) { 
         TIMER1(); 
+        $('#wmac1').attr('disabled', 'disabled')
+
         console.log("btnClick1 is 1 AND start TIMER1()");
 
         setTimeout(function () {
           clearInterval(PLAYTIME1);
           btnClick1 = 0;
+          $('#wmac1').attr('disabled', '')
+          window.location.reload()
 
           console.log("타이머1 삭제");
           console.log("btnClick1 is 0?? : " + btnClick1);
@@ -202,11 +206,15 @@
 
       if(btnClick2 == 1) { 
         TIMER2(); 
+        $('#wmac1').attr('disabled', 'disabled')
+
         console.log("btnClick2 is 1 AND start TIMER2()");
 
         setTimeout(function () {
           clearInterval(PLAYTIME2);
           btnClick2 = 0;
+          $('#wmac1').attr('disabled', '')
+          window.location.reload()
 
           console.log("타이머2 삭제");
           console.log("btnClick2 is 0?? : " + btnClick2);
