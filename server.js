@@ -1509,15 +1509,16 @@ app.get('/map', function(req, res) {
     if (에러) return console.log(에러)
 
     var store = new Array();
-    let name, lat, lng;
+    let name, lat, lng, path;
 
     for (let i = 0; i < 결과.length; i++) {
 
       name = 결과[i].name;
       lat = 결과[i].lat;
       lng = 결과[i].lng;
+      path = 결과[i].path
 
-      store[i] = {name, lat, lng};
+      store[i] = {name, lat, lng, path};
       
     }
     res.render('map.ejs', {store, KAKAO_MAP_KEY});

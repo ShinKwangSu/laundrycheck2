@@ -66,19 +66,23 @@
       var positions = [
         {
           title: '<%=store[0].name%>', 
-          latlng: new kakao.maps.LatLng('<%=store[0].lat%>', '<%=store[0].lng%>')
+          latlng: new kakao.maps.LatLng('<%=store[0].lat%>', '<%=store[0].lng%>'),
+          path: '<%=store[0].path%>'
         },
         {
           title: '<%=store[1].name%>', 
-          latlng: new kakao.maps.LatLng('<%=store[1].lat%>', '<%=store[1].lng%>')
+          latlng: new kakao.maps.LatLng('<%=store[1].lat%>', '<%=store[1].lng%>'),
+          path: '<%=store[1].path%>'
         },
         {
           title: '<%=store[2].name%>', 
-          latlng: new kakao.maps.LatLng('<%=store[2].lat%>', '<%=store[2].lng%>')
+          latlng: new kakao.maps.LatLng('<%=store[2].lat%>', '<%=store[2].lng%>'),
+          path: '<%=store[2].path%>'
         },
         {
           title: '<%=store[3].name%>', 
-          latlng: new kakao.maps.LatLng('<%=store[3].lat%>', '<%=store[3].lng%>')
+          latlng: new kakao.maps.LatLng('<%=store[3].lat%>', '<%=store[3].lng%>'),
+          path: '<%=store[3].path%>'
         }
       ]; 
       
@@ -117,7 +121,7 @@
             '                <div class="ellipsis">' +
             `                  ${data.title}` +
             '                </div>' + 
-            '                <div class="linkcenter"><a href="/macStatusB" target="_blank" class="link">현황확인 하러가기</a></div>' + 
+            `                <div class="linkcenter"><a href="${data.path}" target="_blank" class="link">현황확인 하러가기</a></div>` + 
             '              </div>' + 
             '          </div>' + 
             '      </div>' +    
