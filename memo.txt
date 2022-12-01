@@ -543,3 +543,14 @@ branchinfoB1,B2
 bwaituseB
 macStatusB
 wsitB 추가
+
+12/01 수정부분
+문제점
+기기 1번과 2번 모두 30초 이내로 남았을 때 30초에 더 가까운 기기로 배정됨
+
+해결방안
+waitcheck와 waitcheckb에 아래 코드 추가
+- Timer1과 Timer2 모두 30초보다 적게 남았을 때....!
+- Timer2보다 Timer1이 더 조금 남아 wmac을 0에서 1로 수정
+- Timer1보다 Timer2가 더 조금 남아 wmac을 0에서 2로 수정
+- Timer1과 Timer2이 모두 30초 이하로 남아 wmac을 0에서 1로 수정

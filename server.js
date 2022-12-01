@@ -213,19 +213,19 @@ app.get('/', function(req, res) {
 })
 
 //4. 메인페이지(socket)
-// app.get('/', function (req, res) {
-//   let flashmsg = req.flash()
-//   let feedback = flashmsg.success
+/* app.get('/', function (req, res) {
+  let flashmsg = req.flash()
+  let feedback = flashmsg.success
 
-//   if (feedback != 0) {
-//     if (!req.session.nickname) {
-//       res.render('socket.ejs', { session: "true", successRes: 'NOWELCOME', welcomeUser: 'NOWELCOME' });
-//     }
-//     else {
-//       res.render('socket.ejs', { session: "false", successRes: feedback, welcomeUser: req.user })
-//     }
-//   }
-// });
+  if (feedback != 0) {
+    if (!req.session.nickname) {
+      res.render('socket.ejs', { session: "true", successRes: 'NOWELCOME', welcomeUser: 'NOWELCOME' });
+    }
+    else {
+      res.render('socket.ejs', { session: "false", successRes: feedback, welcomeUser: req.user })
+    }
+  }
+}); */
 
 
 // 카운트다운 타이머>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
@@ -1036,7 +1036,7 @@ app.get('/waitB', isLogin, function(req, res) {
     db.collection('counter').findOne({name : '대기인원수2'}, function(에러, 결과){
       console.log("/waitB.get >> 웨이팅 총대기인원수 : " + 결과.totalWait) //결과.totalWait = 대기인원수
     
-      //찾은 데이터를 wait.ejs 안에 넣기
+      //찾은 데이터를 waitB.ejs 안에 넣기
       //req.user를 사용자라는 이름으로, 결과를 counters라는 이름으로 보내기
       res.render('waitB.ejs', {사용자 : req.user, counters : 결과})
     })
@@ -1222,6 +1222,26 @@ app.get('/waitcheck', isLogin, function(req, res) {
               console.log("/waitcheck.get >> Timer2이 30초 이하로 남아 wmac을 0에서 2로 수정")
             })
           }
+          else if((min1 == 0 && sec1 <= 30) || (min2 == 0 && sec2 <= 30)) { //추가
+            if(sec1 < sec2) {
+              //wmac을 1로 update하는 부분
+              db.collection('waitinfo').updateOne({userid : req.user.id}, {$set: {wmac:1} }, function(에러, 결과){
+                console.log("/waitcheck.get >> Timer2보다 Timer1이 더 조금 남아 wmac을 0에서 1로 수정")
+              })
+            }
+            else if(sec1 > sec2) {
+              //wmac을 2로 update하는 부분
+              db.collection('waitinfo').updateOne({userid : req.user.id}, {$set: {wmac:2} }, function(에러, 결과){
+                console.log("/waitcheck.get >> Timer1보다 Timer2가 더 조금 남아 wmac을 0에서 2로 수정")
+              })
+            }
+            else if(sec3 == sec4) {
+              //wmac을 2로 update하는 부분
+              db.collection('waitinfo').updateOne({userid : req.user.id}, {$set: {wmac:1} }, function(에러, 결과){
+                console.log("/waitcheck.get >> Timer1과 Timer2이 모두 30초 이하로 남아 wmac을 0에서 1로 수정")
+              })
+            }
+          }
           else if((min1 == undefined && sec1 == undefined) || (min2 == undefined && sec2 == undefined)) {
             //wmac을 1로 update하는 부분
             db.collection('waitinfo2').updateOne({userid : req.user.id}, {$set: {wmac:1} }, function(에러, 결과){
@@ -1332,6 +1352,26 @@ app.get('/waitcheckB', isLogin, function(req, res) {
             db.collection('waitinfo2').updateOne({userid : req.user.id}, {$set: {wmac:2} }, function(에러, 결과){
               console.log("/waitcheckB.get >> Timer4이 30초 이하로 남아 wmac을 0에서 2로 수정")
             })
+          }
+          else if((min3 == 0 && sec3 <= 30) || (min4 == 0 && sec4 <= 30)) { //추가
+            if(sec3 < sec4) {
+              //wmac을 1로 update하는 부분
+              db.collection('waitinfo2').updateOne({userid : req.user.id}, {$set: {wmac:1} }, function(에러, 결과){
+                console.log("/waitcheckB.get >> Timer4보다 Timer3이 더 조금 남아 wmac을 0에서 1로 수정")
+              })
+            }
+            else if(sec3 > sec4) {
+              //wmac을 2로 update하는 부분
+              db.collection('waitinfo2').updateOne({userid : req.user.id}, {$set: {wmac:2} }, function(에러, 결과){
+                console.log("/waitcheckB.get >> Timer3보다 Timer4가 더 조금 남아 wmac을 0에서 2로 수정")
+              })
+            }
+            else if(sec3 == sec4) {
+              //wmac을 2로 update하는 부분
+              db.collection('waitinfo2').updateOne({userid : req.user.id}, {$set: {wmac:1} }, function(에러, 결과){
+                console.log("/waitcheckB.get >> Timer1과 Timer2이 모두 30초 이하로 남아 wmac을 0에서 1로 수정")
+              })
+            }
           }
           else if((min3 == undefined && sec3 == undefined) || (min4 == undefined && sec4 == undefined)) {
             //wmac을 1로 update하는 부분
