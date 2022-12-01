@@ -237,7 +237,7 @@ let btnClick1 = 0;    let btnClick2 = 0;    //branchinfo 버튼 클릭 여부
 let btnClick3 = 0;    let btnClick4 = 0;
 
 function StartTimerA1() {
-  time1 = 10000;                  //setInterval(1000) = 1초인데, *3분(180초)하면 180,000
+  time1 = 60000;                  //setInterval(1000) = 1초인데, *3분(180초)하면 180,000
   min1 = 0;                       //1
   sec1 = 10;                      //60
   function TIMER1() {
@@ -246,8 +246,10 @@ function StartTimerA1() {
       time1 = time1 - 1000;         //1초씩 감소
       min1 = time1 / (60 * 1000);   //초를 분으로 나눔
   
-      if (sec1 > 0) {   //sec=60 에서 1씩 빼서 출력
-        min1 = Math.floor(min1);
+      if (sec1 > 0) {   
+        //실수로 계산 > 소숫점 아래를 버리고 출력
+        //sec=60 에서 1씩 빼서 출력
+        min1 = Math.floor(min1);  
         sec1 = sec1 - 1;
         
         console.log("StartTimerA1() >> 타이머1(??:??) " + min1 + ":" + sec1);
@@ -278,20 +280,22 @@ function StartTimerA1() {
       console.log('StartTimerA1() >> db.branchUsage - A지점의 Wmac1이 false로 수정(즉, A지점 1번 세탁기 사용끝)')
     })
 
-  }, 10000);                      //3분(180,000)되면 타이머 삭제
+  }, 60000);                      //3분(180,000)되면 타이머 삭제
 }
 
 function StartTimerA2() {
-  time2 = 10000;                   //setInterval(1000) = 1초인데, *3분(180초)하면 180,000
+  time2 = 60000;                   //setInterval(1000) = 1초인데, *3분(180초)하면 180,000
   min2 = 0;
-  sec2 = 10;
+  sec2 = 60;
   function TIMER2() {
     PLAYTIME2 = setInterval(function() {
       btnClick2 = 1;                //branchinfo 버튼 클릭 여부(true)
       time2 = time2 - 1000;         //1초씩 감소
       min2 = time2 / (60 * 1000);   //초를 분으로 나눔
   
-      if (sec2 > 0) {   //sec=60 에서 1씩 빼서 출력
+      if (sec2 > 0) {   
+        //실수로 계산 > 소숫점 아래를 버리고 출력
+        //sec=60 에서 1씩 빼서 출력
         min2 = Math.floor(min2);
         sec2 = sec2 - 1;
         
@@ -323,7 +327,7 @@ function StartTimerA2() {
       console.log('StartTimerA2() >> db.branchUsage - A지점의 Wmac2이 false로 수정(즉, A지점 2번 세탁기 사용끝)')
     })
 
-  }, 10000);                      //3분(180,000)되면 타이머 삭제
+  }, 60000);                      //3분(180,000)되면 타이머 삭제
 }
 
 function StartTimerB1() {
@@ -336,7 +340,9 @@ function StartTimerB1() {
       time3 = time3 - 1000;         //1초씩 감소
       min3 = time3 / (60 * 1000);   //초를 분으로 나눔
   
-      if (sec3 > 0) {               //sec=60 에서 1씩 빼서 출력
+      if (sec3 > 0) {               
+        //실수로 계산 > 소숫점 아래를 버리고 출력
+        //sec=60 에서 1씩 빼서 출력
         min3 = Math.floor(min3);
         sec3 = sec3 - 1;
         
@@ -381,7 +387,9 @@ function StartTimerB2() {
       time4 = time4 - 1000;         //1초씩 감소
       min4 = time4 / (60 * 1000);   //초를 분으로 나눔
   
-      if (sec4 > 0) {               //sec=60 에서 1씩 빼서 출력
+      if (sec4 > 0) {               
+        //실수로 계산 > 소숫점 아래를 버리고 출력
+        //sec=60 에서 1씩 빼서 출력
         min4 = Math.floor(min4);
         sec4 = sec4 - 1;
         
