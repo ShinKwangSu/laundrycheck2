@@ -213,19 +213,19 @@ app.get('/', function(req, res) {
 })
 
 //4. 메인페이지(socket)
-// app.get('/', function (req, res) {
-//   let flashmsg = req.flash()
-//   let feedback = flashmsg.success
+/* app.get('/', function (req, res) {
+  let flashmsg = req.flash()
+  let feedback = flashmsg.success
 
-//   if (feedback != 0) {
-//     if (!req.session.nickname) {
-//       res.render('socket.ejs', { session: "true", successRes: 'NOWELCOME', welcomeUser: 'NOWELCOME' });
-//     }
-//     else {
-//       res.render('socket.ejs', { session: "false", successRes: feedback, welcomeUser: req.user })
-//     }
-//   }
-// });
+  if (feedback != 0) {
+    if (!req.session.nickname) {
+      res.render('socket.ejs', { session: "true", successRes: 'NOWELCOME', welcomeUser: 'NOWELCOME' });
+    }
+    else {
+      res.render('socket.ejs', { session: "false", successRes: feedback, welcomeUser: req.user })
+    }
+  }
+}); */
 
 
 // 카운트다운 타이머>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
@@ -237,17 +237,20 @@ let btnClick1 = 0;    let btnClick2 = 0;    //branchinfo 버튼 클릭 여부
 let btnClick3 = 0;    let btnClick4 = 0;
 
 function StartTimerA1() {
-  time1 = 10000;                  //setInterval(1000) = 1초인데, *3분(180초)하면 180,000
-  min1 = 0;                       //1
-  sec1 = 10;                      //60
+  time1 = 60000;                  //setInterval(1000) = 1초 -> 1분(60초)은 60000으로 총시간은 60000으로 선언
+  min1 = 1;                       //카운트다운 타이머를 구현하기 위해 min은 1, sec은 60으로 선언
+  sec1 = 60;                      //60
+
   function TIMER1() {
-    PLAYTIME1 = setInterval(function() {
-      btnClick1 = 1;               //branchinfo 버튼 클릭 여부(true)
+    PLAYTIME1 = setInterval(function() {  //1초에 한번씩 반복되는 setInterval() 사용
+      btnClick1 = 1;                //branchinfo 버튼 클릭 여부(true)
       time1 = time1 - 1000;         //1초씩 감소
       min1 = time1 / (60 * 1000);   //초를 분으로 나눔
   
-      if (sec1 > 0) {   //sec=60 에서 1씩 빼서 출력
-        min1 = Math.floor(min1);
+      if (sec1 > 0) {   
+        //실수로 계산 > 소숫점 아래를 버리고 출력
+        //sec=60 에서 1씩 빼서 출력
+        min1 = Math.floor(min1);  
         sec1 = sec1 - 1;
         
         console.log("StartTimerA1() >> 타이머1(??:??) " + min1 + ":" + sec1);
@@ -260,38 +263,41 @@ function StartTimerA1() {
 
         console.log("StartTimerA1() >> 타이머1(??:??) " + min1 + ":" + sec1);
       }
-    }, 1000)  //1초마다
+    }, 1000)  //1초마다 실행
   }
   
   TIMER1();
 
   setTimeout(function () {
     clearInterval(PLAYTIME1);
-    btnClick1 = 0;                    //branchinfo 버튼 클릭 여부(false)
+    btnClick1 = 0;                   //branchinfo 버튼 클릭 여부(false)
 
     console.log("StartTimerA1() >> 타이머1 삭제");
     console.log("StartTimerA1() >> btnClick1 is 0?: " + btnClick1);
 
-    //서버의 타이머1이 삭제될 때 db.branchUsage에서 branchName이 A인 isUseWmac1을 false로 변경 => 사용중아님
+    //서버의 타이머1이 삭제될 때
+    //db.branchUsage에서 branchName이 A인 isUseWmac1을 false로 변경 => 사용중아님
     db.collection('branchUsage').updateOne({branchName : 'A'}, {$set : {isUseWmac1:false} }, function(에러, 결과){
       if(에러){return console.log(에러)}
       console.log('StartTimerA1() >> db.branchUsage - A지점의 Wmac1이 false로 수정(즉, A지점 1번 세탁기 사용끝)')
     })
 
-  }, 10000);                      //3분(180,000)되면 타이머 삭제
+  }, 60000);                      //1분(60000)되면 타이머 삭제
 }
 
 function StartTimerA2() {
-  time2 = 10000;                   //setInterval(1000) = 1초인데, *3분(180초)하면 180,000
-  min2 = 0;
-  sec2 = 10;
+  time2 = 60000;                   //setInterval(1000) = 1초인데, *3분(180초)하면 180,000
+  min2 = 1;
+  sec2 = 60;
   function TIMER2() {
     PLAYTIME2 = setInterval(function() {
       btnClick2 = 1;                //branchinfo 버튼 클릭 여부(true)
       time2 = time2 - 1000;         //1초씩 감소
       min2 = time2 / (60 * 1000);   //초를 분으로 나눔
   
-      if (sec2 > 0) {   //sec=60 에서 1씩 빼서 출력
+      if (sec2 > 0) {   
+        //실수로 계산 > 소숫점 아래를 버리고 출력
+        //sec=60 에서 1씩 빼서 출력
         min2 = Math.floor(min2);
         sec2 = sec2 - 1;
         
@@ -323,7 +329,7 @@ function StartTimerA2() {
       console.log('StartTimerA2() >> db.branchUsage - A지점의 Wmac2이 false로 수정(즉, A지점 2번 세탁기 사용끝)')
     })
 
-  }, 10000);                      //3분(180,000)되면 타이머 삭제
+  }, 60000);                      //3분(180,000)되면 타이머 삭제
 }
 
 function StartTimerB1() {
@@ -336,7 +342,9 @@ function StartTimerB1() {
       time3 = time3 - 1000;         //1초씩 감소
       min3 = time3 / (60 * 1000);   //초를 분으로 나눔
   
-      if (sec3 > 0) {               //sec=60 에서 1씩 빼서 출력
+      if (sec3 > 0) {               
+        //실수로 계산 > 소숫점 아래를 버리고 출력
+        //sec=60 에서 1씩 빼서 출력
         min3 = Math.floor(min3);
         sec3 = sec3 - 1;
         
@@ -381,7 +389,9 @@ function StartTimerB2() {
       time4 = time4 - 1000;         //1초씩 감소
       min4 = time4 / (60 * 1000);   //초를 분으로 나눔
   
-      if (sec4 > 0) {               //sec=60 에서 1씩 빼서 출력
+      if (sec4 > 0) {               
+        //실수로 계산 > 소숫점 아래를 버리고 출력
+        //sec=60 에서 1씩 빼서 출력
         min4 = Math.floor(min4);
         sec4 = sec4 - 1;
         
@@ -1036,7 +1046,7 @@ app.get('/waitB', isLogin, function(req, res) {
     db.collection('counter').findOne({name : '대기인원수2'}, function(에러, 결과){
       console.log("/waitB.get >> 웨이팅 총대기인원수 : " + 결과.totalWait) //결과.totalWait = 대기인원수
     
-      //찾은 데이터를 wait.ejs 안에 넣기
+      //찾은 데이터를 waitB.ejs 안에 넣기
       //req.user를 사용자라는 이름으로, 결과를 counters라는 이름으로 보내기
       res.render('waitB.ejs', {사용자 : req.user, counters : 결과})
     })
@@ -1222,6 +1232,26 @@ app.get('/waitcheck', isLogin, function(req, res) {
               console.log("/waitcheck.get >> Timer2이 30초 이하로 남아 wmac을 0에서 2로 수정")
             })
           }
+          else if((min1 == 0 && sec1 <= 30) || (min2 == 0 && sec2 <= 30)) { //추가
+            if(sec1 < sec2) {
+              //wmac을 1로 update하는 부분
+              db.collection('waitinfo').updateOne({userid : req.user.id}, {$set: {wmac:1} }, function(에러, 결과){
+                console.log("/waitcheck.get >> Timer2보다 Timer1이 더 조금 남아 wmac을 0에서 1로 수정")
+              })
+            }
+            else if(sec1 > sec2) {
+              //wmac을 2로 update하는 부분
+              db.collection('waitinfo').updateOne({userid : req.user.id}, {$set: {wmac:2} }, function(에러, 결과){
+                console.log("/waitcheck.get >> Timer1보다 Timer2가 더 조금 남아 wmac을 0에서 2로 수정")
+              })
+            }
+            else if(sec3 == sec4) {
+              //wmac을 2로 update하는 부분
+              db.collection('waitinfo').updateOne({userid : req.user.id}, {$set: {wmac:1} }, function(에러, 결과){
+                console.log("/waitcheck.get >> Timer1과 Timer2이 모두 30초 이하로 남아 wmac을 0에서 1로 수정")
+              })
+            }
+          }
           else if((min1 == undefined && sec1 == undefined) || (min2 == undefined && sec2 == undefined)) {
             //wmac을 1로 update하는 부분
             db.collection('waitinfo2').updateOne({userid : req.user.id}, {$set: {wmac:1} }, function(에러, 결과){
@@ -1332,6 +1362,26 @@ app.get('/waitcheckB', isLogin, function(req, res) {
             db.collection('waitinfo2').updateOne({userid : req.user.id}, {$set: {wmac:2} }, function(에러, 결과){
               console.log("/waitcheckB.get >> Timer4이 30초 이하로 남아 wmac을 0에서 2로 수정")
             })
+          }
+          else if((min3 == 0 && sec3 <= 30) || (min4 == 0 && sec4 <= 30)) { //추가
+            if(sec3 < sec4) {
+              //wmac을 1로 update하는 부분
+              db.collection('waitinfo2').updateOne({userid : req.user.id}, {$set: {wmac:1} }, function(에러, 결과){
+                console.log("/waitcheckB.get >> Timer4보다 Timer3이 더 조금 남아 wmac을 0에서 1로 수정")
+              })
+            }
+            else if(sec3 > sec4) {
+              //wmac을 2로 update하는 부분
+              db.collection('waitinfo2').updateOne({userid : req.user.id}, {$set: {wmac:2} }, function(에러, 결과){
+                console.log("/waitcheckB.get >> Timer3보다 Timer4가 더 조금 남아 wmac을 0에서 2로 수정")
+              })
+            }
+            else if(sec3 == sec4) {
+              //wmac을 2로 update하는 부분
+              db.collection('waitinfo2').updateOne({userid : req.user.id}, {$set: {wmac:1} }, function(에러, 결과){
+                console.log("/waitcheckB.get >> Timer1과 Timer2이 모두 30초 이하로 남아 wmac을 0에서 1로 수정")
+              })
+            }
           }
           else if((min3 == undefined && sec3 == undefined) || (min4 == undefined && sec4 == undefined)) {
             //wmac을 1로 update하는 부분
