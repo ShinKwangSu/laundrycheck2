@@ -237,12 +237,13 @@ let btnClick1 = 0;    let btnClick2 = 0;    //branchinfo 버튼 클릭 여부
 let btnClick3 = 0;    let btnClick4 = 0;
 
 function StartTimerA1() {
-  time1 = 60000;                  //setInterval(1000) = 1초인데, *3분(180초)하면 180,000
-  min1 = 0;                       //1
-  sec1 = 10;                      //60
+  time1 = 60000;                  //setInterval(1000) = 1초 -> 1분(60초)은 60000으로 총시간은 60000으로 선언
+  min1 = 1;                       //카운트다운 타이머를 구현하기 위해 min은 1, sec은 60으로 선언
+  sec1 = 60;                      //60
+
   function TIMER1() {
-    PLAYTIME1 = setInterval(function() {
-      btnClick1 = 1;               //branchinfo 버튼 클릭 여부(true)
+    PLAYTIME1 = setInterval(function() {  //1초에 한번씩 반복되는 setInterval() 사용
+      btnClick1 = 1;                //branchinfo 버튼 클릭 여부(true)
       time1 = time1 - 1000;         //1초씩 감소
       min1 = time1 / (60 * 1000);   //초를 분으로 나눔
   
@@ -262,30 +263,31 @@ function StartTimerA1() {
 
         console.log("StartTimerA1() >> 타이머1(??:??) " + min1 + ":" + sec1);
       }
-    }, 1000)  //1초마다
+    }, 1000)  //1초마다 실행
   }
   
   TIMER1();
 
   setTimeout(function () {
     clearInterval(PLAYTIME1);
-    btnClick1 = 0;                    //branchinfo 버튼 클릭 여부(false)
+    btnClick1 = 0;                   //branchinfo 버튼 클릭 여부(false)
 
     console.log("StartTimerA1() >> 타이머1 삭제");
     console.log("StartTimerA1() >> btnClick1 is 0?: " + btnClick1);
 
-    //서버의 타이머1이 삭제될 때 db.branchUsage에서 branchName이 A인 isUseWmac1을 false로 변경 => 사용중아님
+    //서버의 타이머1이 삭제될 때
+    //db.branchUsage에서 branchName이 A인 isUseWmac1을 false로 변경 => 사용중아님
     db.collection('branchUsage').updateOne({branchName : 'A'}, {$set : {isUseWmac1:false} }, function(에러, 결과){
       if(에러){return console.log(에러)}
       console.log('StartTimerA1() >> db.branchUsage - A지점의 Wmac1이 false로 수정(즉, A지점 1번 세탁기 사용끝)')
     })
 
-  }, 60000);                      //3분(180,000)되면 타이머 삭제
+  }, 60000);                      //1분(60000)되면 타이머 삭제
 }
 
 function StartTimerA2() {
   time2 = 60000;                   //setInterval(1000) = 1초인데, *3분(180초)하면 180,000
-  min2 = 0;
+  min2 = 1;
   sec2 = 60;
   function TIMER2() {
     PLAYTIME2 = setInterval(function() {
