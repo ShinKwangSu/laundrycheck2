@@ -1245,7 +1245,7 @@ app.get('/waitcheck', isLogin, function(req, res) {
                 console.log("/waitcheck.get >> Timer1보다 Timer2가 더 조금 남아 wmac을 0에서 2로 수정")
               })
             }
-            else if(sec3 == sec4) {
+            else if(sec1 == sec2) {
               //wmac을 2로 update하는 부분
               db.collection('waitinfo').updateOne({userid : req.user.id}, {$set: {wmac:1} }, function(에러, 결과){
                 console.log("/waitcheck.get >> Timer1과 Timer2이 모두 30초 이하로 남아 wmac을 0에서 1로 수정")
@@ -1254,7 +1254,7 @@ app.get('/waitcheck', isLogin, function(req, res) {
           }
           else if((min1 == undefined && sec1 == undefined) || (min2 == undefined && sec2 == undefined)) {
             //wmac을 1로 update하는 부분
-            db.collection('waitinfo2').updateOne({userid : req.user.id}, {$set: {wmac:1} }, function(에러, 결과){
+            db.collection('waitinfo').updateOne({userid : req.user.id}, {$set: {wmac:1} }, function(에러, 결과){
               console.log("/waitcheck.get >> Timer1과 Timer2가 모두 진행중이지 않아 wmac을 0에서 1로 수정")
             })
           }
